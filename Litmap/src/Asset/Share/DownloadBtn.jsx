@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Panel,
-  useReactFlow,
-  getRectOfNodes,
-  getTransformForBounds,
-} from "reactflow";
+import { useReactFlow, getRectOfNodes, getTransformForBounds } from "reactflow";
 import { toPng } from "html-to-image";
 
 function DownloadButton(props) {
@@ -46,14 +41,14 @@ function DownloadButton(props) {
       .then(function (dataUrl) {
         var img = new Image();
         img.src = dataUrl; // img태그의 src에 저장
-        setUrl([img, img.src]);
+        setUrl(img.src);
       })
       .catch(function (error) {
         console.error(error);
       });
   }
   /* 다운버튼 클릭 시 */
-  const onClick = () => {
+  const downImg = () => {
     downloadImage(imgUrl);
   };
 
@@ -62,13 +57,7 @@ function DownloadButton(props) {
   });
 
   return (
-    <button
-      className="download-btn"
-      onClick={
-        // DownImg
-        console.log(imgUrl)
-      }
-    >
+    <button className="download-btn" onClick={downImg}>
       png로 저장
     </button>
   );
