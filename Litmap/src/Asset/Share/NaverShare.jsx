@@ -4,7 +4,6 @@ export default function NaverShare() {
     var title = encodeURI("릿맵");
     var shareURL =
       "https://share.naver.com/web/shareView?url=" + url + "&title=" + title;
-    // document.location = shareURL;
     window.open(shareURL);
   }
   return (
