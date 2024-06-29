@@ -6,7 +6,6 @@ export default function Card() {
       <p>성별</p>
       <p>배우이름</p>
       <p>상세설명</p>
-      <p>안녕</p>
     </div>
   );
 }
