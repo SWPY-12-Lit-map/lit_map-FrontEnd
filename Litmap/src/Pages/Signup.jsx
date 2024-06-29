@@ -116,17 +116,14 @@ const SignupPage = () => {
                                 maxLength={10}
                                 required={!isIndividualAuthor}
                             />
-                        </label>
-                    </FormField>
-
-                    <FormField>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={isIndividualAuthor}
-                                onChange={(e) => setIsIndividualAuthor(e.target.checked)}
-                            />
-                            사업자 없는 경우(1인작가)
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={isIndividualAuthor}
+                                    onChange={(e) => setIsIndividualAuthor(e.target.checked)}
+                                />
+                                사업자 없는 경우(1인작가)
+                            </label>
                         </label>
                     </FormField>
 
@@ -139,17 +136,14 @@ const SignupPage = () => {
                                 onChange={(e) => setRepresentativeName(e.target.value)}
                                 required
                             />
-                        </label>
-                    </FormField>
-
-                    <FormField>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={isCoOwner}
-                                onChange={(e) => setIsCoOwner(e.target.checked)}
-                            />
-                            공동인 경우 체크
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={isCoOwner}
+                                    onChange={(e) => setIsCoOwner(e.target.checked)}
+                                />
+                                공동인 경우 체크
+                            </label>
                         </label>
                     </FormField>
 
@@ -166,7 +160,6 @@ const SignupPage = () => {
                             </label>
                         </FormField>
                     )}
-
 
                     <FormField>
                         <label>
