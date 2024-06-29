@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import KakaoShare from "./KakaoShare";
-import DownloadButton from "./DownloadBtn";
+import DownloadImg from "./DownloadImg";
 import Copy from "./Copy";
 import NaverShare from "./NaverShare";
 
@@ -22,7 +22,7 @@ function Drop(props) {
       </Modal.Header>
       <div>
         <KakaoShare imgUrl={imgUrl}></KakaoShare>
-        <DownloadButton imgUrl={imgUrl} setUrl={setUrl}></DownloadButton>
+        <DownloadImg imgUrl={imgUrl} setUrl={setUrl}></DownloadImg>
         <Copy imgUrl={imgUrl}></Copy>
         <NaverShare></NaverShare>
       </div>

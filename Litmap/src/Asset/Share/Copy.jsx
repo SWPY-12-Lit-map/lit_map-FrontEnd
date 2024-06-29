@@ -1,16 +1,19 @@
-import CopytoClipboard from "react-copy-to-clipboard";
+import { copyImageToClipboard } from "copy-image-clipboard";
 
 export default function Copy(props) {
   const imgUrl = props.imgUrl;
-
+  const pngCopy = () => {
+    copyImageToClipboard(imgUrl)
+      .then(() => {
+        alert("완료!");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   return (
-    <CopytoClipboard
-      text={imgUrl}
-      onCopy={() => {
-        alert("복사완료");
-      }}
-    >
-      <button>클립보드에 복사하기</button>
-    </CopytoClipboard>
+    <div>
+      <button onClick={pngCopy}>클립보드에 복사하기</button>
+    </div>
   );
 }

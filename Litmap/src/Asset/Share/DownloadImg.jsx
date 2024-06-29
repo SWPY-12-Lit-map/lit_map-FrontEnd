@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useReactFlow, getRectOfNodes, getTransformForBounds } from "reactflow";
 import { toPng } from "html-to-image";
 
-function DownloadButton(props) {
+export default function DownloadImg(props) {
   const { getNodes } = useReactFlow();
   const imageWidth = 1024;
   const imageHeight = 768;
@@ -12,7 +12,7 @@ function DownloadButton(props) {
   /* 이미지 다운 */
   function downloadImage(dataUrl) {
     const a = document.createElement("a");
-    a.setAttribute("download", "reactflow.png");
+    a.setAttribute("download", "인물관계도.png");
     a.setAttribute("href", dataUrl);
     a.click();
   }
@@ -62,5 +62,3 @@ function DownloadButton(props) {
     </button>
   );
 }
-
-export default DownloadButton;
