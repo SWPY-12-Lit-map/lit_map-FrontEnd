@@ -3,6 +3,10 @@ import { useStore, getStraightPath } from 'reactflow';
 
 import { getEdgeParams } from './util';
 
+function getAngle(sx, sy, tx, ty) {
+  return Math.atan2(ty - sy, tx - sx) * (180 / Math.PI);
+}
+
 function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextChange, selected }) {
   const sourceNode = useStore(
     useCallback((store) => store.nodeInternals.get(source), [source])
@@ -32,6 +36,8 @@ function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextC
     targetY: ty,
   });
 
+  const angle = getAngle(sx, sy, tx, ty);
+
   const handleTextChange = (event) => {
     const newText = event.target.value;
     setText(newText);
@@ -58,6 +64,7 @@ function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextC
         height={30}
         x={labelX - 50}
         y={labelY - 15}
+        transform={`rotate(${angle}, ${labelX}, ${labelY})`}
         requiredExtensions="http://www.w3.org/1999/xhtml"
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
