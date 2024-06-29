@@ -4,6 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import KakaoShare from "./KakaoShare";
 import DownloadButton from "./DownloadBtn";
 import Copy from "./Copy";
+import NaverShare from "./NaverShare";
 
 function Drop(props) {
   const [imgUrl, setUrl] = useState([]);
@@ -23,6 +24,7 @@ function Drop(props) {
         <KakaoShare imgUrl={imgUrl}></KakaoShare>
         <DownloadButton imgUrl={imgUrl} setUrl={setUrl}></DownloadButton>
         <Copy imgUrl={imgUrl}></Copy>
+        <NaverShare></NaverShare>
       </div>
       <Modal.Footer>
         <Button onClick={props.onHide}>닫기</Button>
