@@ -6,14 +6,12 @@ const Nav = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--background-color);
     margin: 5px;
 `;
 
 const NavLogo = styled.div`
     display: flex;
     font-size: 24px;
-    color: var(--text-color);
     margin-right: 20px;
 
     @media all and (max-width: 960px) {
@@ -40,8 +38,6 @@ const NavMenuItem = styled.li`
     padding: 20px 15px;
 
     &:hover {
-        color: var(--background-color);
-        background-color: var(--accent-color);
         border-radius: 4px;
     }
 `;
@@ -64,10 +60,6 @@ const NavLoginItem = styled.li`
 const StyledLink = styled(Link)`
     text-decoration: none;
     color: black;
-
-    &:hover {
-        color: var(--accent-color);
-    }
 `;
 
 const LoginButton = styled(StyledLink)`
