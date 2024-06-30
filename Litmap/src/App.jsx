@@ -1,12 +1,18 @@
-import Connection from "./Pages/Connection";
-import Signup from "./Pages/Signup";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './Pages/Navbar';
+import Connection from './Pages/Connection';
+import Signup from './Pages/Signup';
 
 function App() {
   return (
-    <>
-      <Connection></Connection>
-      <Signup />
-    </>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Connection />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </Router>
   );
 }
 

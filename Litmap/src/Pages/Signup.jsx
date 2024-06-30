@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const SignupContainer = styled.div`
-    margin-top: 50px;
+    margin-left: 50px;
 `;
 
 const FormField = styled.div`
