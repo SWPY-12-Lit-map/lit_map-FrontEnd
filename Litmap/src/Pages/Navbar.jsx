@@ -80,8 +80,8 @@ function Navbar() {
                 <LogoImg src="/litmap.png" alt="로고" />
             </NavLogo>
             <NavMenu>
-                <NavMenuItem>홈</NavMenuItem>
-                <NavMenuItem>카테고리1</NavMenuItem>
+                <NavMenuItem><StyledLink to="/">홈</StyledLink></NavMenuItem>
+                <NavMenuItem><StyledLink to="/category1">카테고리1</StyledLink></NavMenuItem>
                 <NavMenuItem>카테고리2</NavMenuItem>
             </NavMenu>
             <NavLogin>
