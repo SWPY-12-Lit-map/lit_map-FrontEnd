@@ -33,7 +33,7 @@ function Drop(props) {
   );
 }
 
-export default function Dropping() {
+export default function ModalBtn() {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (

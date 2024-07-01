@@ -14,29 +14,14 @@ import CustomConnectionLine from "./CustomConnectionLine";
 
 import "reactflow/dist/style.css";
 import "./style.css";
+import styled from "styled-components";
 
-const initialNodes = [
-  {
-    id: "1",
-    type: "custom",
-    position: { x: 0, y: 0 },
-  },
-  {
-    id: "2",
-    type: "custom",
-    position: { x: 300, y: 0 },
-  },
-  {
-    id: "3",
-    type: "custom",
-    position: { x: 0, y: 300 },
-  },
-  {
-    id: "4",
-    type: "custom",
-    position: { x: 300, y: 300 },
-  },
-];
+const Mapping = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+const initialNodes = [];
 
 const initialEdges = [];
 
@@ -69,6 +54,16 @@ const Mindmap = (props) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
+  const count = props.count;
+  const createNodes = useCallback(() => {
+    const newNodes = [...Array(parseInt(count))].map((_, i) => ({
+      id: `${i}`,
+      type: "custom",
+      position: { x: (i + 5) * 100, y: (i + 5) * 100 },
+    }));
+    setNodes((nds) => [...nds, ...newNodes]);
+  }, [count, setNodes]);
+
   const onConnect = useCallback(
     (params) =>
       setEdges((eds) => addEdge({ ...params, data: { text: "" } }, eds)),
@@ -98,6 +93,7 @@ const Mindmap = (props) => {
   }, []);
 
   useEffect(() => {
+    createNodes();
     const handleKeyDown = (event) => {
       if (event.key === "Delete" && selectedEdgeId) {
         setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
@@ -112,7 +108,7 @@ const Mindmap = (props) => {
   }, [selectedEdgeId]);
 
   return (
-    <>
+    <Mapping>
       <ReactFlow
         nodes={nodes}
         edges={edges.map((edge) => ({
@@ -139,7 +135,7 @@ const Mindmap = (props) => {
         <Controls />
         <MiniMap />
       </ReactFlow>
-    </>
+    </Mapping>
   );
 };
 

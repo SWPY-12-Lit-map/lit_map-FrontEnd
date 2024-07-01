@@ -1,9 +1,9 @@
-import Connection from "./Pages/Connection";
+import Post from "./Pages/Post";
 
 function App() {
   return (
     <>
-      <Connection></Connection>
+      <Post></Post>
     </>
   );
 }
