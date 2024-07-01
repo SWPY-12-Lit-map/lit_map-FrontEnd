@@ -1,10 +1,20 @@
-import Post from "./Pages/Post";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Navbar from "./Pages/Navbar";
+import Connection from "./Pages/Connection";
+import Signup from "./Pages/Signup";
+import Home from "./Pages/Home";
 
 function App() {
   return (
-    <>
-      <Post></Post>
-    </>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/category1" element={<Connection />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </Router>
   );
 }
 
