@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import styled from "styled-components";
@@ -27,39 +27,28 @@ const EditInfo = styled.div`
 export default function EditCharacter(props) {
   const count = props.count;
   const setCount = props.setCount;
-  const nextId = useRef(0);
-  const [infos, setInfo] = useState({
-    name: "",
-    // species,
-  });
-
-  const [data, setData] = useState([{}]);
+  const infos = props.infos;
+  const setInfos = props.setInfos;
 
   /* 이미지 업로드 */
-  const UploadImg = () => {
-    const [img, setImg] = useState(null);
-
+  const UploadImg = ({ index }) => {
     const fileUpload = (e) => {
-      const file = e.target.files[0]; // 첫번째 업로드 한 사진 불러오기
+      const file = e.target.files[0];
       const imgUrl = URL.createObjectURL(file);
-      setImg(imgUrl);
+
+      const updatedInfos = infos.map((info, i) =>
+        i === index ? { ...info, img: imgUrl } : info
+      );
+      setInfos(updatedInfos);
     };
 
     return (
       <div>
-        {img == null ? (
-          <Image
-            src={basicImg}
-            style={{ width: "100px", height: "100px" }}
-            roundedCircle
-          />
-        ) : (
-          <Image
-            src={img}
-            style={{ width: "100px", height: "100px" }}
-            roundedCircle
-          />
-        )}
+        <Image
+          src={infos[index].img || basicImg}
+          style={{ width: "100px", height: "100px" }}
+          roundedCircle
+        />
         <input
           title="프로필 업로드"
           type="file"
@@ -70,72 +59,123 @@ export default function EditCharacter(props) {
     );
   };
 
-  function ChangeDrop(e, a) {
-    document.querySelector(`#${a}`).innerHTML = e.target.text;
+  function ChangeDrop(e, key, index) {
+    const updatedInfos = infos.map((info, i) =>
+      i === index ? { ...info, [key]: e.target.text } : info
+    );
+    setInfos(updatedInfos);
   }
+
+  const inputChange = (e, data, index) => {
+    const updatedInfos = infos.map((info, i) =>
+      i === index ? { ...info, [data]: e.target.value } : info
+    );
+    setInfos(updatedInfos);
+    console.log(infos);
+  };
 
   return (
     <EditInfo>
-      {[...Array(parseInt(count))].map((n, i) => {
-        return (
-          <Card key={i} id={i}>
-            <UploadImg index={i}></UploadImg>
-            <Card.Body>
-              <Card.Title>캐릭터 정보를 입력하세요</Card.Title>
-              <input placeholder="이름"></input>
-              <DropdownButton
-                id="species"
-                title="인간/동물/사물 중 선택하세요"
-                variant="none"
-              >
-                {["인간", "동물", "사물"].map((selected, i) => {
-                  return (
-                    <Dropdown.Item
-                      key={i}
-                      onClick={(e) => {
-                        ChangeDrop(e, "species");
-                      }}
-                    >
-                      {selected}
-                    </Dropdown.Item>
-                  );
-                })}
-              </DropdownButton>
-              <DropdownButton id="main" title="주/조연 선택" variant="none">
-                {["주연", "조연"].map((main, i) => {
-                  return (
-                    <Dropdown.Item
-                      key={i}
-                      onClick={(e) => {
-                        ChangeDrop(e, "main");
-                      }}
-                    >
-                      {main}
-                    </Dropdown.Item>
-                  );
-                })}
-              </DropdownButton>
-              <DropdownButton id="gender" title="성별" variant="none">
-                {["남성", "여성"].map((main, i) => {
-                  return (
-                    <Dropdown.Item
-                      key={i}
-                      onClick={(e) => {
-                        ChangeDrop(e, "gender");
-                      }}
-                    >
-                      {main}
-                    </Dropdown.Item>
-                  );
-                })}
-              </DropdownButton>
-              <input placeholder="나이"></input>
-              <input placeholder="성격(MBTI 입력)"></input>
-              <input placeholder="그 외 정보"></input>
-            </Card.Body>
-          </Card>
-        );
-      })}
+      {infos.map((info, i) => (
+        <Card key={i} id={info.id}>
+          <UploadImg index={i} />
+          <Card.Body>
+            <Card.Title>캐릭터 정보를 입력하세요</Card.Title>
+            <input
+              placeholder="이름"
+              value={info.name}
+              onChange={(e) => inputChange(e, "name", i)}
+            />
+
+            <DropdownButton
+              id={`species${i}`}
+              title={info.species || "인간/동물/사물 중 선택하세요"}
+              variant="none"
+            >
+              {["인간", "동물", "사물"].map((selected, j) => (
+                <Dropdown.Item
+                  key={j}
+                  onClick={(e) => {
+                    ChangeDrop(e, "species", i);
+                  }}
+                >
+                  {selected}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+
+            <DropdownButton
+              id={`main${i}`}
+              title={info.main || "주/조연 선택"}
+              variant="none"
+            >
+              {["주연", "조연"].map((main, j) => (
+                <Dropdown.Item
+                  key={j}
+                  onClick={(e) => {
+                    ChangeDrop(e, "main", i);
+                  }}
+                >
+                  {main}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+
+            <DropdownButton
+              id={`gender${i}`}
+              title={info.gender || "성별"}
+              variant="none"
+            >
+              {["남성", "여성"].map((gender, j) => (
+                <Dropdown.Item
+                  key={j}
+                  onClick={(e) => {
+                    ChangeDrop(e, "gender", i);
+                  }}
+                >
+                  {gender}
+                </Dropdown.Item>
+              ))}
+            </DropdownButton>
+            <input
+              placeholder="나이"
+              value={info.age}
+              onChange={(e) => inputChange(e, "age", i)}
+            />
+            <input
+              placeholder="성격(MBTI 입력)"
+              value={info.personality}
+              onChange={(e) => inputChange(e, "personality", i)}
+            />
+            <input
+              placeholder="그 외 정보"
+              value={info.otherInfo}
+              onChange={(e) => inputChange(e, "otherInfo", i)}
+            />
+          </Card.Body>
+          <Button
+            variant="danger"
+            onClick={() => {
+              const datas = [...infos];
+              datas.forEach((data, index) => {
+                if (data.id == info.id) {
+                  datas.splice(index, 1);
+                }
+              });
+              setInfos(datas);
+              setCount(count - 1);
+            }}
+          >
+            캐릭터 삭제하기
+          </Button>
+        </Card>
+      ))}
+
+      <Button variant="primary" onClick={() => setCount(count + 1)}>
+        캐릭터 추가하기
+      </Button>
+
+      <Card infos={infos} style={{ display: "none" }}></Card>
     </EditInfo>
   );
 }

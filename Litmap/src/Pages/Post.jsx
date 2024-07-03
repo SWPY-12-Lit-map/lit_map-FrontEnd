@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import Sidebar from "../Asset/Sidebar/Sidebar";
 import EditCharacter from "../Asset/EditCharacter";
-import { useState, version } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Posting = styled.div``;
 
@@ -24,7 +24,30 @@ export default function Post() {
     version: "1",
     genre: "",
   });
-  const [count, setCount] = useState(5); // 인물 수
+  const [count, setCount] = useState(3); // 인물 수
+  const [prevCount, setPrevcount] = useState(3);
+  const [mount, setMount] = useState(false);
+
+  const [infos, setInfos] = useState([]);
+  const newInfos = Array.from({ length: count }, (_, i) => ({
+    id: i,
+    name: "",
+    species: "",
+    gender: "",
+    age: "",
+    personality: "",
+    otherInfo: "",
+    img: null,
+  }));
+  useEffect(() => {
+    if (mount == false) {
+      setInfos(newInfos);
+      setMount(true);
+    } else if (prevCount <= count) {
+      setInfos([...infos, newInfos[newInfos.length - 1]]);
+    } else {
+    }
+  }, [count]);
 
   return (
     <Posting>
@@ -39,10 +62,15 @@ export default function Post() {
         />
         <MainPt>
           {state == false ? (
-            <EditCharacter count={count} setCount={setCount} />
+            <EditCharacter
+              count={count}
+              setCount={setCount}
+              infos={infos}
+              setInfos={setInfos}
+            />
           ) : (
             <ReactFlowProvider>
-              <Mindmap count={count} />
+              <Mindmap count={count} infos={infos} />
             </ReactFlowProvider>
           )}
         </MainPt>

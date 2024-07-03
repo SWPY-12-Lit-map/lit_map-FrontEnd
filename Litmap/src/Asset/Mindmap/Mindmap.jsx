@@ -22,22 +22,17 @@ const Mapping = styled.div`
 `;
 
 const initialNodes = [];
-
 const initialEdges = [];
-
 const connectionLineStyle = {
   strokeWidth: 3,
   stroke: "black",
 };
-
 const nodeTypes = {
   custom: CustomNode,
 };
-
 const edgeTypes = {
   floating: FloatingEdge,
 };
-
 const defaultEdgeOptions = {
   style: { strokeWidth: 2, stroke: "black" },
   type: "floating",
@@ -46,7 +41,6 @@ const defaultEdgeOptions = {
     color: "black",
   },
 };
-
 const defaultViewport = { x: 0, y: 0, zoom: 0 };
 
 const Mindmap = (props) => {
@@ -54,14 +48,16 @@ const Mindmap = (props) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
+  const infos = props.infos;
   const count = props.count;
   const createNodes = useCallback(() => {
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
       type: "custom",
       position: { x: (i + 5) * 100, y: (i + 5) * 100 },
+      data: infos[i],
     }));
-    setNodes((nds) => [...nds, ...newNodes]);
+    setNodes((nodes) => [...nodes, ...newNodes]);
   }, [count, setNodes]);
 
   const onConnect = useCallback(

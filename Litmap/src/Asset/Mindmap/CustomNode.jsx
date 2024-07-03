@@ -1,15 +1,12 @@
 import { Handle, NodeResizer, Position, useStore } from "reactflow";
-import Card from "./Card";
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 
-export default function CustomNode({ id, data, selected }) {
+export default function CustomNode({ id, data, selected, index }) {
   const connectionNodeId = useStore(connectionNodeIdSelector);
 
   const isConnecting = !!connectionNodeId;
   const isTarget = connectionNodeId && connectionNodeId !== id;
   // const label = isTarget ? "Drop here" : "Drag to connect";
-  const label = <Card></Card>;
-
   return (
     <div className="customNode" style={{ width: "100%", height: "100%" }}>
       <NodeResizer
@@ -26,8 +23,16 @@ export default function CustomNode({ id, data, selected }) {
             type="source"
           />
         )}
+        <div>
+          <h3>{data.name}</h3>
+          <p>{data.id}</p>
+          <p>{data.gender}</p>
+          <p>{data.species}</p>
+          <p>{data.age}</p>
+          <p>{data.personality}</p>
+          <p>{data.otherInfo}</p>
+        </div>
 
-        {label}
         <Handle
           className="customHandle"
           position={Position.Left}
