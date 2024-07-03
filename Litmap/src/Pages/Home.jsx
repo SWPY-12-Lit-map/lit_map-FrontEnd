@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Category from "../Asset/Category";
+import Megamenu from "../Asset/Megamenu";
 
 const Container = styled.div`
     padding: 20px;
@@ -104,11 +105,11 @@ const Home = () => {
             <Slider>
                 <Arrow direction="left" onClick={prevSlide}>❮</Arrow>
                 <SliderContent currentIndex={currentIndex}>
-                {slides.map((slide, index) => (
-                    <Slide key={index}>
-                    <img src={slide} alt={`Slide ${index}`} />
-                    </Slide>
-                ))}
+                    {slides.map((slide, index) => (
+                        <Slide key={index}>
+                            <img src={slide} alt={`Slide ${index}`} />
+                        </Slide>
+                    ))}
                 </SliderContent>
                 <Arrow direction="right" onClick={nextSlide}>❯</Arrow>
             </Slider>
@@ -123,12 +124,14 @@ const Home = () => {
         
             <Posts>
                 {posts.map((post, index) => (
-                <Post key={index}>
-                    <img src={post.image} alt={post.title} />
-                    <div>{post.title}</div>
-                </Post>
+                    <Post key={index}>
+                        <img src={post.image} alt={post.title} />
+                        <div>{post.title}</div>
+                    </Post>
                 ))}
             </Posts>
+
+            <Megamenu />
         </Container>
     );  
 };

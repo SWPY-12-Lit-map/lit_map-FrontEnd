@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import Megamenu from '../Asset/Megamenu';
 
 const CategoryMenu = styled.ul`
     display: flex;
@@ -11,6 +12,7 @@ const CategoryMenu = styled.ul`
     padding-left: 0;
     gap: 15px;
     margin-bottom: 20px;
+    position: relative;
 `;
 
 const CategoryMenuItem = styled.li`
@@ -24,16 +26,36 @@ const StyledLink = styled(Link)`
 
 const BarsIcon = styled(FontAwesomeIcon)`
     color: #8D8D8D;
+    cursor: pointer;
+`;
+
+const MegamenuContainer = styled.div`
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 100;
+    display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
 `;
 
 function Category() {
     return (
         <CategoryMenu>
-            <CategoryMenuItem><BarsIcon icon={faBars} /></CategoryMenuItem>
+            <CategoryMenuItem>
+                <BarsIcon icon={faBars} />
+            </CategoryMenuItem>
 
-            <CategoryMenuItem><StyledLink to="/category1">카테고리1</StyledLink></CategoryMenuItem>
-            <CategoryMenuItem><StyledLink to="/category2">카테고리2</StyledLink></CategoryMenuItem>
-            <CategoryMenuItem><StyledLink to="/category3">카테고리3</StyledLink></CategoryMenuItem>
+            <CategoryMenuItem>
+                <StyledLink to="/category1">카테고리1</StyledLink>
+            </CategoryMenuItem>
+            <CategoryMenuItem>
+                <StyledLink to="/category2">카테고리2</StyledLink>
+            </CategoryMenuItem>
+            <CategoryMenuItem>
+                <StyledLink to="/category3">카테고리3</StyledLink>
+            </CategoryMenuItem>
         </CategoryMenu>
     );
 }
