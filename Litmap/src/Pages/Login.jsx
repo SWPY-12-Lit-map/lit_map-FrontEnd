@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const PageContainer = styled.div`
     display: flex;
@@ -104,32 +104,6 @@ const ResetPasswordButton = styled.button`
 `;
 
 const LoginPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const history = useHistory();
-
-    const handleLogin = async () => {
-        try {
-            const response = await fetch('', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (response.ok) {
-                // 로그인 성공 시 다음 페이지로 이동
-                history.push('/');
-            } else {
-                // 로그인 실패 처리
-                console.error('로그인 실패');
-            }
-        } catch (error) {
-            console.error('API 호출 중 오류 발생:', error);
-        }
-    };
-
     return (
         <PageContainer>
             <LeftPanel>
@@ -140,22 +114,12 @@ const LoginPage = () => {
                 <LoginTitle>로그인</LoginTitle>
 
                 <InputLabel>아이디(이메일)</InputLabel>
-                <InputBox
-                    type="email"
-                    placeholder="이메일을 입력해주세요."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+                <InputBox type="email" placeholder="이메일을 입력해주세요." />
 
                 <InputLabel>비밀번호</InputLabel>
-                <InputBox
-                    type="password"
-                    placeholder="비밀번호를 입력해주세요."
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                <InputBox type="password" placeholder="비밀번호를 입력해주세요." />
 
-                <LoginButton onClick={handleLogin}>로그인</LoginButton>
+                <LoginButton>로그인</LoginButton>
 
                 <OrText>또는</OrText>
 
