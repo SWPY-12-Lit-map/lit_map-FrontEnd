@@ -1,18 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 const Nav = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 5px;
+    padding: 5px;
 `;
 
-const NavLogo = styled.div`
+const NavLogo = styled(Link)`
     display: flex;
     font-size: 24px;
-    margin-right: 20px;
+    margin-right: 10px;
 
     @media all and (max-width: 960px) {
         font-size: 16px;
@@ -21,75 +23,64 @@ const NavLogo = styled.div`
 
 const LogoImg = styled.img`
     display: flex;
-    width: 50px;
+    width: 80px;
     height: auto;
-    margin-left: 20px;
-    margin-bottom: 15px;
+    margin-left: 10px;
 `;
 
-const NavMenu = styled.ul`
-    display: flex;
-    list-style: none;
-    padding-left: 0;
-    margin-right: auto;
-`;
-
-const NavMenuItem = styled.li`
-    padding: 20px 15px;
-
-    &:hover {
-        border-radius: 4px;
-    }
-`;
-
-const NavLogin = styled.ul`
-    display: flex;
-    color: #000;
-    list-style: none;
-    padding-left: 0;
-`;
-
-const NavLoginItem = styled.li`
-    padding: 20px 15px;
+const SearchBarContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
+    margin: 10px 0;
+    position: relative;
 `;
 
-const StyledLink = styled(Link)`
-    text-decoration: none;
-    color: black;
+const SearchBar = styled.input`
+    width: 500px;
+    padding: 8px;
+    padding-left: 35px;
+    border: 1px solid #EDEDED;
+    border-radius: 30px;
+    color: #8D8D8D;
+    box-shadow: 0 6px 6px -2px rgba(0, 0, 0, 0.3);
 `;
 
-const LoginButton = styled(StyledLink)`
-    background-color: #D9D9D9;
-    border-radius: 10px;
-    width: 100px;
-    height: 35px;
+const SearchIcon = styled(FontAwesomeIcon)`
+    width: 20px;
+    position: absolute;
+    left: 10px;
+    color: #8D8D8D;
+`;
+
+const Profile = styled.div`
     display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+    font-size: 24px;
+    margin-right: 10px;
+`;
+
+const ProfileImg = styled.img`
+    display: flex;
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
 `;
 
 function Navbar() {
     return (
         <Nav>
-            <NavLogo>
-                <LogoImg src="/litmap.png" alt="로고" />
+            <NavLogo to="/">
+                <LogoImg src="/Logo.png" alt="로고" />
             </NavLogo>
-            <NavMenu>
-                <NavMenuItem><StyledLink to="/">홈</StyledLink></NavMenuItem>
-                <NavMenuItem><StyledLink to="/category1">카테고리1</StyledLink></NavMenuItem>
-                <NavMenuItem>카테고리2</NavMenuItem>
-            </NavMenu>
-            <NavLogin>
-                <NavLoginItem><StyledLink to="/signup">가입하기</StyledLink></NavLoginItem>
-                <NavLoginItem>
-                    <LoginButton>로그인하기</LoginButton>
-                </NavLoginItem>
-            </NavLogin>
+
+            <SearchBarContainer>
+                <SearchIcon icon={faMagnifyingGlass} />
+                <SearchBar placeholder="검색어를 입력해보세요" />
+            </SearchBarContainer>
+
+            <Profile>
+                <ProfileImg src="profile.png" alt="프로필"/>
+            </Profile>
         </Nav>
     );
 }

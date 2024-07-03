@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Category from "../Asset/Category";
 
 const Container = styled.div`
     padding: 20px;
@@ -40,22 +41,10 @@ const Arrow = styled.button`
     z-index: 10;
 `;
 
-const SearchBarContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-`;
-
-const SearchBar = styled.input`
-    width: 30%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-`;
-
 const SortOptions = styled.div`
     display: flex;
     justify-content: center;
+    margin-top: 20px;
     margin-bottom: 20px;
     list-style: none;
     gap: 25px;
@@ -71,7 +60,6 @@ const SortOptions = styled.div`
         }
     }
 `;
-
 
 const Posts = styled.div`
     display: flex;
@@ -111,38 +99,36 @@ const Home = () => {
 
     return (
         <Container>
-        <Slider>
-            <Arrow direction="left" onClick={prevSlide}>❮</Arrow>
-            <SliderContent currentIndex={currentIndex}>
-            {slides.map((slide, index) => (
-                <Slide key={index}>
-                <img src={slide} alt={`Slide ${index}`} />
-                </Slide>
-            ))}
-            </SliderContent>
-            <Arrow direction="right" onClick={nextSlide}>❯</Arrow>
-        </Slider>
-    
-        <SearchBarContainer>
-            <SearchBar placeholder="검색어를 입력해보세요" />
-        </SearchBarContainer>
-    
-        <SortOptions>
-            <li>신규순</li>
-            <li>|</li>
-            <li>검색순</li>
-            <li>|</li>
-            <li>분류3</li>
-        </SortOptions>
-    
-        <Posts>
-            {posts.map((post, index) => (
-            <Post key={index}>
-                <img src={post.image} alt={post.title} />
-                <div>{post.title}</div>
-            </Post>
-            ))}
-        </Posts>
+            <Category />
+
+            <Slider>
+                <Arrow direction="left" onClick={prevSlide}>❮</Arrow>
+                <SliderContent currentIndex={currentIndex}>
+                {slides.map((slide, index) => (
+                    <Slide key={index}>
+                    <img src={slide} alt={`Slide ${index}`} />
+                    </Slide>
+                ))}
+                </SliderContent>
+                <Arrow direction="right" onClick={nextSlide}>❯</Arrow>
+            </Slider>
+
+            <SortOptions>
+                <li>신규순</li>
+                <li>|</li>
+                <li>검색순</li>
+                <li>|</li>
+                <li>분류3</li>
+            </SortOptions>
+        
+            <Posts>
+                {posts.map((post, index) => (
+                <Post key={index}>
+                    <img src={post.image} alt={post.title} />
+                    <div>{post.title}</div>
+                </Post>
+                ))}
+            </Posts>
         </Container>
     );  
 };
