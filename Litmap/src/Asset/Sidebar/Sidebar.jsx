@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import InfoInput from "./infoInput";
 import EditTool from "./editTool";
+import { useState } from "react";
 
 const Side = styled.div`
   border: solid 1px black;
@@ -35,6 +36,7 @@ export default function Sidebar(props) {
   const setState = props.setState;
   const work = props.work;
   const setWork = props.setWork;
+  const [next, setNext] = useState(false);
 
   return (
     <Side>
@@ -49,6 +51,8 @@ export default function Sidebar(props) {
           work={work}
           setWork={setWork}
           newInfos={props.newInfos}
+          next={next}
+          setNext={setNext}
         />
       ) : (
         <EditTool />
@@ -66,17 +70,23 @@ export default function Sidebar(props) {
           이전
         </Prevbtn>
       ) : null}
-      <Nextbtn
-        onClick={() => {
-          if (state == 1) {
-            setState(2);
-          } else if (state == 2) {
-            setState(3);
-          }
-        }}
-      >
-        다음
-      </Nextbtn>
+      {next == false ? (
+        <Nextbtn disabled style={{ background: "gray", border: "none" }}>
+          다음
+        </Nextbtn>
+      ) : (
+        <Nextbtn
+          onClick={() => {
+            if (state == 1) {
+              setState(2);
+            } else if (state == 2) {
+              setState(3);
+            }
+          }}
+        >
+          다음
+        </Nextbtn>
+      )}
     </Side>
   );
 }
