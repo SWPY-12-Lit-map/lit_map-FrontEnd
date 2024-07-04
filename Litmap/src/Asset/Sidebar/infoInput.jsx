@@ -149,7 +149,8 @@ export default function InfoInput(props) {
           id="checkbox"
           type="checkbox"
           onClick={() => {
-            console.log(work.thumbnail);
+            const info = { ...work, thumbnail: "대체 이미지" };
+            setWork(info);
           }}
         ></input>{" "}
         <label htmlFor="checkbox">대체 이미지 등록하기</label>
