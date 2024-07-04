@@ -25,7 +25,7 @@ export default function CustomNode({ id, data, selected, index }) {
         )}
         <div>
           <h3>{data.name}</h3>
-          <p>{data.id}</p>
+          {/* <p>{data.id}</p> */}
           <p>{data.gender}</p>
           <p>{data.species}</p>
           <p>{data.age}</p>

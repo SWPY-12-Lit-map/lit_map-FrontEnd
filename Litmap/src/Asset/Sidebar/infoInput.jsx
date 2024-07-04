@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
 import { FileUploader } from "react-drag-drop-files";
+import { useEffect, useState } from "react";
 
 const Input = styled.div`
   display: flex;
@@ -12,9 +13,13 @@ const Input = styled.div`
 `;
 
 const Dropzone = styled.div`
-  width: 300px;
+  width: 200px;
   height: 200px;
   border: solid 1px black;
+`;
+
+const RedStar = styled.span`
+  color: red;
 `;
 
 export default function InfoInput(props) {
@@ -22,6 +27,8 @@ export default function InfoInput(props) {
   const setCount = props.setCount;
   const work = props.work;
   const setWork = props.setWork;
+  const next = props.next;
+  const setNext = props.setNext;
 
   // 장르 변경
   function ChangeDrop(e) {
@@ -40,6 +47,20 @@ export default function InfoInput(props) {
       setWork(info);
     };
 
+    const CheckInputs = () => {
+      Object.keys(work).forEach((key) => {
+        if (work[key] != "") {
+          setNext(true);
+        } else {
+          setNext(false);
+        }
+      });
+    };
+
+    useEffect(() => {
+      CheckInputs();
+    }, [work]);
+
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
         <Dropzone id="dropzone">
@@ -54,7 +75,9 @@ export default function InfoInput(props) {
     <>
       {/* 제목입력 */}
       <Input>
-        <span>제목: </span>
+        <span>
+          <RedStar>*</RedStar> 제목:{" "}
+        </span>
         <input
           placeholder="제목을 입력해주세요"
           value={work.title}
@@ -66,7 +89,10 @@ export default function InfoInput(props) {
       </Input>
       {/* 시스템 버전 */}
       <Input>
-        <span>버전: </span>
+        <span>
+          {" "}
+          <RedStar>*</RedStar>버전:{" "}
+        </span>
         <input
           type="text"
           style={{ background: "light gray" }}
@@ -76,21 +102,26 @@ export default function InfoInput(props) {
       </Input>
       {/* 사용자 임의 버전등록 */}
       <Input>
-        <span>버전명: </span>
+        <span>
+          {" "}
+          <RedStar>*</RedStar> 버전명:{" "}
+        </span>
         <input
           placeholder="버전명을 입력해주세요"
           value={work.userVersion}
           onChange={(e) => {
             const info = { ...work };
             info.userVersion = e.target.value;
-            console.log(info);
             setWork(info);
           }}
         ></input>
       </Input>
       {/* 장르입력 */}
       <Input>
-        <span>장르</span>
+        <span>
+          {" "}
+          <RedStar>*</RedStar> 장르
+        </span>
         <DropdownButton id="dropdown-basic-button" title="장르를 선택하세요">
           {["액션", "코미디", "로맨스", "스릴러"].map((genres, i) => {
             return (
@@ -107,7 +138,12 @@ export default function InfoInput(props) {
         </DropdownButton>
       </Input>
       {/* 이미지 업로드 */}
-      <UploadImg></UploadImg>
+      <div style={{ display: "flex" }}>
+        <span>
+          <RedStar>*</RedStar> 대표 이미지:{" "}
+        </span>
+        <UploadImg></UploadImg>
+      </div>
       <p>
         <input
           id="checkbox"
@@ -120,7 +156,10 @@ export default function InfoInput(props) {
       </p>
       {/* 등장인물 수 */}
       <Input>
-        <span>등장인물: </span>
+        <span>
+          {" "}
+          <RedStar>*</RedStar> 등장인물:{" "}
+        </span>
         <input
           value={count}
           onChange={(e) => {
