@@ -38,13 +38,13 @@ function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextC
 
   const angle = getAngle(sx, sy, tx, ty);
 
-  const handleTextChange = (event) => {
-    const newText = event.target.value;
-    setText(newText);
-    if (onTextChange) {
-      onTextChange(id, newText);
-    }
-  };
+  // const handleTextChange = (event) => {
+  //   const newText = event.target.value;
+  //   setText(newText);
+  //   if (onTextChange) {
+  //     onTextChange(id, newText);
+  //   }
+  // };
 
   return (
     <>
@@ -59,7 +59,7 @@ function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextC
           strokeWidth: selected ? 4 : style.strokeWidth,
         }}
       />
-      <foreignObject
+      {/* <foreignObject
         width={100}
         height={30}
         x={labelX - 50}
@@ -80,7 +80,7 @@ function FloatingEdge({ id, source, target, markerEnd, style, data = {}, onTextC
             }}
           />
         </div>
-      </foreignObject>
+      </foreignObject> */}
     </>
   );
 }
