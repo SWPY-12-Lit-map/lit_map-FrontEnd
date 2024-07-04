@@ -1,5 +1,4 @@
 import React, { useCallback, useState, useEffect } from "react";
-
 import ReactFlow, {
   addEdge,
   useNodesState,
@@ -7,11 +6,11 @@ import ReactFlow, {
   MarkerType,
   MiniMap,
   Controls,
+  useReactFlow,
 } from "reactflow";
 import CustomNode from "./CustomNode";
 import FloatingEdge from "./FloatingEdge";
 import CustomConnectionLine from "./CustomConnectionLine";
-
 import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
@@ -44,6 +43,8 @@ const defaultEdgeOptions = {
 };
 const defaultViewport = { x: 0, y: 0, zoom: 0 };
 
+const flowKey = "flow-data";
+
 const Mindmap = (props) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -51,6 +52,9 @@ const Mindmap = (props) => {
 
   const infos = props.infos;
   const count = props.count;
+  const [rfInstance, setRfInstance] = useState(null);
+  const { setViewport } = useReactFlow();
+
   const createNodes = useCallback(() => {
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
@@ -59,8 +63,9 @@ const Mindmap = (props) => {
       data: infos[i],
     }));
     setNodes((nodes) => [...nodes, ...newNodes]);
-  }, [count, setNodes]);
+  }, [count, setNodes, infos]);
 
+  /* 연결 되었을 때 */
   const onConnect = useCallback(
     (params) =>
       setEdges((eds) => addEdge({ ...params, data: { text: "" } }, eds)),
@@ -78,6 +83,7 @@ const Mindmap = (props) => {
     [setEdges]
   );
 
+  /* 선 삭제 */
   const onEdgesDelete = useCallback(
     (edgesToRemove) => {
       setEdges((eds) => eds.filter((edge) => !edgesToRemove.includes(edge)));
@@ -85,9 +91,34 @@ const Mindmap = (props) => {
     [setEdges]
   );
 
+  /* 선 클릭 */
   const onEdgeClick = useCallback((event, edge) => {
     setSelectedEdgeId(edge.id);
   }, []);
+
+  /* 마인드맵 저장 */
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      console.log(flow);
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [rfInstance]);
+
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = JSON.parse(localStorage.getItem(flowKey));
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        setViewport({ x, y, zoom });
+      }
+    };
+
+    restoreFlow();
+  }, [setNodes, setViewport]);
 
   useEffect(() => {
     createNodes();
@@ -102,7 +133,7 @@ const Mindmap = (props) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedEdgeId]);
+  }, [selectedEdgeId, createNodes, setEdges]);
 
   return (
     <Mapping>
@@ -128,11 +159,14 @@ const Mindmap = (props) => {
         connectionLineComponent={CustomConnectionLine}
         connectionLineStyle={connectionLineStyle}
         defaultViewport={defaultViewport}
+        onInit={setRfInstance} // Set rfInstance when ReactFlow is initialized
       >
         <Controls />
         <MiniMap />
       </ReactFlow>
-      <ModalBtn></ModalBtn>
+      <ModalBtn />
+      <button onClick={onSave}>Save</button>
+      <button onClick={onRestore}>restore</button>
     </Mapping>
   );
 };
