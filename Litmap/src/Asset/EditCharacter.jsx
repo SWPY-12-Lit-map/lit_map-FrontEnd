@@ -1,4 +1,3 @@
-import { useRef, useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import styled from "styled-components";
@@ -82,6 +81,7 @@ export default function EditCharacter(props) {
           <Card.Body>
             <Card.Title>캐릭터 정보를 입력하세요</Card.Title>
             <input
+              type="text"
               placeholder="이름"
               value={info.name}
               onChange={(e) => inputChange(e, "name", i)}
@@ -165,7 +165,6 @@ export default function EditCharacter(props) {
                 });
                 setInfos(datas);
                 setCount(count - 1);
-                console.log(props.prevCount);
               }
             }}
           >
