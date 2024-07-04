@@ -30,14 +30,15 @@ const PersonInfo = styled.div`
 
 export default function Post() {
   const [state, setState] = useState(1); // 1 = 작품정보입력, 2 = 인물정보입력 ,3 = 관계도입력
+  const [count, setCount] = useState(3); // 인물 수
   const [work, setWork] = useState({
     title: "",
     defaultVersion: "1",
     userVersion: "",
     genre: "",
     thumbnail: "",
+    count: count,
   });
-  const [count, setCount] = useState(3); // 인물 수
   const PrevCountRef = useRef();
   const [mount, setMount] = useState(false);
   const [infos, setInfos] = useState([]);

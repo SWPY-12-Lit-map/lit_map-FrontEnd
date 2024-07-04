@@ -48,18 +48,16 @@ export default function InfoInput(props) {
     };
 
     const CheckInputs = () => {
-      Object.keys(work).forEach((key) => {
-        if (work[key] != "") {
-          setNext(true);
-        } else {
-          setNext(false);
-        }
-      });
+      const works = Object.values(work);
+      const found = works.find((a) => a === "");
+      if (found !== "") {
+        setNext(true);
+      }
     };
 
     useEffect(() => {
       CheckInputs();
-    }, [work]);
+    }, [work, setWork]);
 
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
