@@ -19,7 +19,7 @@ export default function KakaoShare(props) {
       objectType: "feed",
       content: {
         title: "인물관계도 확인해보기",
-        description: "",
+        description: "인물 관계도 확인해보세요",
         imageUrl: "", // 이미지는  800 x 400이 적당
         link: {
           webUrl: realUrl,

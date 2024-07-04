@@ -11,10 +11,8 @@ export default function InfoInput(props) {
 
   if (count > 30) {
     setCount(30);
-    alert("30명 이상 금지");
-  } else if (count <= 0) {
+  } else if (count == 0) {
     setCount(1);
-    alert("그래도 등장인물이 있어야죠...");
   }
 
   function ChangeDrop(e) {

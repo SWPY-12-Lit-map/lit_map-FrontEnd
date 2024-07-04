@@ -25,7 +25,7 @@ export default function Post() {
     genre: "",
   });
   const [count, setCount] = useState(3); // 인물 수
-  const [prevCount, setPrevcount] = useState(3);
+  const PrevCountRef = useRef();
   const [mount, setMount] = useState(false);
 
   const [infos, setInfos] = useState([]);
@@ -39,11 +39,17 @@ export default function Post() {
     otherInfo: "",
     img: null,
   }));
+
+  useEffect(() => {
+    PrevCountRef.current = count;
+  });
+  const prevCount = PrevCountRef.current;
+
   useEffect(() => {
     if (mount == false) {
       setInfos(newInfos);
       setMount(true);
-    } else if (prevCount <= count) {
+    } else if (mount == true && prevCount <= count) {
       setInfos([...infos, newInfos[newInfos.length - 1]]);
     } else {
     }
@@ -67,6 +73,7 @@ export default function Post() {
               setCount={setCount}
               infos={infos}
               setInfos={setInfos}
+              prevCount={prevCount}
             />
           ) : (
             <ReactFlowProvider>

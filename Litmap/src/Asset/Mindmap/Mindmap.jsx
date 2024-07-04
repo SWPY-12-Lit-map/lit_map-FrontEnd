@@ -15,6 +15,7 @@ import CustomConnectionLine from "./CustomConnectionLine";
 import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
+import ModalBtn from "../Share/ModalBtn";
 
 const Mapping = styled.div`
   width: 100%;
@@ -131,6 +132,7 @@ const Mindmap = (props) => {
         <Controls />
         <MiniMap />
       </ReactFlow>
+      <ModalBtn></ModalBtn>
     </Mapping>
   );
 };

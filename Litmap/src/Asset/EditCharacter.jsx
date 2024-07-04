@@ -92,14 +92,14 @@ export default function EditCharacter(props) {
               title={info.species || "인간/동물/사물 중 선택하세요"}
               variant="none"
             >
-              {["인간", "동물", "사물"].map((selected, j) => (
+              {["인간", "동물", "사물"].map((data, j) => (
                 <Dropdown.Item
                   key={j}
                   onClick={(e) => {
                     ChangeDrop(e, "species", i);
                   }}
                 >
-                  {selected}
+                  {data}
                 </Dropdown.Item>
               ))}
             </DropdownButton>
@@ -109,14 +109,14 @@ export default function EditCharacter(props) {
               title={info.main || "주/조연 선택"}
               variant="none"
             >
-              {["주연", "조연"].map((main, j) => (
+              {["주연", "조연"].map((data, j) => (
                 <Dropdown.Item
                   key={j}
                   onClick={(e) => {
                     ChangeDrop(e, "main", i);
                   }}
                 >
-                  {main}
+                  {data}
                 </Dropdown.Item>
               ))}
             </DropdownButton>
@@ -126,14 +126,14 @@ export default function EditCharacter(props) {
               title={info.gender || "성별"}
               variant="none"
             >
-              {["남성", "여성"].map((gender, j) => (
+              {["남성", "여성"].map((data, j) => (
                 <Dropdown.Item
                   key={j}
                   onClick={(e) => {
                     ChangeDrop(e, "gender", i);
                   }}
                 >
-                  {gender}
+                  {data}
                 </Dropdown.Item>
               ))}
             </DropdownButton>
@@ -157,13 +157,16 @@ export default function EditCharacter(props) {
             variant="danger"
             onClick={() => {
               const datas = [...infos];
-              datas.forEach((data, index) => {
-                if (data.id == info.id) {
-                  datas.splice(index, 1);
-                }
-              });
-              setInfos(datas);
-              setCount(count - 1);
+              if (count > 1) {
+                datas.forEach((data, index) => {
+                  if (data.id == info.id) {
+                    datas.splice(index, 1);
+                  }
+                });
+                setInfos(datas);
+                setCount(count - 1);
+                console.log(props.prevCount);
+              }
             }}
           >
             캐릭터 삭제하기
@@ -171,7 +174,12 @@ export default function EditCharacter(props) {
         </Card>
       ))}
 
-      <Button variant="primary" onClick={() => setCount(count + 1)}>
+      <Button
+        variant="primary"
+        onClick={() => {
+          setCount(count + 1);
+        }}
+      >
         캐릭터 추가하기
       </Button>
 
