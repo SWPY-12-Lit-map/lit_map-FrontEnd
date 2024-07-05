@@ -21,18 +21,18 @@ const Mapping = styled.div`
   height: 100%;
 `;
 
-const initialNodes = [];
-const initialEdges = [];
+const initialNodes = []; // 초기 노드
+const initialEdges = []; // 초기 연결 선
 const connectionLineStyle = {
   strokeWidth: 3,
   stroke: "black",
 };
 const nodeTypes = {
   custom: CustomNode,
-};
+}; // 노드 스타일
 const edgeTypes = {
   floating: FloatingEdge,
-};
+}; // 선 타입
 const defaultEdgeOptions = {
   style: { strokeWidth: 2, stroke: "black" },
   type: "floating",
@@ -52,9 +52,11 @@ const Mindmap = (props) => {
 
   const infos = props.infos;
   const count = props.count;
+
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
 
+  // 노드 생성
   const createNodes = useCallback(() => {
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
@@ -94,6 +96,7 @@ const Mindmap = (props) => {
   /* 선 클릭 */
   const onEdgeClick = useCallback((event, edge) => {
     setSelectedEdgeId(edge.id);
+    console.log(edge);
   }, []);
 
   /* 마인드맵 저장 */
@@ -105,10 +108,10 @@ const Mindmap = (props) => {
     }
   }, [rfInstance]);
 
+  /* 마인드맵 저장 복구 */
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
       const flow = JSON.parse(localStorage.getItem(flowKey));
-
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
         setNodes(flow.nodes || []);
@@ -116,12 +119,11 @@ const Mindmap = (props) => {
         setViewport({ x, y, zoom });
       }
     };
-
     restoreFlow();
   }, [setNodes, setViewport]);
 
+  /* 선 지우기 */
   useEffect(() => {
-    createNodes();
     const handleKeyDown = (event) => {
       if (event.key === "Delete" && selectedEdgeId) {
         setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
@@ -134,6 +136,11 @@ const Mindmap = (props) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [selectedEdgeId, createNodes, setEdges]);
+
+  // 컴포넌트 로드 시 노드 생성
+  useEffect(() => {
+    createNodes();
+  }, [count]);
 
   return (
     <Mapping>
@@ -159,7 +166,7 @@ const Mindmap = (props) => {
         connectionLineComponent={CustomConnectionLine}
         connectionLineStyle={connectionLineStyle}
         defaultViewport={defaultViewport}
-        onInit={setRfInstance} // Set rfInstance when ReactFlow is initialized
+        onInit={setRfInstance}
       >
         <Controls />
         <MiniMap />
