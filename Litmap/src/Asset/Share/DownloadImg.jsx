@@ -1,23 +1,25 @@
 import React, { useEffect } from "react";
 import { useReactFlow, getRectOfNodes, getTransformForBounds } from "reactflow";
 import { toPng } from "html-to-image";
+import backImg from "../backgroundImg.png";
 
 export default function DownloadImg(props) {
   const { getNodes } = useReactFlow();
-  const imageWidth = 1024;
-  const imageHeight = 768;
+  const imageWidth = 1920;
+  const imageHeight = 1080;
   const imgUrl = props.imgUrl;
   const setUrl = props.setUrl;
+  const work = props.work;
 
-  /* 이미지 다운 */
+  /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
     const a = document.createElement("a");
-    a.setAttribute("download", "인물관계도.png");
+    a.setAttribute("download", `${work.title}.${work.userVersion}.png`);
     a.setAttribute("href", dataUrl);
     a.click();
   }
 
-  /* html to png */
+  /* HTML을 PNG 이미지로 변환하는 함수 */
   function ImgtoPng() {
     const nodesBounds = getRectOfNodes(getNodes());
     const transform = getTransformForBounds(
@@ -28,37 +30,74 @@ export default function DownloadImg(props) {
       2
     );
 
-    toPng(document.querySelector(".react-flow__viewport"), {
-      backgroundColor: "white", // 템플릿 변경시 수정
-      width: imageWidth,
-      height: imageHeight,
-      style: {
-        width: imageWidth,
-        height: imageHeight,
-        transform: `translate(${transform[0]}px, ${transform[1]}px) scale(${transform[2]})`,
-      },
-    })
-      .then(function (dataUrl) {
-        var img = new Image();
-        img.src = dataUrl; // img태그의 src에 저장
-        setUrl(img.src);
+    // 배경 이미지 렌더링
+    const backgroundCanvas = document.createElement("canvas");
+    backgroundCanvas.width = imageWidth;
+    backgroundCanvas.height = imageHeight;
+    const backgroundContext = backgroundCanvas.getContext("2d");
+    const backgroundImage = new Image();
+    backgroundImage.src = backImg;
+    backgroundImage.onload = () => {
+      backgroundContext.drawImage(
+        backgroundImage,
+        0,
+        0,
+        imageWidth,
+        imageHeight
+      );
+
+      // React Flow 노드 렌더링
+      const nodeCanvas = document.createElement("canvas");
+      nodeCanvas.width = imageWidth;
+      nodeCanvas.height = imageHeight;
+      const nodeContext = nodeCanvas.getContext("2d");
+      nodeContext.save();
+      nodeContext.translate(-2, 1);
+      nodeContext.scale(1, 1);
+      toPng(document.querySelector(".react-flow__viewport"), {
+        cacheBust: true,
       })
-      .catch(function (error) {
-        console.error(error);
-      });
+        .then((dataUrl) => {
+          const nodeImage = new Image();
+          nodeImage.src = dataUrl;
+          nodeImage.onload = () => {
+            nodeContext.drawImage(nodeImage, 0, 0);
+            nodeContext.restore();
+
+            // 배경 이미지와 React Flow 노드 이미지 합성
+            const resultCanvas = document.createElement("canvas");
+            resultCanvas.width = imageWidth;
+            resultCanvas.height = imageHeight;
+            const resultContext = resultCanvas.getContext("2d");
+            resultContext.drawImage(backgroundCanvas, 0, 0);
+            resultContext.drawImage(nodeCanvas, 0, 0);
+
+            // 최종 이미지 URL 생성
+            resultCanvas.toBlob((blob) => {
+              const dataUrl = URL.createObjectURL(blob);
+              setUrl(dataUrl);
+            });
+          };
+        })
+        .catch((error) => {
+          console.error("Image conversion error:", error);
+        });
+    };
   }
-  /* 다운버튼 클릭 시 */
-  const downImg = () => {
+
+  /* 다운로드 버튼 클릭 시 호출되는 함수 */
+  const handleDownload = () => {
     downloadImage(imgUrl);
   };
 
+  /* 컴포넌트가 마운트될 때 한 번 호출 */
   useEffect(() => {
     ImgtoPng();
-  });
+  }, []);
 
   return (
-    <button className="download-btn" onClick={downImg}>
-      png로 저장
+    <button className="download-btn" onClick={handleDownload}>
+      PNG로 저장
     </button>
   );
 }

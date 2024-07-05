@@ -181,8 +181,6 @@ export default function EditCharacter(props) {
       >
         캐릭터 추가하기
       </Button>
-
-      <Card infos={infos} style={{ display: "none" }}></Card>
     </EditInfo>
   );
 }
