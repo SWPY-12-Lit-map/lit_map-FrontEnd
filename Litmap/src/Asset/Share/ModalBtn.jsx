@@ -8,6 +8,7 @@ import NaverShare from "./NaverShare";
 
 function Drop(props) {
   const [imgUrl, setUrl] = useState([]);
+  const work = props.work;
   return (
     <Modal
       {...props}
@@ -22,7 +23,7 @@ function Drop(props) {
       </Modal.Header>
       <div>
         <KakaoShare imgUrl={imgUrl}></KakaoShare>
-        <DownloadImg imgUrl={imgUrl} setUrl={setUrl}></DownloadImg>
+        <DownloadImg imgUrl={imgUrl} setUrl={setUrl} work={work}></DownloadImg>
         <Copy imgUrl={imgUrl}></Copy>
         <NaverShare></NaverShare>
       </div>
@@ -33,8 +34,9 @@ function Drop(props) {
   );
 }
 
-export default function ModalBtn() {
+export default function ModalBtn(props) {
   const [modalShow, setModalShow] = React.useState(false);
+  const work = props.work;
 
   return (
     <>
@@ -42,7 +44,7 @@ export default function ModalBtn() {
         공유하기
       </Button>
 
-      <Drop show={modalShow} onHide={() => setModalShow(false)} />
+      <Drop work={work} show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 }

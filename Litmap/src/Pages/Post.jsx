@@ -33,7 +33,7 @@ export default function Post() {
   const [count, setCount] = useState(3); // 인물 수
   const [work, setWork] = useState({
     title: "",
-    defaultVersion: "1",
+    defaultVersion: "0.1",
     userVersion: "",
     genre: "",
     thumbnail: "",
@@ -98,7 +98,7 @@ export default function Post() {
       case 3:
         return (
           <ReactFlowProvider>
-            <Mindmap count={count} infos={infos} />
+            <Mindmap count={count} infos={infos} work={work} />
           </ReactFlowProvider>
         );
     }

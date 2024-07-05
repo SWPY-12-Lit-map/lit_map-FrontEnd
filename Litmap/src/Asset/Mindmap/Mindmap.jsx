@@ -52,6 +52,7 @@ const Mindmap = (props) => {
 
   const infos = props.infos;
   const count = props.count;
+  const work = props.work;
 
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -103,8 +104,15 @@ const Mindmap = (props) => {
   const onSave = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
-      console.log(flow);
+      flow.version = Number(work.defaultVersion);
+      flow.work_id = work.title;
+      flow.viewport = {
+        x: -333.1668897911595,
+        y: -317.6406465385852,
+        zoom: 1.1215817241569601,
+      };
       localStorage.setItem(flowKey, JSON.stringify(flow));
+      console.log(flow);
     }
   }, [rfInstance]);
 
@@ -171,7 +179,7 @@ const Mindmap = (props) => {
         <Controls />
         <MiniMap />
       </ReactFlow>
-      <ModalBtn />
+      <ModalBtn work={work} />
       <button onClick={onSave}>Save</button>
       <button onClick={onRestore}>restore</button>
     </Mapping>
