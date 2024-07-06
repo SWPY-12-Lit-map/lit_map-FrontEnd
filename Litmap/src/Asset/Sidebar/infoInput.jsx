@@ -146,6 +146,7 @@ export default function InfoInput(props) {
         <input
           id="checkbox"
           type="checkbox"
+          defaultChecked={work.thumbnail ? true : false}
           onClick={() => {
             const info = { ...work, thumbnail: "대체 이미지" };
             setWork(info);

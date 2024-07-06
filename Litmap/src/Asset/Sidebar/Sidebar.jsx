@@ -12,8 +12,10 @@ const Side = styled.div`
 const Nav = styled.div`
   width: 100%;
   border: solid 1px black;
-  & button {
+  display: flex;
+  & span {
     width: 50%;
+    text-align: center;
   }
 `;
 
@@ -41,8 +43,23 @@ export default function Sidebar(props) {
   return (
     <Side>
       <Nav>
-        <button>정보입력</button>
-        <button>관계도 수정</button>
+        <span
+          style={{
+            borderBottom:
+              state == 1 || state == 2 ? "solid 2px blue" : "solid 2px gray",
+            display: "block",
+          }}
+        >
+          정보입력
+        </span>
+        <span
+          style={{
+            borderBottom: state == 3 ? "solid 2px blue" : "solid 2px gray",
+            display: "block",
+          }}
+        >
+          관계도 수정
+        </span>
       </Nav>
       {state == 1 || state == 2 ? (
         <InfoInput
@@ -78,8 +95,10 @@ export default function Sidebar(props) {
         <Nextbtn
           onClick={() => {
             if (state == 1) {
+              // 1차 작품 데이터 전송
               setState(2);
             } else if (state == 2) {
+              // 2차 인물 데이터 전송
               setState(3);
             }
           }}
