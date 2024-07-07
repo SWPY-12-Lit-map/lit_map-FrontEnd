@@ -1,5 +1,10 @@
 import { useCallback, useState, useEffect } from "react";
-import { useStore, getStraightPath } from "reactflow";
+import {
+  useStore,
+  getStraightPath,
+  useReactFlow,
+  EdgeLabelRenderer,
+} from "reactflow";
 
 import { getEdgeParams } from "./util";
 
@@ -60,6 +65,11 @@ function FloatingEdge({
       ? { writingMode: "vertical-lr", textOrientation: "upright" }
       : null;
 
+  const onEdgeClick = () => {
+    setEdges((edges) => edges.filter((edge) => edge.id !== id));
+  };
+  const { setEdges } = useReactFlow();
+
   return (
     <>
       <path
@@ -73,59 +83,33 @@ function FloatingEdge({
           strokeWidth: selected ? 4 : style.strokeWidth,
         }}
       />
-      <foreignObject
-        width={
-          // input 박스 넓이 조정
-          (-125 <= angle && angle <= -45) || (45 < angle && angle < 125)
-            ? 50
-            : 100
-        }
-        height={
-          // input 박스 높이 조정
-          (-125 <= angle && angle <= -45) || (45 < angle && angle < 125)
-            ? 100
-            : 30
-        }
-        x={
-          // input x값 조정
-          (-125 <= angle && angle <= -45) || (45 < angle && angle < 125)
-            ? labelX - 30
-            : labelX - 40
-        }
-        y={
-          // input y값 조정
-          (-125 <= angle && angle <= -45) || (45 < angle && angle < 125)
-            ? labelY - 50
-            : labelY - 15
-        }
-        // transform={`rotate(0, ${labelX}, ${labelY})`}
-        // requiredExtensions="http://www.w3.org/1999/xhtml"
-      >
+      <EdgeLabelRenderer>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            height: "100%",
+            position: "absolute",
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            fontSize: 12,
+            pointerEvents: "all",
           }}
+          className="nodrag nopan"
         >
+          {" "}
           <input
             type="text"
             value={text}
             onChange={handleTextChange}
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "1px solid black",
-              boxSizing: "border-box",
-              // border: "none", 불러오기 시에 활성화
-
-              ...ChangeinputStyle,
-            }}
+            style={
+              {
+                // border: "none", 불러오기 시에 활성화
+                // ...ChangeinputStyle,
+              }
+            }
           />
+          <button className="edgebutton" onClick={onEdgeClick}>
+            ×
+          </button>
         </div>
-      </foreignObject>
+      </EdgeLabelRenderer>
     </>
   );
 }
