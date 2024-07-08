@@ -27,7 +27,7 @@ export default function InfoInput(props) {
   const setCount = props.setCount;
   const work = props.work;
   const setWork = props.setWork;
-  const next = props.next;
+
   const setNext = props.setNext;
 
   // 장르 변경
@@ -40,6 +40,7 @@ export default function InfoInput(props) {
   // 파일 업로드
   const fileTypes = ["JPG", "PNG", "GIF"];
 
+  // 이미지 업로드
   const UploadImg = () => {
     const handleChange = (file) => {
       const imgUrl = URL.createObjectURL(file);
@@ -142,6 +143,7 @@ export default function InfoInput(props) {
         </span>
         <UploadImg></UploadImg>
       </div>
+      {/* 대체 이미지 업로드 */}
       <p>
         <input
           id="checkbox"
