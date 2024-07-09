@@ -4,6 +4,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
 import { FileUploader } from "react-drag-drop-files";
 import { useEffect, useState } from "react";
+import Calendar from "../Calender";
 
 const Input = styled.div`
   display: flex;
@@ -27,8 +28,8 @@ export default function InfoInput(props) {
   const setCount = props.setCount;
   const work = props.work;
   const setWork = props.setWork;
-
   const setNext = props.setNext;
+  const [releaseDate, setReleaseDate] = useState(new Date());
 
   // 장르 변경
   function ChangeDrop(e) {
@@ -115,6 +116,13 @@ export default function InfoInput(props) {
           }}
         ></input>
       </Input>
+      {/*  출판일 선택 */}
+      <Calendar
+        setReleaseDate={setReleaseDate}
+        releaseDate={releaseDate}
+        work={work}
+        setWork={setWork}
+      ></Calendar>
       {/* 장르입력 */}
       <Input>
         <span>
@@ -166,6 +174,7 @@ export default function InfoInput(props) {
           value={count}
           onChange={(e) => {
             setCount(e.target.value);
+            console.log(work);
           }}
           type="number"
         ></input>

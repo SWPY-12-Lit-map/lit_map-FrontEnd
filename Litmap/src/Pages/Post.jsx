@@ -4,21 +4,22 @@ import Mindmap from "../Asset/Mindmap/Mindmap";
 import Sidebar from "../Asset/Sidebar/Sidebar";
 import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState } from "react";
+import MyVerticallyCenteredModal from "../Asset/Modal";
 
 const Posting = styled.div`
   height: 90vh;
-
   display: flex;
 `;
 
 const Edit = styled.div`
-  width: 80%;
+  width: 100%;
   height: 100%;
   background-color: white;
 `;
 
 const Main = styled.div`
   height: 90%;
+  width: 100%;
 `;
 
 const Side = styled.div``;
@@ -61,46 +62,61 @@ export default function Post() {
     userVersion: "",
     genre: "",
     thumbnail: "",
-    count: count,
   });
-  const PrevCountRef = useRef();
-  const [mount, setMount] = useState(false);
-  const [infos, setInfos] = useState([]);
-  const [next, setNext] = useState(false);
+  const PrevCountRef = useRef(); // 이전 인물 수
+  const [mount, setMount] = useState(false); // 페이지 로드
+  const [infos, setInfos] = useState([]); // 인물정보
+  const [next, setNext] = useState(false); // 다음 버튼 활성 여부
+  const [extraSave, setExtraSave] = useState(false); // 임시서장 = false / 저장 = true
+  const [modalShow, setModalShow] = useState(false);
 
-  const [edgeType, setEdgetype] = useState(); // 직선 / 곡선
-  const [lineStyle, setLine] = useState(); // 실선 / 점선
+  const [edgeType, setEdgetype] = useState("직선"); // 직선 / 곡선
+  const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
 
   useEffect(() => {
     PrevCountRef.current = count;
-  });
+  }, [count]); // count가 변경될 때만 실행
+
   const prevCount = PrevCountRef.current;
 
   useEffect(() => {
-    const newInfos = Array.from({ length: count }, (_, i) => ({
-      id: i, // 캐릭터 삭제 때문에 필요
-      name: "",
-      species: "",
-      gender: "",
-      age: "",
-      personality: "",
-      otherInfo: "",
-      img: "",
-    })); //
-
     if (!mount) {
+      // 컴포넌트가 마운트될 때만 실행
+      const newInfos = Array.from({ length: count }, (_, i) => ({
+        id: i,
+        name: "",
+        species: "",
+        gender: "",
+        age: "",
+        personality: "",
+        otherInfo: "",
+        img: "",
+      }));
       setInfos(newInfos);
       setMount(true);
-    } else if (prevCount < count) {
-      // 카드 추가시
-      setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
-    } else if (prevCount > count) {
-      // 카드 삭제시
-      setInfos((prevInfos) => prevInfos.slice(0, count));
-    } else if (count < 0) {
-      setCount(0);
-    } else if (count > 30) {
-      setCount(30);
+    } else if (prevCount !== count) {
+      const newInfos = Array.from({ length: count }, (_, i) => ({
+        id: i,
+        name: "",
+        species: "",
+        gender: "",
+        age: "",
+        personality: "",
+        otherInfo: "",
+        img: "",
+      }));
+
+      if (prevCount < count) {
+        setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
+      } else if (prevCount > count) {
+        setInfos((prevInfos) => prevInfos.slice(0, count));
+      }
+
+      if (count <= 1) {
+        setCount(1);
+      } else if (count > 30) {
+        setCount(30);
+      }
     }
   }, [count, mount, prevCount]);
 
@@ -118,16 +134,24 @@ export default function Post() {
         );
       case 2:
         return (
-          <ReactFlowProvider>
-            <Mindmap
-              count={count}
-              infos={infos}
-              work={work}
-              edgeType={edgeType}
-              lineStyle={lineStyle}
+          <p style={{ height: "100%" }}>
+            <ReactFlowProvider>
+              <Mindmap
+                count={count}
+                infos={infos}
+                work={work}
+                edgeType={edgeType}
+                lineStyle={lineStyle}
+              />
+            </ReactFlowProvider>{" "}
+            <MyVerticallyCenteredModal
+              show={modalShow}
+              onHide={() => setModalShow(false)}
             />
-          </ReactFlowProvider>
+          </p>
         );
+      default:
+        return null;
     }
   };
 
@@ -153,14 +177,13 @@ export default function Post() {
         <Main>{Mainpart()}</Main>
         <Foot
           style={{
-            justifyContent: state == 1 ? "flex-end" : "space-between",
+            justifyContent: state === 1 ? "flex-end" : "space-between",
           }}
         >
-          {" "}
-          {state == 2 ? (
+          {state === 2 ? (
             <Prevbtn
               onClick={() => {
-                if (state == 2) {
+                if (state === 2) {
                   setState(1);
                   document.querySelector("#nextBtn").innerHTML = "다음";
                 }
@@ -169,9 +192,11 @@ export default function Post() {
               이전
             </Prevbtn>
           ) : null}
-          {next == false ? (
+          {!next ? (
             <>
-              <ExtraSave>임시저장</ExtraSave>
+              <ExtraSave onClick={() => setExtraSave(false)}>
+                임시저장
+              </ExtraSave>
               <Nextbtn disabled style={{ background: "gray", border: "none" }}>
                 다음
               </Nextbtn>
@@ -182,10 +207,13 @@ export default function Post() {
               <Nextbtn
                 id="nextBtn"
                 onClick={() => {
-                  if (state == 1) {
+                  if (state === 1) {
                     setState(2);
                     document.querySelector("#nextBtn").innerHTML = "저장";
-                  } else if (state == 2) {
+                    setExtraSave(true);
+                  } else if (state === 2) {
+                    // 저장 로직 추가
+                    setModalShow(true);
                   }
                 }}
               >
@@ -194,7 +222,7 @@ export default function Post() {
             </div>
           )}
         </Foot>
-      </Edit>{" "}
+      </Edit>
     </Posting>
   );
 }
