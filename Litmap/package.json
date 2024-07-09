@@ -15,6 +15,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "bootstrap": "^5.3.3",
     "copy-image-clipboard": "^2.1.2",
+    "date-fns": "^3.6.0",
     "html-to-image": "^1.11.11",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.3",
