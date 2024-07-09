@@ -4,6 +4,7 @@ import {
   getStraightPath,
   useReactFlow,
   EdgeLabelRenderer,
+  getBezierPath,
 } from "reactflow";
 
 import { getEdgeParams } from "./util";
@@ -41,13 +42,20 @@ function FloatingEdge({
     return null;
   }
 
-  const { sx, sy, tx, ty } = getEdgeParams(sourceNode, targetNode);
+  const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(
+    sourceNode,
+    targetNode
+  );
 
-  const [edgePath, labelX, labelY] = getStraightPath({
+  const [edgePath, labelX, labelY] = (
+    data.edgeType == "직선" ? getStraightPath : getBezierPath
+  )({
     sourceX: sx,
     sourceY: sy,
     targetX: tx,
     targetY: ty,
+    sourcePosition: sourcePos,
+    targetPosition: targetPos,
   });
 
   const angle = getAngle(sx, sy, tx, ty);
@@ -58,6 +66,7 @@ function FloatingEdge({
     if (onTextChange) {
       onTextChange(id, newText);
     }
+    console.log(data.edgeType);
   };
 
   const ChangeinputStyle =
@@ -81,6 +90,7 @@ function FloatingEdge({
           ...style,
           stroke: selected ? "grey" : style.stroke,
           strokeWidth: selected ? 4 : style.strokeWidth,
+          strokeDasharray: data.lineStyle == "실선" ? "" : "4", // Dotted line pattern
         }}
       />
       <EdgeLabelRenderer>

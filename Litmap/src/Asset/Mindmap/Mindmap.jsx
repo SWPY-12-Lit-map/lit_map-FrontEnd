@@ -50,6 +50,8 @@ const Mindmap = (props) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
+  const edgeType = props.edgeType;
+  const lineStyle = props.lineStyle;
   const infos = props.infos;
   const count = props.count;
   const work = props.work;
@@ -97,7 +99,7 @@ const Mindmap = (props) => {
   /* 선 클릭 */
   const onEdgeClick = useCallback((event, edge) => {
     setSelectedEdgeId(edge.id);
-    console.log(edge);
+    console.log(edgeType);
   }, []);
 
   /* 마인드맵 저장 */
@@ -159,6 +161,8 @@ const Mindmap = (props) => {
           data: {
             ...edge.data,
             onTextChange,
+            edgeType,
+            lineStyle,
           },
           selected: edge.id === selectedEdgeId,
         }))}
