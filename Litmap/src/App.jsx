@@ -5,9 +5,11 @@ import Post from "./Pages/Post";
 import Signup from "./Pages/Signup";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
-import Mypage from "./Pages/Mypage";
+import MypageLayout from "./Pages/MypageLayout";
 import AdminPage from "./Pages/AdminPage";
 import Postdone from "./Pages/Postdone";
+import ProfileEdit from "./Pages/ProfileEdit";
+import ArtworkManagement from "./Pages/ArtworkManagement";
 
 function App() {
   const [mega, setMega] = useState(false);
@@ -16,15 +18,15 @@ function App() {
       <Navbar mega={mega} setMega={setMega} />
       <Routes>
         <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
-        <Route path="/category1" element={<Post />}>
-          {" "}
-        </Route>
-        <Route path="/category1/postdone" element={<Postdone />}></Route>
-
-        <Route path="/category2" element={<Mypage />} />
+        <Route path="/category1" element={<Post />} />
+        <Route path="/category1/postdone" element={<Postdone />} />
+        <Route path="/category2" element={<MypageLayout />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/mypage" element={<Mypage />} />
+        <Route path="/category2/*" element={<MypageLayout />}>
+          <Route path="edit-profile" element={<ProfileEdit />} />
+          <Route path="manage-artworks" element={<ArtworkManagement />} />
+        </Route>
         <Route path="/adminpage" element={<AdminPage />} />
       </Routes>
     </Router>
