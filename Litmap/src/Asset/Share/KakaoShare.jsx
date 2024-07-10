@@ -1,6 +1,16 @@
 import { useEffect } from "react";
+import { RiKakaoTalkFill } from "react-icons/ri";
+import styled from "styled-components";
 // kakao 기능 동작을 위해 넣어준다.
 const { Kakao } = window;
+
+const ShareBtn = styled.button`
+  background-color: #8d2741;
+  border: solid 1px #8d2741;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+`;
 
 export default function KakaoShare(props) {
   // 배포한 자신의 사이트
@@ -38,15 +48,14 @@ export default function KakaoShare(props) {
 
   return (
     <>
-      <button
+      <ShareBtn
         className="grey-btn"
         onClick={() => {
           shareKakao();
         }}
       >
-        {" "}
-        카카오톡 공유하기{" "}
-      </button>
+        <RiKakaoTalkFill color="white" size={"60px"} />
+      </ShareBtn>
     </>
   );
 }

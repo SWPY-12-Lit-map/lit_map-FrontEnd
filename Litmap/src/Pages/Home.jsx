@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Category from "../Asset/Category";
 import Megamenu from "../Asset/Megamenu";
 import Carousel from "react-bootstrap/Carousel";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   font-size: 20px;
@@ -104,9 +105,11 @@ const Foot_Foot = styled.div`
   margin-top: 50px;
 `;
 
-const Home = () => {
-  const [mega, setMega] = useState(false);
+const Home = (props) => {
+  const mega = props.mega;
+  const setMega = props.setMega;
   const [title, setTitle] = useState("");
+  const navigate = useNavigate();
 
   //   캐러셀 이미지
   const slides = ["/advertise1.png", "/advertise2.png", "/advertise3.png"];
@@ -174,7 +177,13 @@ const Home = () => {
         <Posts>
           {posts.map((post, index) => (
             <Post key={index}>
-              <img src={post.image} alt={post.title} />
+              <img
+                src={post.image}
+                alt={post.title}
+                onClick={() => {
+                  navigate("/work");
+                }}
+              />
               <div>{post.title}</div>
             </Post>
           ))}

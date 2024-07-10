@@ -1,3 +1,14 @@
+import { SiNaver } from "react-icons/si";
+import styled from "styled-components";
+
+const ShareBtn = styled.button`
+  background-color: #8d2741;
+  border: solid 1px #8d2741;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+`;
+
 export default function NaverShare() {
   function share() {
     var url = encodeURI(encodeURIComponent("http://localhost:5173/"));
@@ -8,7 +19,9 @@ export default function NaverShare() {
   }
   return (
     <>
-      <button onClick={share}>네이버로 공유하기</button>
+      <ShareBtn onClick={share}>
+        <SiNaver color="white" size={"50px"} />
+      </ShareBtn>
     </>
   );
 }

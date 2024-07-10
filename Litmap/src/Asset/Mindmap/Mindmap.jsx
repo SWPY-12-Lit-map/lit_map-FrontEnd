@@ -183,7 +183,6 @@ const Mindmap = (props) => {
         <Controls />
         <MiniMap />
       </ReactFlow>
-      <ModalBtn work={work} />
       <button onClick={onSave}>Save</button>
       <button onClick={onRestore}>restore</button>
     </Mapping>
