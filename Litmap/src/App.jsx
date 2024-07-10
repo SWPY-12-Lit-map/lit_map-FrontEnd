@@ -10,12 +10,12 @@ import AdminPage from "./Pages/AdminPage";
 import Postdone from "./Pages/Postdone";
 
 function App() {
-  const [mega, setMega] = useState(false);
+  const [login, setLogin] = useState(false);
   return (
     <Router>
-      <Navbar mega={mega} setMega={setMega} />
+      <Navbar login={login} />
       <Routes>
-        <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
+        <Route path="/" element={<Home />} />
         <Route path="/category1" element={<Post />}>
           {" "}
         </Route>
@@ -23,7 +23,7 @@ function App() {
 
         <Route path="/category2" element={<Mypage />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login setLogin={setLogin} />} />
         <Route path="/mypage" element={<Mypage />} />
         <Route path="/adminpage" element={<AdminPage />} />
       </Routes>

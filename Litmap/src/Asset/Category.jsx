@@ -3,20 +3,21 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Link } from "react-router-dom";
-import Megamenu from "../Asset/Megamenu";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 const CategoryMenu = styled.ul`
   display: flex;
   align-items: center;
   list-style: none;
-  padding-left: 0;
+  padding: 20px 50px;
   gap: 15px;
   margin-bottom: 20px;
   position: relative;
+  font-size: 20px;
 `;
 
 const CategoryMenuItem = styled.li`
-  padding: 0 10px;
+  padding: 0 20px;
 `;
 
 const StyledLink = styled(Link)`
@@ -24,28 +25,34 @@ const StyledLink = styled(Link)`
   color: black;
 `;
 
-const MegamenuContainer = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  padding: 20px;
-  z-index: 100;
-  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+const BarsIcon = styled(FontAwesomeIcon)`
+  color: #000000;
+  cursor: pointer;
+  font-size: 20px;
 `;
 
-function Category() {
+function Category(props) {
+  const setMega = props.setMega;
+
   return (
     <CategoryMenu>
+      <BarsIcon
+        icon={faBars}
+        onClick={() => {
+          setMega(true);
+        }}
+      />
       <CategoryMenuItem>
-        <StyledLink to="/category1">카테고리1</StyledLink>
+        <StyledLink to="/category1">책_임시작품등록페이지</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category2">카테고리2</StyledLink>
+        <StyledLink to="/category2">영화_임시마이페이지</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category3">카테고리3</StyledLink>
+        <StyledLink to="/category3">드라마</StyledLink>
+      </CategoryMenuItem>
+      <CategoryMenuItem>
+        <StyledLink to="/category4">웹툰</StyledLink>
       </CategoryMenuItem>
     </CategoryMenu>
   );

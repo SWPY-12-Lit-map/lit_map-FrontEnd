@@ -75,27 +75,27 @@ const MegaLoginItem = styled.li`
   text-align: center;
 `;
 
-const StyledLink = styled(Link)`
-  text-decoration: none;
+const CloseBtn = styled.button`
+  position: absolute;
+  right: 35px;
+  background: none;
   color: white;
-`;
-
-const LoginButton = styled(StyledLink)`
-  background-color: #1890ff;
-  border-radius: 10px;
-  width: 100px;
-  height: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  border: none;
 `;
 
 function Megamenu(props) {
+  const setMega = props.setMega;
   const mega = props.mega;
 
   return (
-    <MegamenuWrapper style={{ display: mega == false ? "none" : "flex" }}>
+    <MegamenuWrapper>
+      <CloseBtn
+        onClick={() => {
+          mega == true ? setMega(false) : null;
+        }}
+      >
+        X
+      </CloseBtn>
       {["책", "영화", "드라마", "웹툰"].map((category) => (
         <Column key={category}>
           <ColumnTitle>{category}</ColumnTitle>
@@ -118,15 +118,6 @@ function Megamenu(props) {
           ))}
         </Column>
       ))}
-
-      <MegaLogin>
-        <MegaLoginItem>
-          <StyledLink to="/signup">가입하기</StyledLink>
-        </MegaLoginItem>
-        <MegaLoginItem>
-          <LoginButton to="/login">로그인하기</LoginButton>
-        </MegaLoginItem>
-      </MegaLogin>
     </MegamenuWrapper>
   );
 }
