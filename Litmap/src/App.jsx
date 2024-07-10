@@ -10,6 +10,7 @@ import AdminPage from "./Pages/AdminPage";
 import Postdone from "./Pages/Postdone";
 import ProfileEdit from "./Pages/ProfileEdit";
 import ArtworkManagement from "./Pages/ArtworkManagement";
+import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 
 function App() {
   const [mega, setMega] = useState(false);
@@ -26,6 +27,7 @@ function App() {
         <Route path="/category2/*" element={<MypageLayout />}>
           <Route path="edit-profile" element={<ProfileEdit />} />
           <Route path="manage-artworks" element={<ArtworkManagement />} />
+          <Route path="delete-service" element={<ServiceWithdrawal />} />
         </Route>
         <Route path="/adminpage" element={<AdminPage />} />
       </Routes>
