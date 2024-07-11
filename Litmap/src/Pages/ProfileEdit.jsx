@@ -104,6 +104,14 @@ const InfoItem = styled.div`
     .content {
         color: #495057;
     }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
 `;
 
 const Button = styled.button`
@@ -114,12 +122,27 @@ const Button = styled.button`
     cursor: pointer;
     border-radius: 5px;
     margin-top: 20px;
-    width: 50%;
+    width: 45%;
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    button {
+        width: 45%;
+    }
 `;
 
 const ProfileEdit = ({ onImageChange }) => {
     const [password, setPassword] = useState("");
     const [profileImage, setProfileImage] = useState("https://via.placeholder.com/100");
+    const [editing, setEditing] = useState(false);
+    const [email, setEmail] = useState("litmap0728@litmap.com");
+    const [phone, setPhone] = useState("010-0000-0000");
+    const [website, setWebsite] = useState("https://www.litmap.com");
+    const [address, setAddress] = useState("서울시 강서구 마곡나루");
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -135,8 +158,20 @@ const ProfileEdit = ({ onImageChange }) => {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Password:", password);
+    const handleEdit = () => {
+        setEditing(true);
+    };
+
+    const handleSave = () => {
+        console.log("저장된 이메일:", email);
+        console.log("저장된 휴대폰 번호:", phone);
+        console.log("저장된 홈페이지 주소:", website);
+        console.log("저장된 사업자 주소:", address);
+        setEditing(false);
+    };
+
+    const handleCancel = () => {
+        setEditing(false);
     };
 
     return (
@@ -157,23 +192,66 @@ const ProfileEdit = ({ onImageChange }) => {
                     <div className="intro">회사 한줄 소개가 들어가는 곳입니다.</div>
                 </ProfileImage>
                 <ProfileInfo>
-                    <InfoItem>
-                        <div className="title">이메일</div>
-                        <div className="content">litmap0728@litmap.com</div>
-                    </InfoItem>
-                    <InfoItem>
-                        <div className="title">휴대폰 번호</div>
-                        <div className="content">010-0000-0000</div>
-                    </InfoItem>
-                    <InfoItem>
-                        <div className="title">홈페이지 주소</div>
-                        <div className="content">https://www.litmap.com</div>
-                    </InfoItem>
-                    <InfoItem>
-                        <div className="title">사업자 주소</div>
-                        <div className="content">서울시 강서구 마곡나루</div>
-                    </InfoItem>
-                    <Button onClick={handleSubmit}>편집하기</Button>
+                    {editing ? (
+                        <>
+                            <InfoItem>
+                                <div className="title">이메일</div>
+                                <input
+                                    type="text"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">휴대폰 번호</div>
+                                <input
+                                    type="text"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">홈페이지 주소</div>
+                                <input
+                                    type="text"
+                                    value={website}
+                                    onChange={(e) => setWebsite(e.target.value)}
+                                />
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">사업자 주소</div>
+                                <input
+                                    type="text"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                />
+                            </InfoItem>
+                            <ButtonContainer>
+                                <Button onClick={handleSave}>저장하기</Button>
+                                <Button onClick={handleCancel}>취소하기</Button>
+                            </ButtonContainer>
+                        </>
+                    ) : (
+                        <>
+                            <InfoItem>
+                                <div className="title">이메일</div>
+                                <div className="content">{email}</div>
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">휴대폰 번호</div>
+                                <div className="content">{phone}</div>
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">홈페이지 주소</div>
+                                <div className="content">{website}</div>
+                            </InfoItem>
+                            <InfoItem>
+                                <div className="title">사업자 주소</div>
+                                <div className="content">{address}</div>
+                            </InfoItem>
+                            <Button onClick={handleEdit}>편집하기</Button>
+                        </>
+                    )}
                 </ProfileInfo>
             </ProfileSection>
         </Content>
