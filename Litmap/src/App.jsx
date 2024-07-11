@@ -14,6 +14,8 @@ import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 
 function App() {
   const [login, setLogin] = useState(false);
+  const [mega, setMega] = useState(false);
+
   return (
     <Router>
       <Navbar login={login} />

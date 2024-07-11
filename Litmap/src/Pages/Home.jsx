@@ -104,11 +104,10 @@ const Foot_Foot = styled.div`
   margin-top: 50px;
 `;
 
-const Home = () => {
-  const [mega, setMega] = useState(false);
+const Home = ({ mega, setMega }) => {
   const [title, setTitle] = useState("");
 
-  //   캐러셀 이미지
+  // 캐러셀 이미지
   const slides = ["/advertise1.png", "/advertise2.png", "/advertise3.png"];
 
   // 작품 썸네일
