@@ -39,6 +39,7 @@ const ProfileImage = styled.div`
     border-radius: 10px;
     padding: 20px;
     margin-right: 20px;
+    position: relative;
 
     img {
         width: 100px;
@@ -68,6 +69,21 @@ const ProfileImage = styled.div`
     .intro {
         font-size: 12px;
         color: #6c757d;
+    }
+
+    .camera-icon {
+        position: absolute;
+        top: 85px;
+        right: 70px;
+        cursor: pointer;
+        background: white;
+        border-radius: 50%;
+        padding: 5px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+        display: none;
     }
 `;
 
@@ -101,11 +117,25 @@ const Button = styled.button`
     width: 50%;
 `;
 
-const ProfileEdit = () => {
+const ProfileEdit = ({ onImageChange }) => {
     const [password, setPassword] = useState("");
+    const [profileImage, setProfileImage] = useState("https://via.placeholder.com/100");
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const imageUrl = reader.result;
+                setProfileImage(imageUrl);
+
+                onImageChange(imageUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = () => {
-        // 비밀번호를 확인하고 다음 단계로 넘어가는 로직 추가
         console.log("Password:", password);
     };
 
@@ -117,7 +147,11 @@ const ProfileEdit = () => {
             <Header>프로필 관리</Header>
             <ProfileSection>
                 <ProfileImage>
-                    <img src="https://via.placeholder.com/100" alt="프로필 이미지" />
+                    <img src={profileImage} alt="프로필 이미지" />
+                    <label className="camera-icon">
+                        📷
+                        <input type="file" accept="image/*" onChange={handleImageChange} />
+                    </label>
                     <div className="nickname">문학동네</div>
                     <div className="role">대표</div>
                     <div className="intro">회사 한줄 소개가 들어가는 곳입니다.</div>
