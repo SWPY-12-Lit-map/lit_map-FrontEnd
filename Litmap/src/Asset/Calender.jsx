@@ -1,4 +1,4 @@
-import { getMonth, getYear } from "date-fns";
+import { format, getMonth, getYear } from "date-fns";
 import { forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -109,15 +109,19 @@ export default function Calendar(props) {
               </div>
             </HeaderContainer>
           )}
-          dateFormat="yyyy.MM.dd" // 날짜 형태
+          dateFormat="yyyy-MM-dd" // 날짜 형태
           shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
           minDate={new Date("1900-01-01")} // minDate 이전 날짜 선택 불가
           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
           selected={props.releaseDate}
           onChange={(date) => {
-            const info = { ...work, releaseDate: date };
+            const info = {
+              ...work,
+              publisherDate: format(date, "yyyy-MM-dd'T'HH:mm:ss"),
+            };
             setWork(info);
             props.setReleaseDate(date);
+            console.log(format(date, "yyyy-MM-dd'T'HH:mm:ss"));
           }}
           customInput={<ExampleCustomInput />}
           showPopperArrow={false}

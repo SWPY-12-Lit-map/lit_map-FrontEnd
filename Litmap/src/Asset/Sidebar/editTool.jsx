@@ -47,6 +47,7 @@ export default function EditTool(props) {
           점선
         </Dropdown.Item>
       </DropdownButton>
+      <div>배경선택</div>
     </p>
   );
 }

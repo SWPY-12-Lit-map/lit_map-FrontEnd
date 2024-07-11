@@ -103,7 +103,8 @@ const ResetPasswordButton = styled.button`
   }
 `;
 
-const LoginPage = () => {
+const LoginPage = (props) => {
+  const setLogin = props.setLogin;
   return (
     <PageContainer>
       <LeftPanel>

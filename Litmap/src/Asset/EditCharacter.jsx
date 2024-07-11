@@ -113,7 +113,7 @@ export default function EditCharacter(props) {
                 <Dropdown.Item
                   key={j}
                   onClick={(e) => {
-                    ChangeDrop(e, "main", i);
+                    ChangeDrop(e, "role", i);
                   }}
                 >
                   {data}
@@ -145,12 +145,12 @@ export default function EditCharacter(props) {
             <input
               placeholder="성격(MBTI 입력)"
               value={info.personality}
-              onChange={(e) => inputChange(e, "personality", i)}
+              onChange={(e) => inputChange(e, "mbti", i)}
             />
             <input
               placeholder="그 외 정보"
               value={info.otherInfo}
-              onChange={(e) => inputChange(e, "otherInfo", i)}
+              onChange={(e) => inputChange(e, "contents", i)}
             />
           </Card.Body>
           <Button

@@ -45,7 +45,7 @@ export default function InfoInput(props) {
   const UploadImg = () => {
     const handleChange = (file) => {
       const imgUrl = URL.createObjectURL(file);
-      const info = { ...work, thumbnail: imgUrl };
+      const info = { ...work, imageUrl: imgUrl };
       setWork(info);
     };
 
@@ -96,7 +96,7 @@ export default function InfoInput(props) {
         <input
           type="text"
           style={{ background: "light gray" }}
-          value={work.defaultVersion}
+          value={work.version}
           disabled
         ></input>
       </Input>
@@ -108,10 +108,9 @@ export default function InfoInput(props) {
         </span>
         <input
           placeholder="버전명을 입력해주세요"
-          value={work.userVersion}
+          value={work.versionName}
           onChange={(e) => {
-            const info = { ...work };
-            info.userVersion = e.target.value;
+            const info = { ...work, versionName: e.target.value };
             setWork(info);
           }}
         ></input>
@@ -123,13 +122,45 @@ export default function InfoInput(props) {
         work={work}
         setWork={setWork}
       ></Calendar>
+      {/* 출판사 이름 */}
+      <Input>
+        {" "}
+        <RedStar>*</RedStar> 출판사:{" "}
+        <input
+          id="text"
+          placeholder="출판사명을 입력해주세요"
+          value={work.publisherName}
+          onChange={(e) => {
+            const info = { ...work, publisherName: e.target.value };
+            setWork(info);
+          }}
+        ></input>{" "}
+      </Input>
+      {/* 작가 이름 */}
+      <Input>
+        {" "}
+        <RedStar>*</RedStar> 작가:{" "}
+        <input
+          id="text"
+          placeholder="작가명을 입력해주세요"
+          value={work.author}
+          onChange={(e) => {
+            const info = { ...work, author: e.target.value };
+            setWork(info);
+          }}
+        ></input>
+        <button>+</button>
+      </Input>
       {/* 장르입력 */}
       <Input>
         <span>
           {" "}
           <RedStar>*</RedStar> 장르
         </span>
-        <DropdownButton id="dropdown-basic-button" title="장르를 선택하세요">
+        <DropdownButton
+          id="dropdown-basic-button"
+          title={work.genre ? work.genre : "장르를 선택하세요"}
+        >
           {["액션", "코미디", "로맨스", "스릴러"].map((genres, i) => {
             return (
               <Dropdown.Item
@@ -156,9 +187,9 @@ export default function InfoInput(props) {
         <input
           id="checkbox"
           type="checkbox"
-          defaultChecked={work.thumbnail ? true : false}
+          defaultChecked={work.imageUrl ? true : false}
           onClick={() => {
-            const info = { ...work, thumbnail: "대체 이미지" };
+            const info = { ...work, imageUrl: "대체 이미지" };
             setWork(info);
           }}
         ></input>{" "}

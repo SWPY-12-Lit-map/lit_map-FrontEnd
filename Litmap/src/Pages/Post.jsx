@@ -5,6 +5,7 @@ import Sidebar from "../Asset/Sidebar/Sidebar";
 import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
+import axios from "axios";
 
 const Posting = styled.div`
   height: 90vh;
@@ -53,25 +54,26 @@ const ExtraSave = styled.button`
   margin-right: 10px;
 `;
 
-export default function Post() {
+export default function Post(props) {
   const [state, setState] = useState(1); // 1 = 작품정보입력, 2 = 인물정보입력 ,3 = 관계도입력
-  const [count, setCount] = useState(3); // 인물 수
-  const [work, setWork] = useState({
-    title: "",
-    defaultVersion: "0.1",
-    userVersion: "",
-    genre: "",
-    thumbnail: "",
-  });
+
   const PrevCountRef = useRef(); // 이전 인물 수
   const [mount, setMount] = useState(false); // 페이지 로드
-  const [infos, setInfos] = useState([]); // 인물정보
+
   const [next, setNext] = useState(false); // 다음 버튼 활성 여부
   const [extraSave, setExtraSave] = useState(false); // 임시서장 = false / 저장 = true
   const [modalShow, setModalShow] = useState(false);
 
-  const [edgeType, setEdgetype] = useState("직선"); // 직선 / 곡선
-  const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
+  const count = props.count;
+  const setCount = props.setCount;
+  const infos = props.infos;
+  const setInfos = props.setInfos;
+  const work = props.work;
+  const setWork = props.setWork;
+  const edgeType = props.edgeType;
+  const setEdgetype = props.setEdgetype;
+  const lineStyle = props.lineStyle;
+  const setLine = props.setLine;
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -83,14 +85,14 @@ export default function Post() {
     if (!mount) {
       // 컴포넌트가 마운트될 때만 실행
       const newInfos = Array.from({ length: count }, (_, i) => ({
-        id: i,
+        id: i, // 제외하고 post
         name: "",
-        species: "",
+        imageUrl: "",
+        type: "",
         gender: "",
         age: "",
-        personality: "",
-        otherInfo: "",
-        img: "",
+        mbti: "",
+        contents: "",
       }));
       setInfos(newInfos);
       setMount(true);
@@ -98,12 +100,12 @@ export default function Post() {
       const newInfos = Array.from({ length: count }, (_, i) => ({
         id: i,
         name: "",
-        species: "",
+        imageUrl: "",
+        type: "",
         gender: "",
         age: "",
-        personality: "",
-        otherInfo: "",
-        img: "",
+        mbti: "",
+        contents: "",
       }));
 
       if (prevCount < count) {
@@ -118,7 +120,7 @@ export default function Post() {
         setCount(30);
       }
     }
-  }, [count, mount, prevCount]);
+  }, [count, mount, prevCount, work]);
 
   const Mainpart = () => {
     switch (state) {
@@ -223,6 +225,47 @@ export default function Post() {
           )}
         </Foot>
       </Edit>
+      <button
+        onClick={() => {
+          // axios
+          //   .post("http://43.200.133.58:8080/api/work", work)
+          //   .then((a) => {
+          //     console.log(a);
+          //   })
+          //   .catch((a) => {
+          //     console.log(a);
+          //   });
+
+          // axios
+          //   .get("http://43.200.133.58:8080/api/work/2/0.2")
+          //   .then((a) => {
+          //     console.log(a);
+          //   })
+          //   .catch((a) => {
+          //     console.log(a);
+          //   });
+
+          // axios
+          //   .delete("http://43.200.133.58:8080/api/cast/2/0.2/등장인물2")
+          //   .then((a) => {
+          //     console.log(a);
+          //   })
+          //   .catch((a) => {
+          //     console.log(a);
+          //   });
+
+          axios
+            .delete("http://43.200.133.58:8080/api/work/2")
+            .then((a) => {
+              console.log(a);
+            })
+            .catch((a) => {
+              console.log(a);
+            });
+        }}
+      >
+        확인용
+      </button>
     </Posting>
   );
 }

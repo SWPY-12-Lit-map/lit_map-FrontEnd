@@ -23,15 +23,7 @@ export default function CustomNode({ id, data, selected, index }) {
             type="source"
           />
         )}
-        <div>
-          <h3>{data.name}</h3>
-          {/* <p>{data.id}</p> */}
-          <p>{data.gender}</p>
-          <p>{data.species}</p>
-          <p>{data.age}</p>
-          <p>{data.personality}</p>
-          <p>{data.otherInfo}</p>
-        </div>
+        <div>dd</div>
 
         <Handle
           className="customHandle"
