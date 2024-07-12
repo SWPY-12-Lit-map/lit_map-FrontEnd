@@ -1,7 +1,10 @@
+import axios from "axios";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 export default function MyVerticallyCenteredModal(props) {
+  const work = props.work;
+  const setWork = props.setWork;
   const navigate = useNavigate();
   return (
     <Modal
@@ -32,6 +35,18 @@ export default function MyVerticallyCenteredModal(props) {
         <Button
           onClick={() => {
             navigate("/category1/postdone");
+
+            const setSaveState = { ...work, confirmCheck: true };
+            setWork(setSaveState);
+            console.log(work);
+            axios
+              .post("http://43.200.133.58:8080/api/work", work)
+              .then((result) => {
+                console.log(result);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           }}
         >
           확인

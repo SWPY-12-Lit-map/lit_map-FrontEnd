@@ -109,7 +109,7 @@ const GetInfo = async () => {
 export default function Work(props) {
   const [state, setState] = useState(false);
   const count = props.count;
-  const infos = props.infos;
+  const characterInfos = props.characterInfos;
   const work = props.work;
   const edgeType = props.edgeType;
   const lineStyle = props.lineStyle;
@@ -173,7 +173,7 @@ export default function Work(props) {
           <ReactFlowProvider>
             <Mindmap
               count={count}
-              infos={infos}
+              characterInfos={characterInfos}
               work={work}
               edgeType={edgeType}
               lineStyle={lineStyle}

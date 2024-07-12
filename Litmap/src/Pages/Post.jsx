@@ -66,7 +66,7 @@ export default function Post(props) {
 
   const count = props.count;
   const setCount = props.setCount;
-  const infos = props.infos;
+  const characterInfos = props.characterInfos;
   const setInfos = props.setInfos;
   const work = props.work;
   const setWork = props.setWork;
@@ -129,9 +129,10 @@ export default function Post(props) {
           <EditCharacter
             count={count}
             setCount={setCount}
-            infos={infos}
+            characterInfos={characterInfos}
             setInfos={setInfos}
             prevCount={prevCount}
+            work={work}
           />
         );
       case 2:
@@ -140,13 +141,16 @@ export default function Post(props) {
             <ReactFlowProvider>
               <Mindmap
                 count={count}
-                infos={infos}
+                characterInfos={characterInfos}
                 work={work}
+                setWork={setWork}
                 edgeType={edgeType}
                 lineStyle={lineStyle}
               />
             </ReactFlowProvider>{" "}
             <MyVerticallyCenteredModal
+              work={work}
+              setWork={setWork}
               show={modalShow}
               onHide={() => setModalShow(false)}
             />
@@ -225,47 +229,6 @@ export default function Post(props) {
           )}
         </Foot>
       </Edit>
-      <button
-        onClick={() => {
-          // axios
-          //   .post("http://43.200.133.58:8080/api/work", work)
-          //   .then((a) => {
-          //     console.log(a);
-          //   })
-          //   .catch((a) => {
-          //     console.log(a);
-          //   });
-
-          // axios
-          //   .get("http://43.200.133.58:8080/api/work/2/0.2")
-          //   .then((a) => {
-          //     console.log(a);
-          //   })
-          //   .catch((a) => {
-          //     console.log(a);
-          //   });
-
-          // axios
-          //   .delete("http://43.200.133.58:8080/api/cast/2/0.2/등장인물2")
-          //   .then((a) => {
-          //     console.log(a);
-          //   })
-          //   .catch((a) => {
-          //     console.log(a);
-          //   });
-
-          axios
-            .delete("http://43.200.133.58:8080/api/work/2")
-            .then((a) => {
-              console.log(a);
-            })
-            .catch((a) => {
-              console.log(a);
-            });
-        }}
-      >
-        확인용
-      </button>
     </Posting>
   );
 }

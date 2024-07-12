@@ -1,10 +1,10 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
 import { FileUploader } from "react-drag-drop-files";
 import { useEffect, useState } from "react";
 import Calendar from "../Calender";
+import axios from "axios";
 
 const Input = styled.div`
   display: flex;
@@ -30,11 +30,13 @@ export default function InfoInput(props) {
   const setWork = props.setWork;
   const setNext = props.setNext;
   const [releaseDate, setReleaseDate] = useState(new Date());
+  const [getGenres, setGenre] = useState([]);
+  const [getCategory, setCategory] = useState([]);
 
   // 장르 변경
-  function ChangeDrop(e) {
-    document.querySelector("#dropdown-basic-button").innerHTML = e.target.text;
-    const info = { ...work, genre: e.target.text };
+  function ChangeDrop(id, sort, data) {
+    document.querySelector(`#${id}`).innerHTML = data;
+    const info = { ...work, [sort]: data };
     setWork(info);
   }
 
@@ -48,29 +50,54 @@ export default function InfoInput(props) {
       const info = { ...work, imageUrl: imgUrl };
       setWork(info);
     };
-
-    const CheckInputs = () => {
-      const works = Object.values(work);
-      const found = works.find((a) => a === "");
-      if (found !== "") {
-        setNext(true);
-      }
-    };
-
-    useEffect(() => {
-      CheckInputs();
-    }, [work, setWork]);
-
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
         <Dropzone id="dropzone">
-          {work.thumbnail
+          {work.imageUrl
             ? "Dropped!"
             : "Click or drag file to this area to upload"}
         </Dropzone>
       </FileUploader>
     );
   };
+
+  // 빈값 확인
+  const CheckInputs = () => {
+    const works = Object.values(work);
+    const found = works.find((a) => a === "");
+    if (found === undefined) {
+      setNext(true);
+    }
+  };
+
+  useEffect(() => {
+    CheckInputs();
+  }, [work, setWork]);
+
+  useEffect(() => {
+    axios
+      .get("http://43.200.133.58:8080/api/genre")
+      .then((result) => {
+        console.log(result.data.result);
+        setGenre(result.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트가 처음 렌더링될 때만 실행되도록 설정
+
+  useEffect(() => {
+    axios
+      .get("http://43.200.133.58:8080/api/category")
+      .then((result) => {
+        console.log(result.data.result);
+        setCategory(result.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트가 처음 렌더링될 때만 실행되도록 설정
+
   return (
     <>
       {/* 제목입력 */}
@@ -115,7 +142,31 @@ export default function InfoInput(props) {
           }}
         ></input>
       </Input>
-      {/*  출판일 선택 */}
+      {/* 카테고리 */}
+      <Input>
+        <span>
+          {" "}
+          <RedStar>*</RedStar> 카테고리
+        </span>
+        <DropdownButton
+          id="카테고리"
+          title={work.category ? work.category : "카테고리를 선택하세요"}
+        >
+          {getCategory.map((category, i) => {
+            return (
+              <Dropdown.Item
+                key={i}
+                onClick={() => {
+                  ChangeDrop("카테고리", "category", category.name);
+                }}
+              >
+                {category.name}
+              </Dropdown.Item>
+            );
+          })}
+        </DropdownButton>
+      </Input>
+      {/* 출판일 선택 */}
       <Calendar
         setReleaseDate={setReleaseDate}
         releaseDate={releaseDate}
@@ -158,18 +209,18 @@ export default function InfoInput(props) {
           <RedStar>*</RedStar> 장르
         </span>
         <DropdownButton
-          id="dropdown-basic-button"
+          id="장르"
           title={work.genre ? work.genre : "장르를 선택하세요"}
         >
-          {["액션", "코미디", "로맨스", "스릴러"].map((genres, i) => {
+          {getGenres.map((genre, i) => {
             return (
               <Dropdown.Item
                 key={i}
-                onClick={(e) => {
-                  ChangeDrop(e);
+                onClick={() => {
+                  ChangeDrop("장르", "genre", genre.name);
                 }}
               >
-                {genres}
+                {genre.name}
               </Dropdown.Item>
             );
           })}
@@ -209,6 +260,21 @@ export default function InfoInput(props) {
           }}
           type="number"
         ></input>
+      </Input>
+      {/* 작품 설명 */}
+      <Input>
+        {" "}
+        <RedStar>*</RedStar> 부가설명:{" "}
+        <input
+          id="text"
+          placeholder="부가설명을 입력해주세요"
+          value={work.contents}
+          onChange={(e) => {
+            const info = { ...work, contents: e.target.value };
+            setWork(info);
+          }}
+        ></input>
+        <button>+</button>
       </Input>
     </>
   );

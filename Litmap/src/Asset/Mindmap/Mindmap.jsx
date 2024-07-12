@@ -52,9 +52,10 @@ const Mindmap = (props) => {
 
   const edgeType = props.edgeType;
   const lineStyle = props.lineStyle;
-  const infos = props.infos;
+  const characterInfos = props.characterInfos;
   const count = props.count;
   const work = props.work;
+  const setWork = props.setWork;
 
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -65,10 +66,10 @@ const Mindmap = (props) => {
       id: `${i}`,
       type: "custom",
       position: { x: (i + 5) * 100, y: (i + 5) * 100 },
-      data: infos[i],
+      data: characterInfos[i],
     }));
     setNodes((nodes) => [...nodes, ...newNodes]);
-  }, [count, setNodes, infos]);
+  }, [count, setNodes, characterInfos]);
 
   /* 연결 되었을 때 */
   const onConnect = useCallback(
@@ -109,28 +110,30 @@ const Mindmap = (props) => {
       flow.version = Number(work.defaultVersion);
       flow.work_id = work.title;
       flow.viewport = {
-        x: -333.1668897911595,
-        y: -317.6406465385852,
-        zoom: 1.1215817241569601,
+        x: rfInstance.getViewport().x,
+        y: rfInstance.getViewport().y,
+        zoom: rfInstance.getViewport().zoom,
       };
       localStorage.setItem(flowKey, JSON.stringify(flow));
       console.log(flow);
+      const updateRelationship = { ...work, relationship: flow, version: 0.1 };
+      setWork(updateRelationship);
     }
-  }, [rfInstance]);
+  }, [rfInstance, work]);
 
   /* 마인드맵 저장 복구 */
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
       const flow = JSON.parse(localStorage.getItem(flowKey));
       if (flow) {
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
+        setTimeout(() => setViewport(flow.viewport), 0); // 뷰포트 설정
+        console.log(flow);
       }
     };
     restoreFlow();
-  }, [setNodes, setViewport]);
+  }, [setNodes, setViewport, setEdges]);
 
   /* 선 지우기 */
   useEffect(() => {
