@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,10 @@ import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 import { faUserXmark } from "@fortawesome/free-solid-svg-icons";
 import { faPeopleRoof } from "@fortawesome/free-solid-svg-icons";
+import AdminPage from "./AdminPage";
+import ProfileEdit from "./ProfileEdit";
+import ArtworkManagement from "./ArtworkManagement";
+import ServiceWithdrawal from "./ServiceWithdrawal";
 
 const Container = styled.div`
   display: flex;
@@ -196,7 +200,13 @@ const MypageLayout = () => {
         </Box>
       </Sidebar>
       <MainContent>
-        <Outlet />
+        <Routes>
+          <Route path="/" element={<ArtworkManagement />} />
+          <Route path="edit-profile" element={<ProfileEdit />} />
+          <Route path="manage-artworks" element={<ArtworkManagement />} />
+          <Route path="delete-service" element={<ServiceWithdrawal />} />
+          <Route path="adminpage" element={<AdminPage />} />
+        </Routes>
       </MainContent>
     </Container>
   );
