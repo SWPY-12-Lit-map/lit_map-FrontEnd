@@ -15,6 +15,8 @@ import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
 import basicImg from "./Asset/blank-profile-picture-973460_1280.png";
 import axios from "axios";
+import FindIdPage from "./Pages/FindIdPage";
+import FindPasswordPage from "./Pages/FindPasswordPage";
 
 function App() {
   const [login, setLogin] = useState(false);
@@ -103,6 +105,8 @@ function App() {
           <Route path="delete-service" element={<ServiceWithdrawal />} />
         </Route>
         <Route path="/adminpage" element={<AdminPage />} />
+        <Route path="/find-id" element={<FindIdPage />} />
+        <Route path="/reset-password" element={<FindPasswordPage />} />
       </Routes>
     </Router>
   );
