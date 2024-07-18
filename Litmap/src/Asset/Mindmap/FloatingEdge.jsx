@@ -67,6 +67,7 @@ function FloatingEdge({
       onTextChange(id, newText);
     }
     console.log(data.edgeType);
+    console.log(data.read);
   };
 
   const ChangeinputStyle =
@@ -90,7 +91,7 @@ function FloatingEdge({
           ...style,
           stroke: selected ? "grey" : style.stroke,
           strokeWidth: selected ? 4 : style.strokeWidth,
-          strokeDasharray: data.lineStyle == "실선" ? "" : "4", // Dotted line pattern
+          strokeDasharray: data.lineStyle == "실선" ? "" : "4",
         }}
       />
       <EdgeLabelRenderer>
@@ -108,16 +109,17 @@ function FloatingEdge({
             type="text"
             value={text}
             onChange={handleTextChange}
-            style={
-              {
-                // border: "none", 불러오기 시에 활성화
-                // ...ChangeinputStyle,
-              }
-            }
+            style={{
+              border: data.read ? "none" : null,
+              // ...ChangeinputStyle,
+            }}
+            readOnly={data.read ? true : false}
           />
-          <button className="edgebutton" onClick={onEdgeClick}>
-            ×
-          </button>
+          {data.read ? null : (
+            <button className="edgebutton" onClick={onEdgeClick}>
+              ×
+            </button>
+          )}
         </div>
       </EdgeLabelRenderer>
     </>

@@ -13,27 +13,25 @@ import ArtworkManagement from "./Pages/ArtworkManagement";
 import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
-import basicImg from "./Asset/blank-profile-picture-973460_1280.png";
-import axios from "axios";
 
 function App() {
+  const date = new Date();
   const [login, setLogin] = useState(false);
   const [mega, setMega] = useState(false);
   const [count, setCount] = useState(3); // 인물 수
   const [characterInfos, setInfos] = useState([]); // 인물정보
   const [work, setWork] = useState({
     confirmCheck: false,
-    category: "", // 책이나 영화 뭐 이런거
-    genre: "", // 장르
-    author: "", // 작가
-    imageUrl: "", // 썸넬 이미지
+    category: "책", // 책이나 영화 뭐 이런거
+    genre: "코미디", // 장르
+    author: "작가", // 작가
+    imageUrl: "대체이미지", // 썸넬 이미지
     memberId: 1, // 작성자 id
-    publisherName: "", // 출판사 이름
-    title: "", // 제목
-    contents: "", // 설명
-    publisherDate: "", // 출판일자
+    title: "제목", // 제목
+    contents: "작품 설명", // 설명
+    publisherDate: date, // 출판일자
     version: 0.1, // 시스템 버전
-    versionName: "", // 작성자 임의 버전
+    versionName: "1화", // 작성자 임의 버전
     casts: [
       {
         name: "",
@@ -50,6 +48,7 @@ function App() {
       // 마인드맵 그대로
     },
   }); // 백엔드 api 양식
+  const [read, setRead] = useState(false);
 
   useEffect(() => {
     const infosChange = { ...work, casts: characterInfos };
@@ -78,6 +77,8 @@ function App() {
               setEdgetype={setEdgetype}
               lineStyle={lineStyle}
               setLine={setLine}
+              read={read}
+              setRead={setRead}
             />
           }
         />
@@ -94,6 +95,8 @@ function App() {
               work={work}
               edgeType={edgeType}
               lineStyle={lineStyle}
+              read={read}
+              setRead={setRead}
             />
           }
         ></Route>

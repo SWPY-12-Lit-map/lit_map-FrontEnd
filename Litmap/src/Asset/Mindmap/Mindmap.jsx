@@ -7,6 +7,8 @@ import ReactFlow, {
   MiniMap,
   Controls,
   useReactFlow,
+  Background,
+  BackgroundVariant,
 } from "reactflow";
 import CustomNode from "./CustomNode";
 import FloatingEdge from "./FloatingEdge";
@@ -14,25 +16,24 @@ import CustomConnectionLine from "./CustomConnectionLine";
 import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
-import ModalBtn from "../Share/ModalBtn";
 
 const Mapping = styled.div`
   width: 100%;
   height: 100%;
 `;
 
-const initialNodes = []; // 초기 노드
-const initialEdges = []; // 초기 연결 선
+const initialNodes = [];
+const initialEdges = [];
 const connectionLineStyle = {
   strokeWidth: 3,
   stroke: "black",
 };
 const nodeTypes = {
   custom: CustomNode,
-}; // 노드 스타일
+};
 const edgeTypes = {
   floating: FloatingEdge,
-}; // 선 타입
+};
 const defaultEdgeOptions = {
   style: { strokeWidth: 2, stroke: "black" },
   type: "floating",
@@ -49,13 +50,19 @@ const Mindmap = (props) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [readNodes, setReadNodes] = useState();
 
-  const edgeType = props.edgeType;
-  const lineStyle = props.lineStyle;
-  const characterInfos = props.characterInfos;
-  const count = props.count;
-  const work = props.work;
-  const setWork = props.setWork;
+  const {
+    edgeType,
+    lineStyle,
+    read,
+    characterInfos,
+    count,
+    work,
+    setWork,
+    backgroundImg,
+    setBackImg,
+  } = props;
 
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -66,10 +73,12 @@ const Mindmap = (props) => {
       id: `${i}`,
       type: "custom",
       position: { x: (i + 5) * 100, y: (i + 5) * 100 },
-      data: characterInfos[i],
+      data: {
+        ...characterInfos[i],
+      },
     }));
     setNodes((nodes) => [...nodes, ...newNodes]);
-  }, [count, setNodes, characterInfos]);
+  }, [count, setNodes, characterInfos, read]);
 
   /* 연결 되었을 때 */
   const onConnect = useCallback(
@@ -100,7 +109,6 @@ const Mindmap = (props) => {
   /* 선 클릭 */
   const onEdgeClick = useCallback((event, edge) => {
     setSelectedEdgeId(edge.id);
-    console.log(edgeType);
   }, []);
 
   /* 마인드맵 저장 */
@@ -114,8 +122,7 @@ const Mindmap = (props) => {
         y: rfInstance.getViewport().y,
         zoom: rfInstance.getViewport().zoom,
       };
-      localStorage.setItem(flowKey, JSON.stringify(flow));
-      console.log(flow);
+      flow.backgroundImage = backgroundImg;
       const updateRelationship = { ...work, relationship: flow, version: 0.1 };
       setWork(updateRelationship);
     }
@@ -124,16 +131,23 @@ const Mindmap = (props) => {
   /* 마인드맵 저장 복구 */
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(flowKey));
+      const flow = work.relationship;
+      const readNodes = flow.nodes;
+      readNodes.forEach((element) => {
+        element.data.read = read;
+        // console.log(element.data);
+      });
+      console.log(readNodes);
+      console.log(flow);
       if (flow) {
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
-        setTimeout(() => setViewport(flow.viewport), 0); // 뷰포트 설정
-        console.log(flow);
+        setTimeout(() => setViewport(flow.viewport), 0);
+        setBackImg(flow.backgroundImage);
       }
     };
     restoreFlow();
-  }, [setNodes, setViewport, setEdges]);
+  }, [props.relationship, read, setNodes, setViewport, setEdges]);
 
   /* 선 지우기 */
   useEffect(() => {
@@ -153,7 +167,14 @@ const Mindmap = (props) => {
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
     createNodes();
-  }, [count]);
+  }, [count, createNodes, read, backgroundImg]);
+
+  useEffect(() => {
+    if (read == true) {
+      onRestore();
+      console.log(read);
+    }
+  }, [read, onRestore]);
 
   return (
     <Mapping>
@@ -166,14 +187,15 @@ const Mindmap = (props) => {
             onTextChange,
             edgeType,
             lineStyle,
+            read,
           },
           selected: edge.id === selectedEdgeId,
         }))}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onEdgesDelete={onEdgesDelete}
-        onEdgeClick={onEdgeClick}
+        onNodesChange={read ? null : onNodesChange}
+        onEdgesChange={read ? null : onEdgesChange}
+        onConnect={read ? null : onConnect}
+        onEdgesDelete={read ? null : onEdgesDelete}
+        onEdgeClick={read ? null : onEdgeClick}
         fitView
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
@@ -183,11 +205,25 @@ const Mindmap = (props) => {
         defaultViewport={defaultViewport}
         onInit={setRfInstance}
       >
+        <Background
+          id="1"
+          style={{
+            backgroundImage: backgroundImg ? `url(${backgroundImg})` : null,
+            backgroundSize: backgroundImg ? "cover" : null,
+            // background:
+            //   "linear-gradient(135deg, rgba(35,185,168,1) 0%, rgba(2,0,36,1) 80%)",
+          }}
+          variant="none"
+        />
         <Controls />
-        <MiniMap />
+        {read ? null : <MiniMap />}
       </ReactFlow>
-      <button onClick={onSave}>Save</button>
-      <button onClick={onRestore}>restore</button>
+      {read ? null : (
+        <>
+          <button onClick={onSave}>Save</button>
+          <button onClick={onRestore}>restore</button>
+        </>
+      )}
     </Mapping>
   );
 };

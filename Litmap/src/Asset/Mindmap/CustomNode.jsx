@@ -8,25 +8,26 @@ const Button = styled.button`
   position: absolute;
   left: 25px;
 `;
-const InfoTap = styled.div`
+const InfoTab = styled.div`
   position: absolute;
 `;
 
-export default function CustomNode({ id, data, selected, index }) {
+export default function CustomNode({ id, data, selected }) {
   const [show, setShow] = useState(false);
-
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const isConnecting = !!connectionNodeId;
   const isTarget = connectionNodeId && connectionNodeId !== id;
-  // const label = isTarget ? "Drop here" : "Drag to connect";
+
   return (
     <div className="customNode" style={{ width: "100%", height: "100%" }}>
-      <NodeResizer
-        color="blue"
-        isVisible={selected}
-        minWidth={100}
-        minHeight={100}
-      />
+      {data.read ? null : (
+        <NodeResizer
+          color="blue"
+          isVisible={selected}
+          minWidth={100}
+          minHeight={100}
+        />
+      )}
       <div
         className="customNodeBody"
         style={{ width: "100%", height: "100%", overflow: "unset" }}
@@ -36,21 +37,21 @@ export default function CustomNode({ id, data, selected, index }) {
             className="customHandle"
             position={Position.Right}
             type="source"
+            style={data.read ? { width: "0%", height: "0%" } : null}
           />
         )}
         <div>
           <Button
             onClick={() => {
-              {
-                show == false ? setShow(true) : setShow(false);
-              }
+              setShow(!show);
             }}
           >
             다운
           </Button>
-          <img src={data.imageUrl ? data.imageUrl : basicImg} width={100}></img>
-          {show == false ? null : (
-            <InfoTap>
+          <img src={data.imageUrl || basicImg} width={100} alt="Profile"></img>
+
+          {show && (
+            <InfoTab>
               <p>이름: {data.name}</p>
               <p>종족: {data.type}</p>
               <p>주조연: {data.role}</p>
@@ -58,7 +59,7 @@ export default function CustomNode({ id, data, selected, index }) {
               <p>나이: {data.age}</p>
               <p>mbti: {data.mbti}</p>
               <p>기타내용: {data.contents}</p>
-            </InfoTap>
+            </InfoTab>
           )}
         </div>
 
@@ -67,6 +68,7 @@ export default function CustomNode({ id, data, selected, index }) {
           position={Position.Left}
           type="target"
           isConnectableStart={false}
+          style={data.read ? { width: "0%", height: "0%" } : null}
         />
       </div>
     </div>
