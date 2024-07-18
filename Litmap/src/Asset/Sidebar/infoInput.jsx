@@ -33,6 +33,8 @@ export default function InfoInput(props) {
   const [getGenres, setGenre] = useState([]);
   const [getCategory, setCategory] = useState([]);
 
+  const [imageFile, setFile] = useState(null);
+
   // 장르 변경
   function ChangeDrop(id, sort, data) {
     document.querySelector(`#${id}`).innerHTML = data;
@@ -41,24 +43,54 @@ export default function InfoInput(props) {
   }
 
   // 파일 업로드
-  const fileTypes = ["JPG", "PNG", "GIF"];
+  const fileTypes = ["JPG", "PNG", "JPEG"];
 
   // 이미지 업로드
-  const UploadImg = () => {
+  function DragDrop() {
     const handleChange = (file) => {
-      const imgUrl = URL.createObjectURL(file);
-      const info = { ...work, imageUrl: imgUrl };
-      setWork(info);
+      setFile(file);
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      formData.append("path", "img");
+      axios
+        .post("https://api.litmap.store/api/files", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response.data.result); // 애를 백엔드에 보낼때 img값으로 넣어야함
+          const ImgUrl = { ...work, imageUrl: response.data.result };
+          setWork(ImgUrl);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     };
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
         <Dropzone id="dropzone">
-          {work.imageUrl
+          {work.thumbnail
             ? "Dropped!"
             : "Click or drag file to this area to upload"}
         </Dropzone>
       </FileUploader>
     );
+  }
+
+  // 작가 수에 따라 input 추가
+  const [inputs, setInputs] = useState([
+    {
+      id: "0",
+      value: "",
+    },
+  ]);
+  const handleAddInput = () => {
+    const newInput = {
+      id: inputs.length,
+      value: "",
+    };
+    setInputs([...inputs, newInput]);
   };
 
   // 빈값 확인
@@ -74,34 +106,36 @@ export default function InfoInput(props) {
     CheckInputs();
   }, [work, setWork]);
 
-  useEffect(() => {
-    axios
-      .get("http://43.200.133.58:8080/api/genre")
-      .then((result) => {
-        console.log(result.data.result);
-        setGenre(result.data.result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트가 처음 렌더링될 때만 실행되도록 설정
+  // // 장르 가져오기
+  // useEffect(() => {
+  //   axios
+  //     .get("https://api.litmap.store/api/genre")
+  //     .then((result) => {
+  //       console.log(result.data.result);
+  //       setGenre(result.data.result);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
 
-  useEffect(() => {
-    axios
-      .get("http://43.200.133.58:8080/api/category")
-      .then((result) => {
-        console.log(result.data.result);
-        setCategory(result.data.result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []); // 의존성 배열을 빈 배열로 설정하여 컴포넌트가 처음 렌더링될 때만 실행되도록 설정
+  // // 카테고리 가져오기
+  // useEffect(() => {
+  //   axios
+  //     .get("https://api.litmap.store/api/category")
+  //     .then((result) => {
+  //       console.log(result.data.result);
+  //       setCategory(result.data.result);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
 
   return (
     <>
       {/* 제목입력 */}
-      <Input>
+      <Input id="title">
         <span>
           <RedStar>*</RedStar> 제목:{" "}
         </span>
@@ -115,7 +149,7 @@ export default function InfoInput(props) {
         ></input>
       </Input>
       {/* 시스템 버전 */}
-      <Input>
+      <Input id="version">
         <span>
           {" "}
           <RedStar>*</RedStar>버전:{" "}
@@ -128,7 +162,7 @@ export default function InfoInput(props) {
         ></input>
       </Input>
       {/* 사용자 임의 버전등록 */}
-      <Input>
+      <Input id="versionName">
         <span>
           {" "}
           <RedStar>*</RedStar> 버전명:{" "}
@@ -143,7 +177,7 @@ export default function InfoInput(props) {
         ></input>
       </Input>
       {/* 카테고리 */}
-      <Input>
+      <Input id="category">
         <span>
           {" "}
           <RedStar>*</RedStar> 카테고리
@@ -165,45 +199,9 @@ export default function InfoInput(props) {
             );
           })}
         </DropdownButton>
-      </Input>
-      {/* 출판일 선택 */}
-      <Calendar
-        setReleaseDate={setReleaseDate}
-        releaseDate={releaseDate}
-        work={work}
-        setWork={setWork}
-      ></Calendar>
-      {/* 출판사 이름 */}
-      <Input>
-        {" "}
-        <RedStar>*</RedStar> 출판사:{" "}
-        <input
-          id="text"
-          placeholder="출판사명을 입력해주세요"
-          value={work.publisherName}
-          onChange={(e) => {
-            const info = { ...work, publisherName: e.target.value };
-            setWork(info);
-          }}
-        ></input>{" "}
-      </Input>
-      {/* 작가 이름 */}
-      <Input>
-        {" "}
-        <RedStar>*</RedStar> 작가:{" "}
-        <input
-          id="text"
-          placeholder="작가명을 입력해주세요"
-          value={work.author}
-          onChange={(e) => {
-            const info = { ...work, author: e.target.value };
-            setWork(info);
-          }}
-        ></input>
-        <button>+</button>
-      </Input>
+      </Input>{" "}
       {/* 장르입력 */}
-      <Input>
+      <Input id="genre">
         <span>
           {" "}
           <RedStar>*</RedStar> 장르
@@ -226,13 +224,74 @@ export default function InfoInput(props) {
           })}
         </DropdownButton>
       </Input>
+      {/* 출판일 선택 */}
+      <Calendar
+        setReleaseDate={setReleaseDate}
+        releaseDate={releaseDate}
+        work={work}
+        setWork={setWork}
+      ></Calendar>
+      {/* 작가 이름 */}
+      <Input>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {" "}
+          {inputs.map((data) => (
+            <div>
+              <input
+                type="radio"
+                name="main"
+                id={data.id}
+                value={data.value}
+                onClick={() => {
+                  const name = data.value;
+                  const info = {
+                    ...work,
+                    author:
+                      inputs.length == 1
+                        ? e.target.value
+                        : `${name},${work.author}`,
+                  };
+
+                  setWork(info);
+                }}
+              ></input>{" "}
+              <input
+                key={data.id}
+                id={data.id}
+                placeholder="작가명을 입력해주세요"
+                value={data.value}
+                onChange={(e) => {
+                  const updatedInputs = inputs.map((item) =>
+                    item.id === data.id
+                      ? { ...item, value: e.target.value }
+                      : item
+                  );
+                  setInputs(updatedInputs);
+                  const info = {
+                    ...work,
+                    author:
+                      inputs.length == 1
+                        ? e.target.value
+                        : `${work.author},${e.target.value}`,
+                  };
+                  setWork(info);
+                  console.log([info.author]);
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <button onClick={handleAddInput}>+</button>
+      </Input>
       {/* 이미지 업로드 */}
-      <div style={{ display: "flex" }}>
+      <Input id="imageUrl" style={{ display: "flex" }}>
         <span>
           <RedStar>*</RedStar> 대표 이미지:{" "}
         </span>
-        <UploadImg></UploadImg>
-      </div>
+        {/* <UploadImg></UploadImg> */}
+        <DragDrop></DragDrop>
+      </Input>
       {/* 대체 이미지 업로드 */}
       <p>
         <input
@@ -247,7 +306,7 @@ export default function InfoInput(props) {
         <label htmlFor="checkbox">대체 이미지 등록하기</label>
       </p>
       {/* 등장인물 수 */}
-      <Input>
+      <Input id="count">
         <span>
           {" "}
           <RedStar>*</RedStar> 등장인물:{" "}
@@ -262,7 +321,7 @@ export default function InfoInput(props) {
         ></input>
       </Input>
       {/* 작품 설명 */}
-      <Input>
+      <Input id="contents">
         {" "}
         <RedStar>*</RedStar> 부가설명:{" "}
         <input
@@ -274,7 +333,6 @@ export default function InfoInput(props) {
             setWork(info);
           }}
         ></input>
-        <button>+</button>
       </Input>
     </>
   );

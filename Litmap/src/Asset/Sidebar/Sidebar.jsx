@@ -68,6 +68,10 @@ export default function Sidebar(props) {
             setLine={props.setLine}
             edgeType={props.edgeType}
             lineStyle={props.lineStyle}
+            backgroundType={props.backgroundType}
+            setBackground={props.setBackground}
+            setBackImg={props.setBackImg}
+            setBackColor={props.setBackColor}
           />
         )}
       </SideMain>
