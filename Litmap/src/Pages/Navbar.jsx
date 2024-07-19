@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -50,14 +50,17 @@ const SearchBar = styled.input`
   border: 1px solid black;
   border-radius: 30px;
   color: #8d8d8d;
+`;
 
-  /* box-shadow: 0 6px 6px -2px rgba(0, 0, 0, 0.3); */
+const SearchBtn = styled.button`
+  position: absolute;
+  right: 20px;
+  background-color: unset;
+  border: none;
 `;
 
 const SearchIcon = styled(FontAwesomeIcon)`
   width: 20px;
-  position: absolute;
-  right: 20px;
   color: #8d8d8d;
 `;
 
@@ -98,6 +101,17 @@ const DropBtn = styled(DropdownButton)`
       box-shadow: none;
     }
   }
+`;
+
+const SearchInfo = styled.div`
+  border: 1px solid black;
+  border-radius: 0 0 30px 30px;
+  background-color: white;
+  width: 100%;
+  height: 500px;
+  position: absolute;
+  top: 60px;
+  z-index: 10;
 `;
 
 const Right = styled.div`
@@ -146,14 +160,71 @@ const AlertBtn = styled.button`
 
 function Navbar(props) {
   const login = props.login;
-  const [searchSort, setSort] = useState();
+  const [userInput, setUserInput] = useState(
+    localStorage.getItem("recentSearch")
+      ? JSON.parse(localStorage.getItem("recentSearch"))
+      : []
+  ); // 유저가 검색한 값 가져오기
+  useEffect(() => {
+    window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
+  }, [userInput, setUserInput]); // 유저 검색내용 저장
+  const [userSearch, setUserSearch] = useState(); // 유저 검색내용
+  const [searchSort, setSort] = useState(); // 검색 카테고리
+  const [state, setState] = useState(false); // 검색창 활성화 여부
+
+  // 특정 영역 외 클릭 시 발생하는 이벤트
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    function handleFocus(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        // input 체크 해제
+        setState(false);
+      }
+    }
+
+    document.addEventListener("mouseup", handleFocus);
+    return () => {
+      document.removeEventListener("mouseup", handleFocus);
+    };
+  }, [searchRef]);
+
+  // localstorage에서 가져오기
+  const [recentSearch, setRecentSearch] = useState();
+
+  const getSearches = () => {
+    const getRecentSearch = localStorage.getItem("recentSearch")
+      ? JSON.parse(localStorage.getItem("recentSearch"))
+      : [];
+    setRecentSearch(getRecentSearch);
+  };
+
+  useEffect(() => {
+    getSearches();
+  }, [setUserInput, userInput, userSearch, setUserSearch]);
+
+  const searchKey = (e) => {
+    if (e.key == "Enter") {
+      console.log(userSearch);
+      setUserInput([...userInput, userSearch]);
+      setUserSearch("");
+      getSearches();
+    }
+  };
+
+  const searchBtn = () => {
+    setUserInput([...userInput, userSearch]);
+    setUserSearch("");
+    getSearches();
+  };
+
   return (
     <Nav>
       <NavLogo to="/">
         <LogoImg src="/Logo.png" alt="로고" />
       </NavLogo>
 
-      <SearchBarContainer>
+      <SearchBarContainer ref={searchRef}>
         <SearchCategory>
           <DropBtn
             id="dropdown-basic-button"
@@ -182,8 +253,41 @@ function Navbar(props) {
             </Dropdown.Item>
           </DropBtn>
         </SearchCategory>
-        <SearchIcon icon={faMagnifyingGlass} />
-        <SearchBar placeholder="검색어를 입력해주세요" />
+        <SearchBtn
+          onClick={() => {
+            searchBtn();
+          }}
+        >
+          <SearchIcon icon={faMagnifyingGlass} />
+        </SearchBtn>
+        <SearchBar
+          id="searchBar"
+          placeholder="검색어를 입력해주세요"
+          className="search"
+          value={userSearch}
+          style={{
+            borderRadius: state ? "30px 30px 0px 0px" : "30px",
+            borderBottom: state ? "none" : "solid 1px black",
+          }}
+          onChange={(e) => {
+            setUserSearch(e.target.value);
+          }}
+          onKeyDown={searchKey}
+          onClick={() => {
+            state ? setState(false) : setState(true);
+          }}
+        />
+        {state ? (
+          <SearchInfo
+            style={{
+              borderTop: state ? "none" : "black",
+            }}
+          >
+            {recentSearch.map((a, index) => (
+              <p key={index}>{a}</p>
+            ))}
+          </SearchInfo>
+        ) : null}
       </SearchBarContainer>
 
       <Right>

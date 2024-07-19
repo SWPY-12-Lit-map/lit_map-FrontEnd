@@ -13,15 +13,14 @@ import ArtworkManagement from "./Pages/ArtworkManagement";
 import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
-import basicImg from "./Asset/blank-profile-picture-973460_1280.png";
-import axios from "axios";
 import FindIdPage from "./Pages/FindIdPage";
 import FindPasswordPage from "./Pages/FindPasswordPage";
 
 function App() {
-  const date = new Date();
   const [login, setLogin] = useState(false);
   const [mega, setMega] = useState(false);
+
+  const date = new Date();
   const [count, setCount] = useState(3); // 인물 수
   const [characterInfos, setInfos] = useState([]); // 인물정보
   const [work, setWork] = useState({
@@ -61,9 +60,10 @@ function App() {
 
   const [edgeType, setEdgetype] = useState("직선"); // 직선 / 곡선
   const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
+
   return (
     <Router>
-      <Navbar login={login} mega={mega} setMega={setMega} />
+      <Navbar login={login} />
       <ScrollTop />
       <Routes>
         <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
