@@ -39,12 +39,12 @@ const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px auto;
   position: relative;
+  width: 40%;
 `;
 
 const SearchBar = styled.input`
-  width: 650px;
+  width: 100%;
   height: 60px;
   padding: 20px 0px 20px 120px;
   border: 1px solid black;

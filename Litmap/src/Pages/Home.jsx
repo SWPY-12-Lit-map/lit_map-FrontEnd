@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Category from "../Asset/Category";
 import Megamenu from "../Asset/Megamenu";
 import Carousel from "react-bootstrap/Carousel";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Container = styled.div`
   font-size: 20px;
@@ -59,6 +60,10 @@ const Posts = styled.div`
   justify-content: center;
   gap: 50px 0px;
   padding: 0 140px;
+
+  @media only screen and (max-width: 800px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `;
 
 const Post = styled.div`
@@ -69,45 +74,24 @@ const Post = styled.div`
 `;
 
 const Foot = styled.div`
-  background-color: #d9d9d9;
+  background-color: #fbf9f6;
   width: 100%;
-  height: 350px;
+  height: 200px;
   padding: 30px 20px 30px 50px;
 `;
 
-const Foot_Head = styled.div`
-  display: flex;
-  justify-content: space-between;
-  a {
-    margin: 0 12px;
+const FootNav = styled.div`
+  margin-top: 20px;
+  & > a {
     text-decoration: none;
-    color: #424242;
-    font-weight: 600;
+    margin: 0 10px;
   }
-`;
-const LogoImg = styled.img`
-  width: 70px;
-  height: auto;
-`;
-const Right = styled.div``;
-const Foot_Body = styled.div`
-  margin-top: 50px;
-  color: #7f7f7f;
-  a {
-    text-decoration: none;
-    color: #424242;
-    font-weight: 600;
-    margin-right: 12px;
-  }
-`;
-const Foot_Foot = styled.div`
-  color: #424242;
-  margin-top: 50px;
 `;
 
 const Home = ({ mega, setMega }) => {
-  const [title, setTitle] = useState("");
   const navigate = useNavigate();
+  const [view, setView] = useState(false); // false = 업데이트순 , true = 조회순
+  const [a, b] = useState([]);
 
   // 캐러셀 이미지
   const slides = ["/advertise1.png", "/advertise2.png", "/advertise3.png"];
@@ -131,6 +115,44 @@ const Home = ({ mega, setMega }) => {
     { image: "/poster5.png" },
   ];
 
+  const viewOrder = () => {
+    axios
+      .get("https://api.litmap.store/api/board/view?pn=2")
+      .then((result) => {
+        console.log(result);
+        // data의 result의 last값이 true가 될때까지 pn=[]값을 올리기
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const updateOrder = () => {
+    axios
+      .get("https://api.litmap.store/api/board/updateList?pn=0")
+      .then((result) => {
+        console.log(result.data.result);
+        // data의 result의 last값이 true가 될때까지 pn=[]값을 올리기
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  // 최신순, 조회순에 필요할 듯
+  useEffect(() => {
+    for (let i = 0; i < 3; i++) {
+      b((prevA) => {
+        const newA = [...prevA, i];
+        console.log(newA);
+        return newA;
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // viewOrder();
+    // updateOrder();
+  }, []);
+
   const [index, setIndex] = useState();
 
   const handleSelect = (selectedIndex) => {
@@ -149,17 +171,7 @@ const Home = ({ mega, setMega }) => {
             return (
               <Carousel.Item key={index}>
                 <div style={{ display: "flex" }}>
-                  {title ? (
-                    <div
-                      style={{
-                        width: title ? "60%" : null,
-                        backgroundColor: "white",
-                      }}
-                    >
-                      {index}
-                    </div>
-                  ) : null}
-                  <img src={img} style={{ width: title ? "40%" : "100%" }} />
+                  <img src={img} style={{ width: "100%" }} />
                 </div>
               </Carousel.Item>
             );
@@ -167,9 +179,27 @@ const Home = ({ mega, setMega }) => {
         </Banner>
 
         <SortOptions>
-          <CategoryBtn>신규순</CategoryBtn>
+          <CategoryBtn
+            onClick={() => {
+              setView(false);
+            }}
+            style={{
+              color: view ? "gray" : "black",
+            }}
+          >
+            업데이트순
+          </CategoryBtn>
           <li>|</li>
-          <CategoryBtn>조회순</CategoryBtn>
+          <CategoryBtn
+            onClick={() => {
+              setView(true);
+            }}
+            style={{
+              color: view ? "black" : "gray",
+            }}
+          >
+            조회순
+          </CategoryBtn>
         </SortOptions>
 
         <Posts>
@@ -187,35 +217,36 @@ const Home = ({ mega, setMega }) => {
           ))}
         </Posts>
       </Container>
+
       <Foot>
-        <Foot_Head>
-          <LogoImg src="/Logo.png" alt="로고" />
-          <Right>
-            <a href="">기업소개</a>
-            <a href="">광고문의</a>
-            <a href="">고객센터</a>
-            <a href="">이용약관</a>
-            <a href="">블로그</a>
-            <a href="">개인정보 처리방침</a>
-          </Right>
-        </Foot_Head>
-        <Foot_Body>
-          <p>(주)릿맵 | 대표이사</p>
-          <p>
-            시물특별시 송파구 올림픽로 300. 롯데월드EI워 35춤 전화번호:
-            02-539-7118
-          </p>
-          <p>
-            사업자듬록번호: 299-86-00021 통신판매번호: 2020-서올송따-3147
-            유료직업소개사업등록번호: (국내) 제2020-3230259-14-5-00018호
-          </p>
-          <div>
-            <a href="">기업문의</a>
-            <a href="">광고문의</a>
-            <a href="">문의</a>
-          </div>
-        </Foot_Body>
-        <Foot_Foot>@ 2024 LITMAP, lnc.</Foot_Foot>
+        <FootNav>
+          <Link to="/개인정보처리방침" style={{ color: "#454545" }}>
+            개인정보처리방침
+          </Link>
+          <span
+            style={{
+              color: "#9F9F9F",
+            }}
+          >
+            |
+          </span>
+          <Link
+            to="/이용약관"
+            style={{
+              color: "#9F9F9F",
+            }}
+          >
+            이용약관
+          </Link>
+        </FootNav>
+        <div
+          style={{
+            color: "#9F9F9F",
+            marginTop: "20px",
+          }}
+        >
+          Copyright 2024. Lit Map(릿맵). All rights reserved.
+        </div>
       </Foot>
     </>
   );
