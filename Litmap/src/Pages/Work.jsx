@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Category from "../Asset/Category";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import YouTube from "react-youtube";
 import { HiOutlinePlayPause } from "react-icons/hi2";
 import ModalBtn from "../Asset/Share/ModalBtn";
@@ -95,24 +95,219 @@ const Recommends = styled.div`
   justify-content: space-between;
 `;
 
-const GetInfo = async () => {
-  await axios
-    .get("http://43.200.133.58:8080/api/work/1")
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
 export default function Work(props) {
   const [state, setState] = useState(false);
+  const [workInfo, setWorkInfo] = useState({
+    workId: 5,
+    category: "책",
+    genre: ["액션"],
+    author: ["작가"],
+    imageUrl: "대체 이미지",
+    memberName: "탈퇴한 회원입니다.",
+    title: "제목",
+    contents: "1",
+
+    versions: {
+      versionNum: 0.1,
+      versionName: "버전명",
+      casts: [
+        {
+          name: "인물1",
+          imageUrl: "임시 사진",
+          type: "인간",
+          role: null,
+          gender: "",
+          age: 0,
+          mbti: "",
+          contents: "",
+        },
+        {
+          name: "인물2",
+          imageUrl: "임시 사진",
+          type: "인간",
+          role: null,
+          gender: "",
+          age: 0,
+          mbti: "",
+          contents: "",
+        },
+        {
+          name: "인물3",
+          imageUrl: "임시 사진",
+          type: "인간",
+          role: null,
+          gender: "",
+          age: 0,
+          mbti: "",
+          contents: "",
+        },
+      ],
+      relationship: {
+        work_id: "제목",
+        nodes: [
+          {
+            id: "0",
+            data: {
+              id: 0,
+              age: "",
+              mbti: "",
+              name: "인물1",
+              type: "",
+              gender: "",
+              contents: "",
+              imageUrl: "",
+            },
+            type: "custom",
+            width: 102,
+            height: 102,
+            dragging: false,
+            position: {
+              x: 479.31138790035584,
+              y: 656.0512455516015,
+            },
+            selected: false,
+            positionAbsolute: {
+              x: 479.31138790035584,
+              y: 656.0512455516015,
+            },
+          },
+          {
+            id: "1",
+            data: {
+              id: 1,
+              age: "",
+              mbti: "",
+              name: "인물2",
+              type: "",
+              gender: "",
+              contents: "",
+              imageUrl: "",
+            },
+            type: "custom",
+            width: 102,
+            height: 102,
+            dragging: false,
+            position: {
+              x: 692.8032028469751,
+              y: 477.0505338078292,
+            },
+            selected: true,
+            positionAbsolute: {
+              x: 692.8032028469751,
+              y: 477.0505338078292,
+            },
+          },
+          {
+            id: "2",
+            data: {
+              id: 2,
+              age: "",
+              mbti: "",
+              name: "인물3",
+              type: "",
+              gender: "",
+              contents: "",
+              imageUrl: "",
+            },
+            type: "custom",
+            width: 102,
+            height: 102,
+            dragging: false,
+            position: {
+              x: 908.0683274021352,
+              y: 666.8982206405694,
+            },
+            selected: false,
+            positionAbsolute: {
+              x: 908.0683274021352,
+              y: 666.8982206405694,
+            },
+          },
+        ],
+        viewport: {
+          x: -820.3305237808547,
+          y: -805.8305237808547,
+          zoom: 1.691751956652619,
+        },
+        edges: [
+          {
+            id: "reactflow__edge-0-1",
+            data: {
+              text: "테스트1",
+              edgeType: "직선",
+              lineStyle: "실선",
+            },
+            type: "floating",
+            style: {
+              stroke: "black",
+              strokeWidth: 2,
+            },
+            source: "0",
+            target: "1",
+            selected: false,
+            markerEnd: {
+              type: "arrowclosed",
+              color: "black",
+            },
+            sourceHandle: null,
+            targetHandle: null,
+          },
+          {
+            id: "reactflow__edge-2-1",
+            data: {
+              text: "테스트2",
+              edgeType: "직선",
+              lineStyle: "실선",
+            },
+            type: "floating",
+            style: {
+              stroke: "black",
+              strokeWidth: 2,
+            },
+            source: "2",
+            target: "1",
+            selected: false,
+            markerEnd: {
+              type: "arrowclosed",
+              color: "black",
+            },
+            sourceHandle: null,
+            targetHandle: null,
+          },
+        ],
+        version: null,
+      },
+    },
+    versionList: [],
+  }); // 백엔드에서 받은거를 저장
+
   const count = props.count;
   const characterInfos = props.characterInfos;
   const work = props.work;
   const edgeType = props.edgeType;
   const lineStyle = props.lineStyle;
+  const read = props.read;
+  const setRead = props.setRead;
+
+  const GetWork = async () => {
+    await axios
+      .get("https://api.litmap.store/api/work/5")
+      .then((result) => {
+        const Get = result.data.result;
+        setWorkInfo(Get);
+        console.log(workInfo);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
+    // GetWork()
+    // 데이터를 가져오는 함수 호출
+  }, [setWorkInfo, setWorkInfo, read]);
+
   return (
     <>
       <Category />
@@ -120,11 +315,13 @@ export default function Work(props) {
         <Workinfo>
           <Thumbnail src="/poster1.png" alt="썸네일 자리"></Thumbnail>
           <Description>
-            <Title>뷰티인사이드</Title> <State>완결</State>
+            <Title>{workInfo.title}</Title>{" "}
+            <State>완결여부 결정도 해야됨</State>
             <SelectBar>
               <Button
                 onClick={() => {
                   setState(false);
+                  console.log(work);
                 }}
                 style={{
                   backgroundColor: state == false ? "#8d2741" : "white",
@@ -149,17 +346,13 @@ export default function Work(props) {
             </SelectBar>
             {state == false ? (
               <Info>
-                <Author>감독/작가</Author>
-                <Releasedate>개봉/출판일자</Releasedate>
-                <Season>시즌</Season>
-                <Channel>공급사이트</Channel>
-                <Content>간단내용</Content>
+                <Author>감독/작가: {workInfo.author}</Author>
+                <Releasedate>개봉/출판일자{workInfo.publisherDate}</Releasedate>
+                <Season>시즌: 이것도 넣어야 됨</Season>
+                <Channel>공급사이트: 이것도 넣어야 함</Channel>
+                <Content>간단내용 {workInfo.contents}</Content>
                 <Btns>
-                  <Btn1>
-                    <HiOutlinePlayPause />
-                    바로보기
-                  </Btn1>
-                  <ModalBtn />
+                  <ModalBtn /> {/* 공유하기 */}
                 </Btns>
               </Info>
             ) : (
@@ -177,22 +370,27 @@ export default function Work(props) {
               work={work}
               edgeType={edgeType}
               lineStyle={lineStyle}
-            ></Mindmap>
+              workInfo={workInfo}
+              read={read}
+              setRead={setRead}
+              casts={workInfo.versions.casts}
+              relationship={workInfo.versions.relationship}
+            />
           </ReactFlowProvider>
         </Connection>
         <Recommend>
           <h3>함께 볼만한 드라마</h3>
           <Recommends>
-            <img src="/poster1.png"></img>
-            <img src="/poster2.png"></img>
-            <img src="/poster3.png"></img>
-            <img src="/poster4.png"></img>
+            <img src="/poster1.png" alt="추천 포스터 1" />
+            <img src="/poster2.png" alt="추천 포스터 2" />
+            <img src="/poster3.png" alt="추천 포스터 3" />
+            <img src="/poster4.png" alt="추천 포스터 4" />
           </Recommends>
         </Recommend>
         {/* <button
           onClick={() => {
             axios
-              .get("http://43.200.133.58:8080/api/work/1")
+              .get("https://api.litmap.store/api/work/1")
               .then((result) => {
                 console.log(result);
               })

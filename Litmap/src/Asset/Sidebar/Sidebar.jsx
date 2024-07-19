@@ -72,7 +72,6 @@ export default function Sidebar(props) {
             backgroundType={props.backgroundType}
             setBackground={props.setBackground}
             setBackImg={props.setBackImg}
-            setBackColor={props.setBackColor}
           />
         )}
       </SideMain>

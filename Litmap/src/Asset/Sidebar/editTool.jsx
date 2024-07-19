@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
@@ -17,7 +17,6 @@ export default function EditTool(props) {
     setBackImg,
     setBackground,
     backgroundType,
-    setBackColor,
   } = props;
 
   const fileTypes = ["JPG", "PNG", "JPEG"];
@@ -38,8 +37,9 @@ export default function EditTool(props) {
   const ColorPick = () => {
     const [color, setColor] = useColor("#123123");
 
-    const onChangeComplete = (color) =>
+    const onChangeComplete = (color) => {
       localStorage.setItem("color", color.hex);
+    };
 
     return (
       <ColorPicker
@@ -50,6 +50,10 @@ export default function EditTool(props) {
       />
     );
   };
+
+  useEffect(() => {
+    localStorage.setItem("color", []);
+  }, []);
 
   return (
     <div>
@@ -62,6 +66,7 @@ export default function EditTool(props) {
               onClick={() => {
                 setBackground(true);
               }}
+              defaultChecked
             />
             <span>이미지</span>
             <input

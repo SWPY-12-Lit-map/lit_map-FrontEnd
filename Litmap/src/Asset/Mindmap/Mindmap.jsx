@@ -8,7 +8,6 @@ import ReactFlow, {
   Controls,
   useReactFlow,
   Background,
-  BackgroundVariant,
 } from "reactflow";
 import CustomNode from "./CustomNode";
 import FloatingEdge from "./FloatingEdge";
@@ -47,11 +46,6 @@ const defaultViewport = { x: 0, y: 0, zoom: 0 };
 const flowKey = "flow-data";
 
 const Mindmap = (props) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
-  const [readNodes, setReadNodes] = useState();
-
   const {
     edgeType,
     lineStyle,
@@ -62,7 +56,14 @@ const Mindmap = (props) => {
     setWork,
     backgroundImg,
     setBackImg,
+    relationship,
   } = props;
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [backColor, setBackColor] = useState();
+  const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
+  const [local, setLocal] = useState(localStorage.getItem("color"));
 
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -123,10 +124,14 @@ const Mindmap = (props) => {
         zoom: rfInstance.getViewport().zoom,
       };
       flow.backgroundImage = backgroundImg;
+      flow.backgroundColor = localStorage.getItem("color")
+        ? localStorage.getItem("color")
+        : null;
       const updateRelationship = { ...work, relationship: flow, version: 0.1 };
       setWork(updateRelationship);
+      console.log(work);
     }
-  }, [rfInstance, work]);
+  }, [rfInstance, work, backgroundImg, setWork]);
 
   /* 마인드맵 저장 복구 */
   const onRestore = useCallback(() => {
@@ -135,20 +140,47 @@ const Mindmap = (props) => {
       const readNodes = flow.nodes;
       readNodes.forEach((element) => {
         element.data.read = read;
-        // console.log(element.data);
       });
-      console.log(readNodes);
-      console.log(flow);
       if (flow) {
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
-        setTimeout(() => setViewport(flow.viewport), 0);
-        setBackImg(flow.backgroundImage);
+        setTimeout(() => setViewport(0.1), 0);
+        if (flow.backgroundColor) {
+          setBackColor(flow.backgroundColor);
+          console.log(backColor);
+        } else if (flow.backgroundImage) {
+          setBackgroundImg(flow.backgroundImage);
+        } else {
+        }
       }
     };
     restoreFlow();
-  }, [props.relationship, read, setNodes, setViewport, setEdges]);
+  }, [
+    work.relationship,
+    read,
+    setNodes,
+    setViewport,
+    setEdges,
+    setBackImg,
+    setBackColor,
+  ]);
 
+  // 이미지나 컬러가 업데이트 될 때 재렌더링
+  useEffect(() => {
+    setBackgroundImg(backgroundImg);
+  }, [setBackImg, , backgroundImg]);
+
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      const color = localStorage.getItem("color");
+      if (color !== backColor) {
+        setBackColor(color);
+      }
+    };
+
+    const intervalId = setInterval(checkLocalStorage, 100);
+    return () => clearInterval(intervalId);
+  }, [backColor]);
   /* 선 지우기 */
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -208,9 +240,9 @@ const Mindmap = (props) => {
         <Background
           id="1"
           style={{
-            backgroundImage: backgroundImg ? `url(${backgroundImg})` : null,
-            backgroundSize: backgroundImg ? "cover" : null,
-            // background:
+            backgroundImage: backgroundImage ? `url(${backgroundImage})` : null,
+            backgroundSize: backgroundImage ? "cover" : null,
+            background: backColor ? backColor : null,
             //   "linear-gradient(135deg, rgba(35,185,168,1) 0%, rgba(2,0,36,1) 80%)",
           }}
           variant="none"

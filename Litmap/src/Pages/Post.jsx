@@ -67,7 +67,6 @@ export default function Post(props) {
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
   const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
-  const [backColor, setBackColor] = useColor(""); // 배경 색깔
 
   const count = props.count;
   const setCount = props.setCount;
@@ -131,7 +130,7 @@ export default function Post(props) {
   }, [count, mount, prevCount, work]);
 
   useEffect(() => {
-    console.log(work); // 상태가 업데이트된 후에 work를 출력합니다.
+    console.log(work);
   }, [work]);
 
   const Mainpart = () => {
@@ -161,8 +160,6 @@ export default function Post(props) {
                 read={read}
                 backgroundImg={backgroundImg}
                 setBackImg={setBackImg}
-                backColor={backColor}
-                setBackColor={setBackColor}
               />
             </ReactFlowProvider>{" "}
             <MyVerticallyCenteredModal
@@ -197,7 +194,6 @@ export default function Post(props) {
           setBackground={setBackground}
           setBackImg={setBackImg}
           backgroundType={backgroundType}
-          setBackColor={setBackColor}
           setMainauth={setMainauth}
         />
       </Side>
