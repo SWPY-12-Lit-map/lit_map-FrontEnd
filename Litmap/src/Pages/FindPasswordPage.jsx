@@ -5,7 +5,8 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 120vh;
+    justify-content: center;
+    min-height: 100vh;
     background-color: #FBF9F6;
 `;
 
@@ -19,18 +20,22 @@ const Logo = styled.div`
 `;
 
 const Title = styled.h1`
+    color: #575757;
     margin-top: 20px;
     font-size: 24px;
 `;
 
 const BoxContainer = styled.div`
-    margin-top: 10px;
     background-color: #FFFFFF;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 400px;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
 `;
 
@@ -84,9 +89,9 @@ const Footer = styled.div`
 `;
 
 const Image = styled.img`
-    margin: 20px 0;
     width: 100px;
     height: 100px;
+    margin: 20px auto;
 `;
 
 const FindPasswordPage = () => {
@@ -115,49 +120,49 @@ const FindPasswordPage = () => {
 
             {step === 1 && (
                 <BoxContainer>
-                <SubTitle>회원 가입 시 등록했던</SubTitle>
-                <SubTitle>
-                    <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
-                </SubTitle>
-                <div>
-                    <OptionTitle>이름</OptionTitle>
-                    <Input
-                    type="text"
-                    placeholder="가입자의 이름을 입력해주세요."
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <OptionTitle>회사명(국문 또는 영문)</OptionTitle>
-                    <Input
-                    type="text"
-                    placeholder="회사명을 입력해주세요."
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <OptionTitle>아이디</OptionTitle>
-                    <Input
-                    type="email"
-                    placeholder="아이디를 이메일 형식으로 입력해주세요."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <FullWidthButton onClick={handleFindPasswordClick}>비밀번호 재설정</FullWidthButton>
+                    <SubTitle>회원 가입 시 등록했던</SubTitle>
+                    <SubTitle>
+                        <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
+                    </SubTitle>
+                    <div>
+                        <OptionTitle>이름</OptionTitle>
+                        <Input
+                            type="text"
+                            placeholder="가입자의 이름을 입력해주세요."
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <OptionTitle>회사명(국문 또는 영문)</OptionTitle>
+                        <Input
+                            type="text"
+                            placeholder="회사명을 입력해주세요."
+                            value={company}
+                            onChange={(e) => setCompany(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <OptionTitle>아이디</OptionTitle>
+                        <Input
+                            type="email"
+                            placeholder="아이디를 이메일 형식으로 입력해주세요."
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <FullWidthButton onClick={handleFindPasswordClick}>비밀번호 재설정</FullWidthButton>
                 </BoxContainer>
             )}
 
             {step === 2 && (
                 <BoxContainer>
-                <SubTitle>가입한 이메일 주소로</SubTitle>
-                <SubTitle>
-                    <HighlightedText>임시 비밀번호</HighlightedText>를 발송하였습니다.
-                </SubTitle>
-                <Image src="/send.png" alt="발송 이미지" />
-                <FullWidthButton onClick={handleLoginClick}>로그인 하기</FullWidthButton>
+                    <SubTitle>가입한 이메일 주소로</SubTitle>
+                    <SubTitle>
+                        <HighlightedText>임시 비밀번호</HighlightedText>를 발송하였습니다.
+                    </SubTitle>
+                    <Image src="/send.png" alt="발송 이미지" />
+                    <FullWidthButton onClick={handleLoginClick}>로그인 하기</FullWidthButton>
                 </BoxContainer>
             )}
 

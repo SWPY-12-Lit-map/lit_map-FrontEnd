@@ -24,11 +24,6 @@ const Logo = styled.div`
   margin-bottom: 20px;
 `;
 
-const LogoText = styled.div`
-  font-size: 16px;
-  color: black;
-`;
-
 const RightPanel = styled.div`
   flex: 1;
   display: flex;
@@ -194,8 +189,7 @@ const LoginPage = (props) => {
     <PageContainer>
       <LeftPanel>
         <Logo>
-          <img src="/Logo.png" alt="로고" width="200px" />
-          <LogoText>릿맵 한줄 라이팅 릿맵 한줄 라이팅</LogoText>
+          <img src="/login_logo.png" alt="로고" width="200px" />
         </Logo>
       </LeftPanel>
 
