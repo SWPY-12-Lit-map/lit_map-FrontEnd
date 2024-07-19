@@ -41,7 +41,7 @@ const BoxContainer = styled.div`
 
 const SubTitle = styled.p`
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
     text-align: center;
 `;
 
@@ -94,6 +94,10 @@ const Image = styled.img`
     margin: 20px auto;
 `;
 
+const Blank = styled.div`
+    margin-bottom: 20px;
+`;
+
 const FindPasswordPage = () => {
     const [step, setStep] = useState(1);
     const [name, setName] = useState("");
@@ -124,6 +128,9 @@ const FindPasswordPage = () => {
                     <SubTitle>
                         <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
                     </SubTitle>
+                    
+                    <Blank></Blank>
+
                     <div>
                         <OptionTitle>이름</OptionTitle>
                         <Input
