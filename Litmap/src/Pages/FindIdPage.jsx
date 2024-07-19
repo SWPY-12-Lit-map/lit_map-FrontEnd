@@ -41,7 +41,7 @@ const BoxContainer = styled.div`
 
 const SubTitle = styled.p`
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
     text-align: center;
 `;
 
@@ -152,6 +152,10 @@ const Icon = styled.div`
     }
 `;
 
+const Blank = styled.div`
+    margin-bottom: 20px;
+`;
+
 const FindIdPage = () => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [step, setStep] = useState(1);
@@ -219,6 +223,7 @@ const FindIdPage = () => {
                         <SubTitle>
                             <HighlightedText>회원 유형</HighlightedText>을 선택해주세요.
                         </SubTitle>
+
                         <OptionGrid>
                             <OptionBox
                                 selected={selectedOption === 'representative'}
@@ -274,6 +279,9 @@ const FindIdPage = () => {
                         <SubTitle>
                             <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
                         </SubTitle>
+
+                        <Blank></Blank>
+                        
                         <div>
                             <OptionTitle>이름</OptionTitle>
                             <Input type="text" placeholder="가입자의 이름을 입력해주세요." />
