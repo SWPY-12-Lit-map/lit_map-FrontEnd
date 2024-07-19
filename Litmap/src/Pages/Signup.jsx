@@ -33,16 +33,23 @@ const BoxContainer = styled.div`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: left;
     width: 400px;
-    height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    position: relative;
+    margin-bottom: 20px;
+`;
+
+const BoxContainerCentered = styled(BoxContainer)`
+    text-align: center;
+    justify-content: center;
+    align-items: center;
 `;
 
 const SubTitle = styled.p`
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
+`;
+
+const SubTitle2 = styled.p`
+    font-size: 12px;
+    margin-bottom: 1px;
 `;
 
 const HighlightedText = styled.span`
@@ -127,6 +134,22 @@ const FullWidthButton = styled.button`
     }
 `;
 
+const FullWidthButton2 = styled.button`
+    width: 100%;
+    color: #8B0024;
+    background-color: white;
+    padding: 10px 0;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
 const CheckboxContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -197,6 +220,74 @@ const CloseButton = styled.button`
     }
 `;
 
+const LibraryImage = styled.img`
+    margin-top: 20px;
+    width: 200px;
+`;
+
+const ButtonContainer = styled.div`
+    margin-top: 20px;
+    width: 100%;
+`;
+
+const InputField = styled.input`
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+`;
+
+const InputFieldWithButton = styled.div`
+    position: relative;
+    width: 100%;
+`;
+
+const Button = styled.button`
+    position: absolute;
+    right: 0;
+    top: 45%;
+    right: 2%;
+    transform: translateY(-50%);
+    padding: 5px;
+    background-color: #F4F4F5;
+    color: #CECED0;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+        background-color: #8B0024;
+        color: white;
+    }
+`;
+
+const SmallText = styled.p`
+    font-size: 12px;
+    color: #7D7D7D;
+    margin-top: -10px;
+    margin-bottom: 10px;
+`;
+
+const SmallText2 = styled.p`
+    font-size: 12px;
+    color: #7D7D7D;
+    margin-top: 1px;
+    margin-bottom: 5px;
+`;
+
+const InfoBox = styled.div`
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #F4F4F5;
+    color: #282828;
+    font-size: 14px;
+    margin-top: 20px;
+`;
+
 const SignupPage = () => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [step, setStep] = useState(1);
@@ -216,6 +307,24 @@ const SignupPage = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalContent, setModalContent] = useState("");
     const [modalTitle, setModalTitle] = useState("");
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        nickname: '',
+        representativeName: '',
+        representativePhone: '',
+        companyName: '',
+        companyPhone: '',
+        businessNumber: '',
+        businessAddress: '',
+        businessDetailAddress: '',
+        workEmail: '',
+        workBusinessNumber: '',
+        workURL: ''
+    });
+    const [apiError, setApiError] = useState('');
 
     useEffect(() => {
         Modal.setAppElement('#root');
@@ -225,7 +334,7 @@ const SignupPage = () => {
         setSelectedOption(option);
     };
 
-    const handleNextClick = () => {
+    const handleNextClick = async () => {
         if (step === 1) {
             if (selectedOption) {
                 setStep(2);
@@ -234,13 +343,29 @@ const SignupPage = () => {
                 setValidationFailed(true);
             }
         } else if (step === 2) {
+            const allFieldsFilled = Object.values(formData).every(field => field.trim() !== '');
+            if (allFieldsFilled) {
+                setStep(3);
+                setValidationFailed(false);
+            } else {
+                setValidationFailed(true);
+            }
+        } else if (step === 3) {
             if (terms.spoilerAgreement && terms.age && terms.termsOfService && terms.privacyPolicy) {
                 setValidationFailed(false);
-                window.location.href = "/";
+                setStep(4);
             } else {
                 setValidationFailed(true);
             }
         }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
     };
 
     const handleCheckboxChange = (e) => {
@@ -271,6 +396,34 @@ const SignupPage = () => {
 
     const closeModal = () => {
         setModalIsOpen(false);
+    };
+
+    const handleLibraryClick = () => {
+        window.location.href = "/";
+    };
+
+    const handleRegisterClick = () => {
+        window.location.href = "/category1";
+    };
+
+    const handleValidationCheck = async (field) => {
+        try {
+            const response = await fetch(`/api/validate/${field}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ value: formData[field] }),
+            });
+            const result = await response.json();
+            if (!result.valid) {
+                setApiError(`${field} is already in use.`);
+            } else {
+                setApiError('');
+            }
+        } catch (error) {
+            setApiError('An error occurred while validating the field.');
+        }
     };
 
     return (
@@ -343,7 +496,252 @@ const SignupPage = () => {
                 </>
             )}
 
-            {step === 2 && (
+            {step === 2 && selectedOption !== 'writer' && (
+                <>
+                    <BoxContainer>
+                        <Title>기본 정보</Title>
+
+                        <label>이름</label>
+                        <InputField 
+                            type="text" 
+                            name="name" 
+                            placeholder="이름을 입력해주세요." 
+                            value={formData.name}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>이메일</label>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="email" 
+                                name="email" 
+                                placeholder="이메일을 입력해주세요." 
+                                value={formData.email}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('email')}>중복확인</Button>
+                        </InputFieldWithButton>
+
+                        <label>비밀번호</label>
+                        <InputField 
+                            type="password" 
+                            name="password" 
+                            placeholder="비밀번호를 입력해주세요." 
+                            value={formData.password}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>비밀번호 확인</label>
+                        <InputField 
+                            type="password" 
+                            name="confirmPassword" 
+                            placeholder="비밀번호를 다시 한번 입력해주세요." 
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                        />
+                        <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+                        
+                        <label>닉네임</label>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="text" 
+                                name="nickname" 
+                                placeholder="닉네임을 입력해주세요." 
+                                value={formData.nickname}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button>
+                        </InputFieldWithButton>
+                    </BoxContainer>
+                    <BoxContainer>
+                        <Title>사업자 정보</Title>
+
+                        <label>대표자명</label>
+                        <InputField 
+                            type="text" 
+                            name="representativeName" 
+                            placeholder="대표자명을 입력해주세요." 
+                            value={formData.representativeName}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>대표 전화번호</label>
+                        <InputField 
+                            type="text" 
+                            name="representativePhone" 
+                            placeholder="(예시) 01013245678" 
+                            value={formData.representativePhone}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>회사명(국문 또는 영문)</label>
+                        <InputField 
+                            type="text" 
+                            name="companyName" 
+                            placeholder="출판사나 제작사명을 입력해주세요." 
+                            value={formData.companyName}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>출판사 전화번호</label>
+                        <InputField 
+                            type="text" 
+                            name="companyPhone" 
+                            placeholder="(예시) 01013245768" 
+                            value={formData.companyPhone}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>사업자 번호</label>
+                        <SmallText2>사업자 번호 입력 후 사업자 인증을 진행해주세요.</SmallText2>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="text" 
+                                name="businessNumber" 
+                                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." 
+                                value={formData.businessNumber}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('businessNumber')}>사업자 인증</Button>
+                        </InputFieldWithButton>
+
+                        <label>사업자 주소</label>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="text" 
+                                name="businessAddress" 
+                                placeholder="주소를 입력해주세요." 
+                                value={formData.businessAddress}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('businessAddress')}>주소 검색</Button>
+                        </InputFieldWithButton>
+                        <InputField 
+                            type="text" 
+                            name="businessDetailAddress" 
+                            placeholder="상세 주소를 입력해주세요." 
+                            value={formData.businessDetailAddress}
+                            onChange={handleInputChange}
+                        />
+
+                        <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                        {validationFailed && (
+                            <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+                        )}
+                    </BoxContainer>
+                    <Footer>릿맵 | 02 |</Footer>
+                </>
+            )}
+
+            {step === 2 && selectedOption === 'writer' && (
+                <>
+                    <BoxContainer>
+                        <Title>기본 정보</Title>
+
+                        <label>이름</label>
+                        <InputField 
+                            type="text" 
+                            name="name" 
+                            placeholder="이름을 입력해주세요." 
+                            value={formData.name}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>이메일</label>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="email" 
+                                name="email" 
+                                placeholder="이메일을 입력해주세요." 
+                                value={formData.email}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('email')}>중복확인</Button>
+                        </InputFieldWithButton>
+
+                        <label>비밀번호</label>
+                        <InputField 
+                            type="password" 
+                            name="password" 
+                            placeholder="비밀번호를 입력해주세요." 
+                            value={formData.password}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>비밀번호 확인</label>
+                        <InputField 
+                            type="password" 
+                            name="confirmPassword" 
+                            placeholder="비밀번호를 다시 한번 입력해주세요." 
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                        />
+                        <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+                        
+                        <label>닉네임</label>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="text" 
+                                name="nickname" 
+                                placeholder="닉네임을 입력해주세요." 
+                                value={formData.nickname}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button>
+                        </InputFieldWithButton>
+                    </BoxContainer>
+                    <BoxContainer>
+                        <Title>1인작가 정보</Title>
+
+                        <label>업무용 이메일</label>
+                        <SmallText2>업무용으로 쓰는 이메일을 추가 등록해주세요.</SmallText2>
+                        <InputField 
+                            type="email" 
+                            name="workEmail" 
+                            placeholder="이메일을 입력해주세요." 
+                            value={formData.workEmail}
+                            onChange={handleInputChange}
+                        />
+
+                        <label>사업자 번호</label>
+                        <SmallText2>사업자 등록번호 숫자 10자리를 입력해주세요.</SmallText2>
+                        <InputFieldWithButton>
+                            <InputField 
+                                type="text" 
+                                name="workBusinessNumber" 
+                                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." 
+                                value={formData.workBusinessNumber}
+                                onChange={handleInputChange}
+                            />
+                            <Button onClick={() => handleValidationCheck('workBusinessNumber')}>사업자 인증</Button>
+                        </InputFieldWithButton>
+
+                        <label>작품정보(국문 또는 영문)</label>
+                        <SmallText2>작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.</SmallText2>
+                        <InputField 
+                            type="text" 
+                            name="workURL" 
+                            placeholder="http://www.litmap.com" 
+                            value={formData.workURL}
+                            onChange={handleInputChange}
+                        />
+
+                        <InfoBox>
+                            <SubTitle>1인 작가 가입 안내사항</SubTitle>
+                            <SubTitle2>1인 작가의 경우 별도의 관리자 승인이 필요함으로</SubTitle2>
+                            <SubTitle2>가입 정보 작성 후 승인까지 1~3일이 소요될 수 있습니다.</SubTitle2>
+                        </InfoBox>
+
+                        <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                        {validationFailed && (
+                            <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+                        )}
+                    </BoxContainer>
+                    <Footer>릿맵 | 02 |</Footer>
+                </>
+            )}
+
+            {step === 3 && (
                 <>
                     <BoxContainer>
                         <SubTitle>릿맵 <HighlightedText>이용 약관에 동의</HighlightedText>하시면</SubTitle>
@@ -426,7 +824,38 @@ const SignupPage = () => {
                             <ErrorMessage>모든 필수 항목에 동의해야 합니다.</ErrorMessage>
                         )}
                     </BoxContainer>
-                    <Footer>릿맵 | 02 |</Footer>
+                    <Footer>릿맵 | 03 |</Footer>
+                </>
+            )}
+
+            {step === 4 && (
+                <>
+                    <BoxContainerCentered>
+                        <Title>환영합니다!</Title>
+                        <SubTitle>릿맵에 가입이 완료되었습니다.</SubTitle>
+                        <br />
+                        {selectedOption === 'writer' ? (
+                            <>
+                                <SubTitle>승인 절차는 약 1~3일 정도 소요되며,</SubTitle>
+                                <SubTitle>승인 완료 시 확인 메일을 발송해드립니다.</SubTitle>
+                                <LibraryImage src="/library.png" alt="Library" />
+                                <ButtonContainer>
+                                    <FullWidthButton onClick={handleLibraryClick}>작품 둘러보기</FullWidthButton>
+                                </ButtonContainer>
+                            </>
+                        ) : (
+                            <>
+                                <SubTitle>이제부터 릿맵과 함께</SubTitle>
+                                <SubTitle>작품의 완성을 함께해요.</SubTitle>
+                                <LibraryImage src="/library.png" alt="Library" />
+                                <ButtonContainer>
+                                    <FullWidthButton2 onClick={handleLibraryClick}>작품 둘러보기</FullWidthButton2>
+                                    <FullWidthButton onClick={handleRegisterClick}>작품 등록하기</FullWidthButton>
+                                </ButtonContainer>
+                            </>
+                        )}
+                    </BoxContainerCentered>
+                    <Footer>릿맵 | 04 |</Footer>
                 </>
             )}
 
@@ -457,3 +886,4 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
+
