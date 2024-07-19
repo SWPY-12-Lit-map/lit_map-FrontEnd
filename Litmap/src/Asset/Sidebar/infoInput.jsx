@@ -18,7 +18,6 @@ const Dropzone = styled.div`
   height: 200px;
   border: solid 1px black;
 `;
-
 const RedStar = styled.span`
   color: red;
 `;
@@ -29,10 +28,10 @@ export default function InfoInput(props) {
   const work = props.work;
   const setWork = props.setWork;
   const setNext = props.setNext;
+  const setMainauth = props.setMainauth;
   const [releaseDate, setReleaseDate] = useState(new Date());
   const [getGenres, setGenre] = useState([]);
   const [getCategory, setCategory] = useState([]);
-
   const [imageFile, setFile] = useState(null);
 
   // 장르 변경
@@ -50,7 +49,7 @@ export default function InfoInput(props) {
     const handleChange = (file) => {
       setFile(file);
       const formData = new FormData();
-      formData.append("image", imageFile);
+      formData.append("image", file); // 여기를 imageFile 대신 file로 수정
       formData.append("path", "img");
       axios
         .post("https://api.litmap.store/api/files", formData, {
@@ -85,6 +84,7 @@ export default function InfoInput(props) {
       value: "",
     },
   ]);
+
   const handleAddInput = () => {
     const newInput = {
       id: inputs.length,
@@ -92,6 +92,8 @@ export default function InfoInput(props) {
     };
     setInputs([...inputs, newInput]);
   };
+
+  const authors = inputs.map((input) => input.value);
 
   // 빈값 확인
   const CheckInputs = () => {
@@ -105,7 +107,6 @@ export default function InfoInput(props) {
   useEffect(() => {
     CheckInputs();
   }, [work, setWork]);
-
   // // 장르 가져오기
   // useEffect(() => {
   //   axios
@@ -233,31 +234,25 @@ export default function InfoInput(props) {
       ></Calendar>
       {/* 작가 이름 */}
       <Input>
+        <RedStar>*</RedStar>
+        <span>작가명</span>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {" "}
           {inputs.map((data) => (
-            <div>
+            <div key={data.id}>
               <input
                 type="radio"
                 name="main"
                 id={data.id}
                 value={data.value}
                 onClick={() => {
-                  const name = data.value;
-                  const info = {
-                    ...work,
-                    author:
-                      inputs.length == 1
-                        ? e.target.value
-                        : `${name},${work.author}`,
-                  };
-
-                  setWork(info);
+                  const names = authors;
+                  const name = authors.find((name) => name === data.value);
+                  const position = names.indexOf(name);
+                  [names[0], names[position]] = [names[position], names[0]];
+                  setMainauth(name);
                 }}
-              ></input>{" "}
+              ></input>
               <input
-                key={data.id}
-                id={data.id}
                 placeholder="작가명을 입력해주세요"
                 value={data.value}
                 onChange={(e) => {
@@ -267,15 +262,11 @@ export default function InfoInput(props) {
                       : item
                   );
                   setInputs(updatedInputs);
-                  const info = {
+                  setWork({
                     ...work,
-                    author:
-                      inputs.length == 1
-                        ? e.target.value
-                        : `${work.author},${e.target.value}`,
-                  };
-                  setWork(info);
-                  console.log([info.author]);
+                    author: updatedInputs.map((item) => item.value),
+                  });
+                  console.log(work);
                 }}
               />
             </div>
@@ -289,7 +280,6 @@ export default function InfoInput(props) {
         <span>
           <RedStar>*</RedStar> 대표 이미지:{" "}
         </span>
-        {/* <UploadImg></UploadImg> */}
         <DragDrop></DragDrop>
       </Input>
       {/* 대체 이미지 업로드 */}

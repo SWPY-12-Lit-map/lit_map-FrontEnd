@@ -6,6 +6,7 @@ import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
+import { useColor } from "react-color-palette";
 
 const Posting = styled.div`
   height: 90vh;
@@ -60,9 +61,13 @@ export default function Post(props) {
   const PrevCountRef = useRef(); // 이전 인물 수
   const [mount, setMount] = useState(false); // 페이지 로드
 
+  const [mainAuthor, setMainauth] = useState("");
   const [next, setNext] = useState(false); // 다음 버튼 활성 여부
   const [extraSave, setExtraSave] = useState(false); // 임시서장 = false / 저장 = true
-  const [modalShow, setModalShow] = useState(false);
+  const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
+  const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
+  const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
+  const [backColor, setBackColor] = useColor(""); // 배경 색깔
 
   const count = props.count;
   const setCount = props.setCount;
@@ -74,6 +79,8 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
+  const setRead = props.setRead;
+  const read = props.read;
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -82,6 +89,7 @@ export default function Post(props) {
   const prevCount = PrevCountRef.current;
 
   useEffect(() => {
+    setRead(false);
     if (!mount) {
       // 컴포넌트가 마운트될 때만 실행
       const newInfos = Array.from({ length: count }, (_, i) => ({
@@ -122,6 +130,10 @@ export default function Post(props) {
     }
   }, [count, mount, prevCount, work]);
 
+  useEffect(() => {
+    console.log(work); // 상태가 업데이트된 후에 work를 출력합니다.
+  }, [work]);
+
   const Mainpart = () => {
     switch (state) {
       case 1:
@@ -146,6 +158,11 @@ export default function Post(props) {
                 setWork={setWork}
                 edgeType={edgeType}
                 lineStyle={lineStyle}
+                read={read}
+                backgroundImg={backgroundImg}
+                setBackImg={setBackImg}
+                backColor={backColor}
+                setBackColor={setBackColor}
               />
             </ReactFlowProvider>{" "}
             <MyVerticallyCenteredModal
@@ -177,6 +194,11 @@ export default function Post(props) {
           setEdgetype={setEdgetype}
           lineStyle={lineStyle}
           setLine={setLine}
+          setBackground={setBackground}
+          setBackImg={setBackImg}
+          backgroundType={backgroundType}
+          setBackColor={setBackColor}
+          setMainauth={setMainauth}
         />
       </Side>
       <Edit>
@@ -200,7 +222,20 @@ export default function Post(props) {
           ) : null}
           {!next ? (
             <>
-              <ExtraSave onClick={() => setExtraSave(false)}>
+              <ExtraSave
+                onClick={() => {
+                  const Extrasave = { ...work, confirmCheck: false };
+                  setWork(Extrasave);
+                  axios
+                    .post("https://api.litmap.store/api/work", work)
+                    .then((result) => {
+                      console.log(result);
+                    })
+                    .then((error) => {
+                      console.log(error);
+                    });
+                }}
+              >
                 임시저장
               </ExtraSave>
               <Nextbtn disabled style={{ background: "gray", border: "none" }}>
@@ -209,7 +244,22 @@ export default function Post(props) {
             </>
           ) : (
             <div>
-              <ExtraSave>임시저장</ExtraSave>
+              <ExtraSave
+                onClick={() => {
+                  const Extrasave = { ...work, confirmCheck: false };
+                  setWork(Extrasave);
+                  axios
+                    .post("https://api.litmap.store/api/work", work)
+                    .then((result) => {
+                      console.log(result);
+                    })
+                    .then((error) => {
+                      console.log(error);
+                    });
+                }}
+              >
+                임시저장
+              </ExtraSave>
               <Nextbtn
                 id="nextBtn"
                 onClick={() => {
@@ -217,6 +267,16 @@ export default function Post(props) {
                     setState(2);
                     document.querySelector("#nextBtn").innerHTML = "저장";
                     setExtraSave(true);
+                    const names = work.author;
+                    const name = names.find((name) => name == mainAuthor);
+                    const position = names.indexOf(name);
+                    if (position !== -1) {
+                      [names[0], names[position]] = [names[position], names[0]];
+                    }
+                    const namesString = names.join(",");
+                    console.log(namesString);
+                    setWork({ ...work, author: namesString });
+                    console.log(work);
                   } else if (state === 2) {
                     // 저장 로직 추가
                     setModalShow(true);

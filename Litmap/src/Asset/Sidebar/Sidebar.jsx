@@ -61,6 +61,7 @@ export default function Sidebar(props) {
             newInfos={props.newInfos}
             next={next}
             setNext={setNext}
+            setMainauth={props.setMainauth}
           />
         ) : (
           <EditTool
