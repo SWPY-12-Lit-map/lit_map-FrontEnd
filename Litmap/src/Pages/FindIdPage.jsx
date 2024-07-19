@@ -5,7 +5,8 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 120vh;
+    justify-content: center;
+    min-height: 100vh;
     background-color: #FBF9F6;
 `;
 
@@ -19,18 +20,22 @@ const Logo = styled.div`
 `;
 
 const Title = styled.h1`
+    color: #575757;
     margin-top: 20px;
     font-size: 24px;
 `;
 
 const BoxContainer = styled.div`
-    margin-top: 10px;
     background-color: #FFFFFF;
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 400px;
+    height: 65vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
 `;
 
@@ -137,16 +142,14 @@ const FullWidthButton = styled.button`
     }
 `;
 
-const CheckmarkIcon = styled.div`
-    font-size: 24px;
-    color: #4CAF50;
+const Icon = styled.div`
+    font-size: 50px;
     margin: 20px 0;
-`;
 
-const CrossIcon = styled.div`
-    font-size: 24px;
-    color: #F44336;
-    margin: 20px 0;
+    img {
+        width: 100px;
+        height: 100px;
+    }
 `;
 
 const FindIdPage = () => {
@@ -167,16 +170,16 @@ const FindIdPage = () => {
         // API 호출 로직을 여기에 추가
         // 임의의 데이터 넣어둠.
         const fakeApiResponse = {
-        success: true, // false로 바꾸면 실패 페이지로 이동
-        email: "litmap@gmail.com",
-        registrationDate: "2022.07.01",
+            success: true, // false로 바꾸면 실패 페이지로 이동
+            email: "litmap@gmail.com",
+            registrationDate: "2022.07.01",
         };
 
         if (fakeApiResponse.success) {
-        setUserFound(true);
-        setUserData(fakeApiResponse);
+            setUserFound(true);
+            setUserData(fakeApiResponse);
         } else {
-        setUserFound(false);
+            setUserFound(false);
         }
 
         setStep(3);
@@ -211,116 +214,120 @@ const FindIdPage = () => {
             
             {step === 1 && (
                 <>
-                <BoxContainer>
-                    <SubTitle>회원 가입 시 선택하였던</SubTitle>
-                    <SubTitle>
-                    <HighlightedText>회원 유형</HighlightedText>을 선택해주세요.
-                    </SubTitle>
-                    <OptionGrid>
-                    <OptionBox
-                        selected={selectedOption === 'representative'}
-                        onClick={() => handleOptionClick('representative')}
-                    >
-                        <OptionImageWrapper className="option-image-wrapper">
-                        <OptionImage src="/representative.png" alt="대표" />
-                        </OptionImageWrapper>
-                        <OptionTitle>대표</OptionTitle>
-                        <OptionDescription>출판사, 제작사 등의 사업자 본인</OptionDescription>
-                    </OptionBox>
-                    <OptionBox
-                        selected={selectedOption === 'staff'}
-                        onClick={() => handleOptionClick('staff')}
-                    >
-                        <OptionImageWrapper className="option-image-wrapper">
-                        <OptionImage src="/staff.png" alt="직원" />
-                        </OptionImageWrapper>
-                        <OptionTitle>직원</OptionTitle>
-                        <OptionDescription>출판사, 제작사 등의 임직원</OptionDescription>
-                    </OptionBox>
-                    <OptionBox
-                        selected={selectedOption === 'writer'}
-                        onClick={() => handleOptionClick('writer')}
-                    >
-                        <OptionImageWrapper className="option-image-wrapper">
-                        <OptionImage src="/writer.png" alt="1인 작가" />
-                        </OptionImageWrapper>
-                        <OptionTitle>1인 작가</OptionTitle>
-                        <OptionDescription>독립, 프리랜서 작가</OptionDescription>
-                    </OptionBox>
-                    <OptionBox
-                        selected={selectedOption === 'cooperation'}
-                        onClick={() => handleOptionClick('cooperation')}
-                    >
-                        <OptionImageWrapper className="option-image-wrapper">
-                        <OptionImage src="/cooperation.png" alt="협력사" />
-                        </OptionImageWrapper>
-                        <OptionTitle>협력사</OptionTitle>
-                        <OptionDescription>출판사, 제작사 등의 파트너사</OptionDescription>
-                    </OptionBox>
-                    </OptionGrid>
-                    <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
-                </BoxContainer>
-                <Footer>릿맵 | 01 |</Footer>
+                    <BoxContainer>
+                        <SubTitle>회원 가입 시 선택하였던</SubTitle>
+                        <SubTitle>
+                            <HighlightedText>회원 유형</HighlightedText>을 선택해주세요.
+                        </SubTitle>
+                        <OptionGrid>
+                            <OptionBox
+                                selected={selectedOption === 'representative'}
+                                onClick={() => handleOptionClick('representative')}
+                            >
+                                <OptionImageWrapper className="option-image-wrapper">
+                                    <OptionImage src="/representative.png" alt="대표" />
+                                </OptionImageWrapper>
+                                <OptionTitle>대표</OptionTitle>
+                                <OptionDescription>출판사, 제작사 등의 사업자 본인</OptionDescription>
+                            </OptionBox>
+                            <OptionBox
+                                selected={selectedOption === 'staff'}
+                                onClick={() => handleOptionClick('staff')}
+                            >
+                                <OptionImageWrapper className="option-image-wrapper">
+                                    <OptionImage src="/staff.png" alt="직원" />
+                                </OptionImageWrapper>
+                                <OptionTitle>직원</OptionTitle>
+                                <OptionDescription>출판사, 제작사 등의 임직원</OptionDescription>
+                            </OptionBox>
+                            <OptionBox
+                                selected={selectedOption === 'writer'}
+                                onClick={() => handleOptionClick('writer')}
+                            >
+                                <OptionImageWrapper className="option-image-wrapper">
+                                    <OptionImage src="/writer.png" alt="1인 작가" />
+                                </OptionImageWrapper>
+                                <OptionTitle>1인 작가</OptionTitle>
+                                <OptionDescription>독립, 프리랜서 작가</OptionDescription>
+                            </OptionBox>
+                            <OptionBox
+                                selected={selectedOption === 'cooperation'}
+                                onClick={() => handleOptionClick('cooperation')}
+                            >
+                                <OptionImageWrapper className="option-image-wrapper">
+                                    <OptionImage src="/cooperation.png" alt="협력사" />
+                                </OptionImageWrapper>
+                                <OptionTitle>협력사</OptionTitle>
+                                <OptionDescription>출판사, 제작사 등의 파트너사</OptionDescription>
+                            </OptionBox>
+                        </OptionGrid>
+                        <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                    </BoxContainer>
+                    <Footer>릿맵 | 01 |</Footer>
                 </>
             )}
 
             {step === 2 && (
                 <>
-                <BoxContainer>
-                    <SubTitle>회원 가입시 등록했던</SubTitle>
-                    <SubTitle>
-                    <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
-                    </SubTitle>
-                    <div>
-                    <OptionTitle>이름</OptionTitle>
-                    <Input type="text" placeholder="가입자의 이름을 입력해주세요." />
-                    </div>
-                    <div>
-                    <OptionTitle>출판사명(국문 또는 영문)</OptionTitle>
-                    <Input type="text" placeholder="출판사명을 입력해주세요." />
-                    </div>
-                    <div>
-                    <OptionTitle>사업자 번호</OptionTitle>
-                    <LeftAlignedText>사업자 번호 입력 후 사업자 인증을 진행해주세요.</LeftAlignedText>
-                    <Input type="text" placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." />
-                    </div>
-                    <FullWidthButton onClick={handleFindIdClick}>아이디 찾기</FullWidthButton>
-                </BoxContainer>
-                <Footer>릿맵 | 02 |</Footer>
+                    <BoxContainer>
+                        <SubTitle>회원 가입시 등록했던</SubTitle>
+                        <SubTitle>
+                            <HighlightedText>가입정보</HighlightedText>를 입력해주세요.
+                        </SubTitle>
+                        <div>
+                            <OptionTitle>이름</OptionTitle>
+                            <Input type="text" placeholder="가입자의 이름을 입력해주세요." />
+                        </div>
+                        <div>
+                            <OptionTitle>출판사명(국문 또는 영문)</OptionTitle>
+                            <Input type="text" placeholder="출판사명을 입력해주세요." />
+                        </div>
+                        <div>
+                            <OptionTitle>사업자 번호</OptionTitle>
+                            <LeftAlignedText>사업자 번호 입력 후 사업자 인증을 진행해주세요.</LeftAlignedText>
+                            <Input type="text" placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." />
+                        </div>
+                        <FullWidthButton onClick={handleFindIdClick}>아이디 찾기</FullWidthButton>
+                    </BoxContainer>
+                    <Footer>릿맵 | 02 |</Footer>
                 </>
             )}
 
             {step === 3 && (
                 <>
-                {userFound ? (
-                    <BoxContainer>
-                    <SubTitle>릿맵에 등록한</SubTitle>
-                    <SubTitle>
-                        <HighlightedText>가입 아이디가 확인되었습니다</HighlightedText>.
-                    </SubTitle>
-                    <div>
-                        <HighlightedText>{userData.email}</HighlightedText>
-                    </div>
-                    <div>
-                        <p>가입일자: {userData.registrationDate}</p>
-                    </div>
-                    <CheckmarkIcon>✔</CheckmarkIcon>
-                    <FullWidthButton onClick={handleLoginClick}>로그인 하기</FullWidthButton>
-                    <FullWidthButton onClick={handleResetPasswordClick}>비밀번호 재설정</FullWidthButton>
-                    </BoxContainer>
-                ) : (
-                    <BoxContainer>
-                    <SubTitle>입력한 회원 정보와 일치하는</SubTitle>
-                    <SubTitle>
-                        <HighlightedText>아이디가 없습니다</HighlightedText>.
-                    </SubTitle>
-                    <p>입력한 정보를 다시 확인해주세요.</p>
-                    <CrossIcon>✘</CrossIcon>
-                    <FullWidthButton onClick={handleHomeClick}>홈으로 가기</FullWidthButton>
-                    <FullWidthButton onClick={handleSignupClick}>이메일로 회원가입</FullWidthButton>
-                    </BoxContainer>
-                )}
-                <Footer>릿맵 | 03 |</Footer>
+                    {userFound ? (
+                        <BoxContainer>
+                            <SubTitle>릿맵에 등록한</SubTitle>
+                            <SubTitle>
+                                <HighlightedText>가입 아이디가 확인되었습니다</HighlightedText>.
+                            </SubTitle>
+                            <div>
+                                <HighlightedText>{userData.email}</HighlightedText>
+                            </div>
+                            <div>
+                                <p>가입일자: {userData.registrationDate}</p>
+                            </div>
+                            <Icon>
+                                <img src="/checkmark-circle.png" alt="체크 표시" />
+                            </Icon>
+                            <FullWidthButton onClick={handleLoginClick}>로그인 하기</FullWidthButton>
+                            <FullWidthButton onClick={handleResetPasswordClick}>비밀번호 재설정</FullWidthButton>
+                        </BoxContainer>
+                    ) : (
+                        <BoxContainer>
+                            <SubTitle>입력한 회원 정보와 일치하는</SubTitle>
+                            <SubTitle>
+                                <HighlightedText>아이디가 없습니다</HighlightedText>.
+                            </SubTitle>
+                            <p>입력한 정보를 다시 확인해주세요.</p>
+                            <Icon>
+                                <img src="/close-circle.png" alt="엑스 표시" />
+                            </Icon>
+                            <FullWidthButton onClick={handleHomeClick}>홈으로 가기</FullWidthButton>
+                            <FullWidthButton onClick={handleSignupClick}>이메일로 회원가입</FullWidthButton>
+                        </BoxContainer>
+                    )}
+                    <Footer>릿맵 | 03 |</Footer>
                 </>
             )}
         </PageContainer>
