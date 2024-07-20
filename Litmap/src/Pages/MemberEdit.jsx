@@ -135,7 +135,7 @@ const ButtonContainer = styled.div`
     }
 `;
 
-const ProfileEdit = ({ onImageChange }) => {
+const MemberEdit = ({ onImageChange }) => {
     const [password, setPassword] = useState("");
     const [profileImage, setProfileImage] = useState("https://via.placeholder.com/100");
     const [editing, setEditing] = useState(false);
@@ -177,9 +177,9 @@ const ProfileEdit = ({ onImageChange }) => {
     return (
         <Content>
             <Breadcrumb>
-                마이페이지 / <HighlightedText>프로필 관리</HighlightedText>
+                마이페이지 / <HighlightedText>회원정보 수정</HighlightedText>
             </Breadcrumb>
-            <Header>프로필 관리</Header>
+            <Header>회원정보 수정</Header>
             <ProfileSection>
                 <ProfileImage>
                     <img src={profileImage} alt="프로필 이미지" />
@@ -258,4 +258,4 @@ const ProfileEdit = ({ onImageChange }) => {
     );
 };
 
-export default ProfileEdit;
+export default MemberEdit;

@@ -8,7 +8,8 @@ import Login from "./Pages/Login";
 import MypageLayout from "./Pages/MypageLayout";
 import AdminPage from "./Pages/AdminPage";
 import Postdone from "./Pages/Postdone";
-import ProfileEdit from "./Pages/ProfileEdit";
+import ProfileManage from "./Pages/ProfileManage";
+import MemberEdit from "./Pages/MemberEdit";
 import ArtworkManagement from "./Pages/ArtworkManagement";
 import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 import Work from "./Pages/Work";
@@ -105,7 +106,8 @@ function App() {
           }
         ></Route>
         <Route path="/category2/*" element={<MypageLayout />}>
-          <Route path="edit-profile" element={<ProfileEdit />} />
+          <Route path="manage-profile" element={<ProfileManage />} />
+          <Route path="edit-member" element={<MemberEdit />} />
           <Route path="manage-artworks" element={<ArtworkManagement />} />
           <Route path="delete-service" element={<ServiceWithdrawal />} />
         </Route>

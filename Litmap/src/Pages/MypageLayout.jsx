@@ -1,15 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFaceSmile } from "@fortawesome/free-solid-svg-icons";
-import { faLock } from "@fortawesome/free-solid-svg-icons";
-import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
-import { faGear } from "@fortawesome/free-solid-svg-icons";
-import { faUserXmark } from "@fortawesome/free-solid-svg-icons";
-import { faPeopleRoof } from "@fortawesome/free-solid-svg-icons";
 import AdminPage from "./AdminPage";
-import ProfileEdit from "./ProfileEdit";
+import MemberEdit from "./MemberEdit";
+import ProfileManage from "./ProfileManage";
 import ArtworkManagement from "./ArtworkManagement";
 import ServiceWithdrawal from "./ServiceWithdrawal";
 
@@ -97,6 +91,7 @@ const StatsSection = styled.div`
 `;
 
 const MenuSection = styled.div`
+  width: 100%;
   h3 {
     font-size: 16px;
     color: #767676;
@@ -120,9 +115,10 @@ const MenuSection = styled.div`
           text-decoration: underline;
         }
 
-        .icon {
+        img {
           margin-right: 8px;
-          color: #000;
+          width: 20px;
+          height: 20px;
         }
       }
     }
@@ -130,12 +126,14 @@ const MenuSection = styled.div`
 `;
 
 const MypageLayout = () => {
+  const [profileImage, setProfileImage] = useState("https://via.placeholder.com/60");
+
   return (
     <Container>
       <Sidebar>
         <Box>
           <ProfileSection>
-            <img src="https://via.placeholder.com/60" alt="프로필 이미지" />
+            <img src={profileImage} alt="프로필 이미지" />
             <div className="name">문학동네님</div>
             <div className="role">대표</div>
           </ProfileSection>
@@ -155,15 +153,15 @@ const MypageLayout = () => {
             <h3>계정</h3>
             <ul>
               <li>
-                <Link to="edit-profile">
-                  <FontAwesomeIcon icon={faFaceSmile} className="icon" />
+                <Link to="manage-profile">
+                  <img src="/mypage_profile.png" alt="프로필관리 이미지" />
                   프로필 관리
                 </Link>
               </li>
               <li>
-                <Link to="security">
-                  <FontAwesomeIcon icon={faLock} className="icon" />
-                  로그인 및 보안
+                <Link to="edit-member">
+                  <img src="/mypage_edit.png" alt="회원정보 수정" />
+                  회원정보 수정
                 </Link>
               </li>
             </ul>
@@ -171,27 +169,19 @@ const MypageLayout = () => {
             <ul>
               <li>
                 <Link to="manage-artworks">
-                  <FontAwesomeIcon icon={faBookOpen} className="icon" />
+                  <img src="/mypage_list.png" alt="작품 리스트" />
                   작품 리스트
-                </Link>
-              </li>
-              <li>
-                <Link to="settings">
-                  <FontAwesomeIcon icon={faGear} className="icon" />
-                  환경 설정
                 </Link>
               </li>
             </ul>
             <ul>
               <li>
                 <Link to="delete-service">
-                  <FontAwesomeIcon icon={faUserXmark} className="icon" />
                   서비스 탈퇴하기
                 </Link>
               </li>
               <li>
                 <Link to="adminpage">
-                  <FontAwesomeIcon icon={faPeopleRoof} className="icon" />
                   관리자용 메뉴
                 </Link>
               </li>
@@ -202,7 +192,8 @@ const MypageLayout = () => {
       <MainContent>
         <Routes>
           <Route path="/" element={<ArtworkManagement />} />
-          <Route path="edit-profile" element={<ProfileEdit />} />
+          <Route path="manage-profile" element={<ProfileManage profileImage={profileImage} setProfileImage={setProfileImage} />} />
+          <Route path="edit-member" element={<MemberEdit />} />
           <Route path="manage-artworks" element={<ArtworkManagement />} />
           <Route path="delete-service" element={<ServiceWithdrawal />} />
           <Route path="adminpage" element={<AdminPage />} />
