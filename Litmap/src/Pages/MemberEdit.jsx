@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Content = styled.div`
     padding: 20px;
@@ -11,106 +12,63 @@ const Content = styled.div`
     margin: 0 auto;
 `;
 
-const Breadcrumb = styled.div`
-    font-size: 14px;
-    color: #6c757d;
-    margin-bottom: 10px;
-`;
-
-const HighlightedText = styled.span`
-    font-weight: bold;
-    color: #343a40;
-`;
-
 const Header = styled.div`
     font-size: 24px;
     margin-bottom: 20px;
-`;
-
-const ProfileSection = styled.div`
-    display: flex;
-    margin-bottom: 20px;
-`;
-
-const ProfileImage = styled.div`
-    width: 250px;
-    text-align: center;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 20px;
-    margin-right: 20px;
-    position: relative;
-
-    img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin-bottom: 10px;
-    }
-
-    .nickname {
-        font-size: 18px;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-
-    .role {
-        width: 50px;
-        font-size: 14px;
-        color: #fff;
-        background-color: #8D2741; 
-        padding: 5px 10px;
-        border-radius: 50px;
-        margin-bottom: 10px;
-        display: inline-block;
-        text-align: center;
-    }
-
-    .intro {
-        font-size: 12px;
-        color: #6c757d;
-    }
-
-    .camera-icon {
-        position: absolute;
-        top: 85px;
-        right: 70px;
-        cursor: pointer;
-        background: white;
-        border-radius: 50%;
-        padding: 5px;
-        border: 1px solid #ccc;
-    }
-
-    input[type="file"] {
-        display: none;
-    }
-`;
-
-const ProfileInfo = styled.div`
-    flex-grow: 1;
-    margin-left: 30px;
+    font-weight: bold;
 `;
 
 const InfoItem = styled.div`
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-wrap: wrap;
 
     .title {
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-right: 10px;
         color: #343a40;
     }
 
-    .content {
-        color: #495057;
+    .description {
+        color: #959595;
+        font-size: 10px;
+        margin-bottom: 10px;
+    }
+
+    .input-container {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
     }
 
     input {
         width: 100%;
         padding: 8px;
+        padding-right: 30px;
+        border: 1px solid #9F9F9F;
+        border-radius: 10px;
+        color: #9F9F9F;
+        font-size: 13px;
         margin-top: 5px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+    }
+
+    .error {
+        color: red;
+        font-size: 12px;
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #9F9F9F;
     }
 `;
 
@@ -122,7 +80,12 @@ const Button = styled.button`
     cursor: pointer;
     border-radius: 5px;
     margin-top: 20px;
-    width: 45%;
+    width: 80px;
+    align-self: flex-end;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
 `;
 
 const ButtonContainer = styled.div`
@@ -130,130 +93,287 @@ const ButtonContainer = styled.div`
     justify-content: space-between;
     margin-top: 20px;
 
-    button {
-        width: 45%;
+    .left {
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-start;
     }
+
+    .right {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+`;
+
+const SmallButton = styled.button`
+    background-color: white;
+    color: #8D2741;
+    border: 1px solid #8D2741;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 12px;
+    margin-left: auto;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+`;
+
+const WithdrawalButton = styled.button`
+    background-color: white;
+    color: #959595;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 30px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const CloseButton = styled(Button)`
+    width: 100px;
+    background-color: white;
+    border: 1px solid #7D7D7D;
+    color: #7D7D7D;
+    font-size: 15px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const RestoreButton = styled(Button)`
+    width: 100px;
+    background-color: #E7C6CE;
+    color: white;
+    border: none;
+    font-size: 15px;
+
+    &:hover {
+        background-color: #8B0024;
+    }
+`;
+
+const SmallText = styled.p`
+    font-size: 12px;
+    color: #7D7D7D;
+    margin-top: -10px;
+    margin-bottom: 10px;
 `;
 
 const MemberEdit = ({ onImageChange }) => {
     const [password, setPassword] = useState("");
-    const [profileImage, setProfileImage] = useState("https://via.placeholder.com/100");
     const [editing, setEditing] = useState(false);
     const [email, setEmail] = useState("litmap0728@litmap.com");
     const [phone, setPhone] = useState("010-0000-0000");
     const [website, setWebsite] = useState("https://www.litmap.com");
     const [address, setAddress] = useState("서울시 강서구 마곡나루");
+    const [detailAddress, setDetailAddress] = useState("상세주소");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isPhoneEditable, setIsPhoneEditable] = useState(false);
+    const [isWebsiteEditable, setIsWebsiteEditable] = useState(false);
+    const [isAddressEditable, setIsAddressEditable] = useState(false);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const imageUrl = reader.result;
-                setProfileImage(imageUrl);
+    const handlePasswordVisibilityToggle = () => {
+        setIsPasswordVisible(!isPasswordVisible);
+    };
 
-                onImageChange(imageUrl);
-            };
-            reader.readAsDataURL(file);
+    const handleNext = () => {
+        const isPasswordCorrect = password === "password123"; // 임시로 비밀번호 설정해둠
+        if (isPasswordCorrect) {
+            setEditing(true);
+            setErrorMessage("");
+        } else {
+            setErrorMessage("비밀번호가 일치하지 않습니다.");
         }
     };
 
-    const handleEdit = () => {
-        setEditing(true);
-    };
-
-    const handleSave = () => {
-        console.log("저장된 이메일:", email);
-        console.log("저장된 휴대폰 번호:", phone);
-        console.log("저장된 홈페이지 주소:", website);
-        console.log("저장된 사업자 주소:", address);
-        setEditing(false);
+    const handleSave = async () => {
+        if (newPassword !== confirmPassword) {
+            setErrorMessage("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+        const updatedData = {
+            email,
+            phone,
+            website,
+            address,
+            detailAddress,
+            newPassword
+        };
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedData),
+            });
+            if (!response.ok) {
+                throw new Error("정보 수정에 실패했습니다.");
+            }
+            console.log("정보가 성공적으로 저장되었습니다.");
+            setEditing(false);
+        } catch (error) {
+            console.error("Error:", error);
+            setErrorMessage("정보 수정에 실패했습니다.");
+        }
     };
 
     const handleCancel = () => {
         setEditing(false);
     };
 
+    const handleServiceWithdrawal = async () => {
+        try {
+            const response = await fetch("", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            if (!response.ok) {
+                throw new Error("서비스 탈퇴에 실패했습니다.");
+            }
+            console.log("서비스가 성공적으로 탈퇴되었습니다.");
+            // 서비스 탈퇴 후 로직 추가 -> 로그아웃된 홈페이지로 이동?
+        } catch (error) {
+            console.error("Error:", error);
+            setErrorMessage("서비스 탈퇴에 실패했습니다.");
+        }
+    };
+
     return (
         <Content>
-            <Breadcrumb>
-                마이페이지 / <HighlightedText>회원정보 수정</HighlightedText>
-            </Breadcrumb>
-            <Header>회원정보 수정</Header>
-            <ProfileSection>
-                <ProfileImage>
-                    <img src={profileImage} alt="프로필 이미지" />
-                    <label className="camera-icon">
-                        📷
-                        <input type="file" accept="image/*" onChange={handleImageChange} />
-                    </label>
-                    <div className="nickname">문학동네</div>
-                    <div className="role">대표</div>
-                    <div className="intro">회사 한줄 소개가 들어가는 곳입니다.</div>
-                </ProfileImage>
-                <ProfileInfo>
-                    {editing ? (
-                        <>
-                            <InfoItem>
-                                <div className="title">이메일</div>
-                                <input
-                                    type="text"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">휴대폰 번호</div>
-                                <input
-                                    type="text"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">홈페이지 주소</div>
-                                <input
-                                    type="text"
-                                    value={website}
-                                    onChange={(e) => setWebsite(e.target.value)}
-                                />
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">사업자 주소</div>
+            {!editing ? (
+                <>
+                    <Header>비밀번호 확인</Header>
+                    <div className="description">안전한 개인정보를 위해 비밀번호를 입력해주세요.</div>
+                    <InfoItem>
+                        <div className="title">비밀번호</div>
+                        <div className="input-container">
+                            <input
+                                type={isPasswordVisible ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="비밀번호를 입력해주세요."
+                            />
+                            <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
+                                {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                            </div>
+                        </div>
+                        {errorMessage && <div className="error">{errorMessage}</div>}
+                    </InfoItem>
+                    <Button onClick={handleNext}>다음</Button>
+                </>
+            ) : (
+                <>
+                    <Header>회원정보 및 수정</Header>
+                    <InfoItem>
+                        <div className="title">이메일</div>
+                        <div>{email}</div>
+                    </InfoItem>
+                    <InfoItem>
+                        <div className="title">새 비밀번호</div>
+                        <div className="input-container">
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                        </div>
+                    </InfoItem>
+                    <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+                    <InfoItem>
+                        <div className="title">새 비밀번호 확인</div>
+                        <div className="input-container">
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                            {newPassword !== confirmPassword && (
+                                <div className="error">비밀번호가 일치하지 않습니다.</div>
+                            )}
+                        </div>
+                    </InfoItem>
+                    <InfoItem>
+                        <div className="title">휴대폰 번호</div>
+                        {isPhoneEditable ? (
+                            <input
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                            />
+                        ) : (
+                            <div>{phone}</div>
+                        )}
+                        <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
+                            {isPhoneEditable ? "완료" : "변경"}
+                        </SmallButton>
+                    </InfoItem>
+                    <InfoItem>
+                        <div className="title">홈페이지 주소</div>
+                        {isWebsiteEditable ? (
+                            <input
+                                type="text"
+                                value={website}
+                                onChange={(e) => setWebsite(e.target.value)}
+                            />
+                        ) : (
+                            <div>{website}</div>
+                        )}
+                        <SmallButton onClick={() => setIsWebsiteEditable(!isWebsiteEditable)}>
+                            {isWebsiteEditable ? "완료" : "변경"}
+                        </SmallButton>
+                    </InfoItem>
+                    <InfoItem>
+                        <div className="title">사업자 주소</div>
+                        {isAddressEditable ? (
+                            <>
                                 <input
                                     type="text"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
                                 />
-                            </InfoItem>
-                            <ButtonContainer>
-                                <Button onClick={handleSave}>저장하기</Button>
-                                <Button onClick={handleCancel}>취소하기</Button>
-                            </ButtonContainer>
-                        </>
-                    ) : (
-                        <>
-                            <InfoItem>
-                                <div className="title">이메일</div>
-                                <div className="content">{email}</div>
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">휴대폰 번호</div>
-                                <div className="content">{phone}</div>
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">홈페이지 주소</div>
-                                <div className="content">{website}</div>
-                            </InfoItem>
-                            <InfoItem>
-                                <div className="title">사업자 주소</div>
-                                <div className="content">{address}</div>
-                            </InfoItem>
-                            <Button onClick={handleEdit}>편집하기</Button>
-                        </>
-                    )}
-                </ProfileInfo>
-            </ProfileSection>
+                                <input
+                                    type="text"
+                                    value={detailAddress}
+                                    onChange={(e) => setDetailAddress(e.target.value)}
+                                    placeholder="상세 주소"
+                                    style={{ marginTop: "10px" }}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <div>{address}</div>
+                                <div>{detailAddress}</div>
+                            </>
+                        )}
+                        <SmallButton onClick={() => setIsAddressEditable(!isAddressEditable)}>
+                            {isAddressEditable ? "완료" : "변경"}
+                        </SmallButton>
+                    </InfoItem>
+                    <ButtonContainer>
+                        <div className="left">
+                            <WithdrawalButton onClick={handleServiceWithdrawal}>서비스 탈퇴하기</WithdrawalButton>
+                        </div>
+                        <div className="right">
+                            <CloseButton onClick={handleCancel}>취소하기</CloseButton>
+                            <RestoreButton onClick={handleSave}>저장하기</RestoreButton>
+                        </div>
+                    </ButtonContainer>
+                </>
+            )}
         </Content>
     );
 };
