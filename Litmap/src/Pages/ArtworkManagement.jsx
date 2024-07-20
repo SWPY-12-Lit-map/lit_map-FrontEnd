@@ -1,28 +1,54 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotate } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faChevronRight, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 
 const Content = styled.div`
-    flex-grow: 1;
-    background-color: #f0f2f5;
     padding: 20px;
-`;
-
-const Breadcrumb = styled.div`
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 10px;
-`;
-
-const HighlightedText = styled.span`
-    font-weight: bold;
-    color: black;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 `;
 
 const Header = styled.div`
     font-size: 24px;
     margin-bottom: 20px;
+    font-weight: bold;
+`;
+
+const BigButton = styled.button`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 16px;
+
+    img {
+        margin-right: 10px;
+    }
+
+    .text-container {
+        flex-grow: 1;
+        text-align: left;
+    }
+
+    .text-title {
+        font-weight: bold;
+    }
+
+    .text-subtitle {
+        font-size: 12px;
+        color: #888;
+    }
 `;
 
 const Table = styled.table`
@@ -30,51 +56,40 @@ const Table = styled.table`
     border-collapse: collapse;
 `;
 
-const Th = styled.th`
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-`;
-
 const Td = styled.td`
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #DADADA;
     padding: 10px;
+
+    button {
+        border: none;
+        background-color: white;
+    }
 `;
 
-const Button = styled.button`
-    background-color: #1890ff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
+const CheckBox = styled.img`
+    margin-right: 10px;
     cursor: pointer;
-    border-radius: 5px;
-    margin-right: 10px;
-`;
-
-const CheckBox = styled.input.attrs({ type: "checkbox" })`
-    margin-right: 10px;
-`;
-
-const Footer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
 `;
 
 const Pagination = styled.div`
     display: flex;
     justify-content: center;
     margin-top: 20px;
-`;
+    gap: 10px;
 
-const PageButton = styled.button`
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    cursor: pointer;
-    &:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
+    .page-number {
+        cursor: pointer;
+        margin: 0 5px;
+        &.active {
+            font-weight: bold;
+            color: black;
+        }
+    }
+
+    .page-control {
+        cursor: pointer;
+        margin: 0 5px;
+        color: #aaa;
     }
 `;
 
@@ -86,12 +101,53 @@ const RefreshSection = styled.div`
 `;
 
 const Status = styled.div`
-    background-color: ${({ status }) => status === '임시 저장' ? '#FFF7E6' : status === '게시 완료' ? '#E6F7FF' : '#F6FFED'};
-    border: 1px solid ${({ status }) => status === '임시 저장' ? '#FFD591' : status === '게시 완료' ? '#91D5FF' : '#B7EB8F'};
-    color: ${({ status }) => status === '임시 저장' ? '#FA8C16' : status === '게시 완료' ? '#1890FF' : '#52C41A'};
+    background-color: ${({ status }) => status === '임시 저장' ? '#FFE1DC' : status === '게시 완료' ? '#EFF5FF' : '#FFF5E6'};
+    border: none;
+    color: #121212;
     padding: 5px 10px;
     border-radius: 5px;
     display: inline-block;
+`;
+
+const DropDown = styled.select`
+    padding: 5px 10px;
+    border: 1px solid #7D7D7D;
+    border-radius: 8px;
+    margin-right: 10px;
+    color: #7D7D7D;
+`;
+
+const SearchBar = styled.div`
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0 10px;
+    background-color: #C5C5C5;
+    color: #E9E9E9;
+`;
+
+const SearchInput = styled.input`
+    border: none;
+    border-radius: 100px;
+    outline: none;
+    padding: 5px;
+    flex-grow: 1;
+    background-color: #C5C5C5;
+    color: #E9E9E9;
+`;
+
+const Controls = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+`;
+
+const Divider = styled.div`
+    width: 100%;
+    height: 2px;
+    background-color: #DADADA;
+    margin-bottom: 10px;
 `;
 
 const ArtworkManagement = () => {
@@ -99,31 +155,60 @@ const ArtworkManagement = () => {
         {
             id: 1,
             name: "오만과 편견",
-            modifyDate: "2024.06.20 13:52",
+            modifyDate: "2024.06.20",
             firstRegisterDate: "2024.06.20 13:40",
             status: "임시 저장",
-            author: "김믿음/초록뱀미디어",
         },
         {
             id: 2,
             name: "홍길동전",
-            modifyDate: "2024.05.04 09:13",
+            modifyDate: "2024.05.04",
             firstRegisterDate: "2024.05.01 09:00",
             status: "게시 완료",
-            author: "김믿음/초록뱀미디어",
         },
         {
             id: 3,
             name: "사랑의 이해",
-            modifyDate: "2024.05.04 09:13",
+            modifyDate: "2024.05.04",
             firstRegisterDate: "2024.05.01 09:00",
             status: "승인 중",
-            author: "김믿음/초록뱀미디어",
+        },
+        {
+            id: 4,
+            name: "오만과 편견1",
+            modifyDate: "2024.06.20",
+            firstRegisterDate: "2024.06.20 13:40",
+            status: "임시 저장",
+        },
+        {
+            id: 5,
+            name: "홍길동전1",
+            modifyDate: "2024.05.04",
+            firstRegisterDate: "2024.05.01 09:00",
+            status: "게시 완료",
+        },
+        {
+            id: 6,
+            name: "사랑의 이해1",
+            modifyDate: "2024.05.04",
+            firstRegisterDate: "2024.05.01 09:00",
+            status: "승인 중",
+        },
+        {
+            id: 7,
+            name: "사랑의 이해2",
+            modifyDate: "2024.05.04",
+            firstRegisterDate: "2024.05.01 09:00",
+            status: "승인 중",
         },
     ]);
     const [checkedItems, setCheckedItems] = useState({});
     const [allChecked, setAllChecked] = useState(false);
     const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
+    const [filterStatus, setFilterStatus] = useState("all");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     const handleCheckAll = () => {
         const newCheckedItems = {};
@@ -142,79 +227,121 @@ const ArtworkManagement = () => {
         setRefreshTime(new Date().toLocaleString());
     };
 
-    const handleDelete = () => {
-        const newData = data.filter(item => !checkedItems[item.id]);
+    const handleDelete = (id) => {
+        const newData = data.filter(item => item.id !== id);
         setData(newData);
-        setCheckedItems({});
-        setAllChecked(false);
+        const newCheckedItems = { ...checkedItems };
+        delete newCheckedItems[id];
+        setCheckedItems(newCheckedItems);
     };
+
+    const filteredData = data.filter((item) => {
+        if (filterStatus !== "all" && item.status !== filterStatus) {
+            return false;
+        }
+        if (searchTerm && !item.name.includes(searchTerm)) {
+            return false;
+        }
+        return true;
+    });
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(filteredData.length / itemsPerPage); i++) {
+        pageNumbers.push(i);
+    }
 
     return (
         <Content>
-            <Breadcrumb>
-                마이페이지 / <HighlightedText>내 작품 관리</HighlightedText>
-            </Breadcrumb>
+            <Header>작품 및 리스트</Header>
 
-            <Header>내 작품 관리</Header>
+            <BigButton onClick={() => window.location.href = "/category1"}>
+                <img src="/registration.png" alt="등록 아이콘" />
+                <div className="text-container">
+                    <div className="text-title">릿맵 등록하기</div>
+                    <div className="text-subtitle">새 작품의 인물지도를 등록해보세요.</div>
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} size="2x" />
+            </BigButton>
 
             <RefreshSection>
                 조회 시간 : {refreshTime}
                 <FontAwesomeIcon
-                    icon={faRotate}
+                    icon={faRotateRight}
                     onClick={handleRefresh}
                     style={{ cursor: 'pointer', marginLeft: '10px', color: '#1890ff' }}
                 />
             </RefreshSection>
 
+            <Controls>
+                <div>
+                    <CheckBox
+                        src={allChecked ? "/list_color_check.png" : "/list_check.png"}
+                        onClick={handleCheckAll}
+                    />
+                    <span>전체보기 (456개)</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <DropDown onChange={(e) => setFilterStatus(e.target.value)}>
+                        <option value="all">상태순</option>
+                        <option value="임시 저장">임시저장</option>
+                        <option value="승인 중">승인중</option>
+                        <option value="게시 완료">게시완료</option>
+                    </DropDown>
+                    <SearchBar>
+                        <SearchInput
+                            placeholder="검색어 입력"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FontAwesomeIcon icon={faSearch} />
+                    </SearchBar>
+                </div>
+            </Controls>
+
+            <Divider />
+
             <Table>
-                <thead>
-                    <tr>
-                        <Th>
-                            <CheckBox
-                                checked={allChecked}
-                                onChange={handleCheckAll}
-                            />
-                            작품명
-                        </Th>
-                        <Th>수정일</Th>
-                        <Th>최초 등록일</Th>
-                        <Th>상태</Th>
-                        <Th>작성자</Th>
-                    </tr>
-                </thead>
                 <tbody>
-                    {data.map((item) => (
+                    {currentItems.map((item) => (
                         <tr key={item.id}>
                             <Td>
                                 <CheckBox
-                                    checked={!!checkedItems[item.id]}
-                                    onChange={() => handleCheckItem(item.id)}
+                                    src={checkedItems[item.id] ? "/list_color_check.png" : "/list_check.png"}
+                                    onClick={() => handleCheckItem(item.id)}
                                 />
-                                {item.name}
                             </Td>
                             <Td>{item.modifyDate}</Td>
-                            <Td>{item.firstRegisterDate}</Td>
+                            <Td>{item.name}</Td>
                             <Td>
                                 <Status status={item.status}>{item.status}</Status>
                             </Td>
-                            <Td>{item.author}</Td>
+                            <Td>
+                                <button onClick={() => window.location.href = "/category1"}>수정하기</button>
+                            </Td>
+                            <Td>
+                                <button onClick={() => handleDelete(item.id)}>삭제하기</button>
+                            </Td>
                         </tr>
                     ))}
                 </tbody>
             </Table>
 
-            <Footer>
-                <div>
-                    <Button onClick={handleDelete}>삭제하기</Button>
-                    <Button>수정하기</Button>
-                </div>
-            </Footer>
-
             <Pagination>
-                <PageButton>Previous</PageButton>
-                <PageButton>1</PageButton>
-                <PageButton>2</PageButton>
-                <PageButton>Next</PageButton>
+                <span className="page-control" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>&lt;</span>
+                {pageNumbers.map(number => (
+                    <span
+                        key={number}
+                        className={`page-number ${currentPage === number ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(number)}
+                    >
+                        {number}
+                    </span>
+                ))}
+                <span className="page-control" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === pageNumbers.length}>&gt;</span>
             </Pagination>
         </Content>
     );
