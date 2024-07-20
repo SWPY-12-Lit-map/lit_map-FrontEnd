@@ -5,7 +5,6 @@ import AdminPage from "./AdminPage";
 import MemberEdit from "./MemberEdit";
 import ProfileManage from "./ProfileManage";
 import ArtworkManagement from "./ArtworkManagement";
-import ServiceWithdrawal from "./ServiceWithdrawal";
 
 const Container = styled.div`
   display: flex;
@@ -176,11 +175,6 @@ const MypageLayout = () => {
             </ul>
             <ul>
               <li>
-                <Link to="delete-service">
-                  서비스 탈퇴하기
-                </Link>
-              </li>
-              <li>
                 <Link to="adminpage">
                   관리자용 메뉴
                 </Link>
@@ -195,7 +189,6 @@ const MypageLayout = () => {
           <Route path="manage-profile" element={<ProfileManage profileImage={profileImage} setProfileImage={setProfileImage} />} />
           <Route path="edit-member" element={<MemberEdit />} />
           <Route path="manage-artworks" element={<ArtworkManagement />} />
-          <Route path="delete-service" element={<ServiceWithdrawal />} />
           <Route path="adminpage" element={<AdminPage />} />
         </Routes>
       </MainContent>

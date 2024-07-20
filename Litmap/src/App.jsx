@@ -11,7 +11,6 @@ import Postdone from "./Pages/Postdone";
 import ProfileManage from "./Pages/ProfileManage";
 import MemberEdit from "./Pages/MemberEdit";
 import ArtworkManagement from "./Pages/ArtworkManagement";
-import ServiceWithdrawal from "./Pages/ServiceWithdrawal";
 import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
 import FindIdPage from "./Pages/FindIdPage";
@@ -109,7 +108,6 @@ function App() {
           <Route path="manage-profile" element={<ProfileManage />} />
           <Route path="edit-member" element={<MemberEdit />} />
           <Route path="manage-artworks" element={<ArtworkManagement />} />
-          <Route path="delete-service" element={<ServiceWithdrawal />} />
         </Route>
         <Route path="/adminpage" element={<AdminPage />} />
         <Route path="/find-id" element={<FindIdPage />} />
