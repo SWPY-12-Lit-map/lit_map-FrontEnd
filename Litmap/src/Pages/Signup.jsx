@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
-// import Modal from "react-modal";
+import Modal from "react-modal";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const PageContainer = styled.div`
   display: flex;
@@ -313,18 +315,11 @@ const SignupPage = () => {
     password: "",
     confirmPassword: "",
     nickname: "",
-    representativeName: "",
-    representativePhone: "",
-    companyName: "",
-    companyPhone: "",
-    businessNumber: "",
-    businessAddress: "",
-    businessDetailAddress: "",
     workEmail: "",
-    workBusinessNumber: "",
     workURL: "",
   });
   const [apiError, setApiError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     Modal.setAppElement("#root");
@@ -343,10 +338,35 @@ const SignupPage = () => {
         setValidationFailed(true);
       }
     } else if (step === 2) {
-      const allFieldsFilled = Object.values(formData).every(
-        (field) => field.trim() !== ""
-      );
+      let allFieldsFilled = false;
+
+      if (selectedOption === "writer") {
+        allFieldsFilled =
+          formData.name &&
+          formData.email &&
+          formData.password &&
+          formData.confirmPassword &&
+          formData.nickname &&
+          formData.workEmail &&
+          formData.workURL;
+      } else {
+        allFieldsFilled =
+          formData.name &&
+          formData.email &&
+          formData.password &&
+          formData.confirmPassword &&
+          formData.nickname &&
+          formData.workEmail &&
+          formData.workURL;
+      }
+
       if (allFieldsFilled) {
+        if (formData.password !== formData.confirmPassword) {
+          setValidationFailed(true);
+          setApiError("Passwords do not match.");
+          return;
+        }
+        console.log("Form Data at Step 2:", formData);
         setStep(3);
         setValidationFailed(false);
       } else {
@@ -360,7 +380,10 @@ const SignupPage = () => {
         terms.privacyPolicy
       ) {
         setValidationFailed(false);
-        setStep(4);
+        const success = await handleSubmit();
+        if (success) {
+          setStep(4);
+        }
       } else {
         setValidationFailed(true);
       }
@@ -413,23 +436,39 @@ const SignupPage = () => {
     window.location.href = "/category1";
   };
 
-  const handleValidationCheck = async (field) => {
+  const handleSubmit = async () => {
+    const payload = {
+      litmapEmail: formData.email,
+      workEmail: formData.workEmail,
+      name: formData.name,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      nickname: formData.nickname,
+      memberRoleStatus: selectedOption.toUpperCase(),
+    };
+
+    console.log("Payload:", payload); // 서버로 전송할 데이터를 콘솔에 출력
+
     try {
-      const response = await fetch(`/api/validate/${field}`, {
-        method: "POST",
+      const response = await axios.post("/api/members/register", payload, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ value: formData[field] }),
       });
-      const result = await response.json();
-      if (!result.valid) {
-        setApiError(`${field} is already in use.`);
-      } else {
-        setApiError("");
-      }
+      console.log("Response:", response); // 서버 응답을 콘솔에 출력
+      return true;
     } catch (error) {
-      setApiError("An error occurred while validating the field.");
+      console.error("There was an error!", error);
+      if (error.response) {
+        console.error("Server responded with status:", error.response.status);
+        console.error("Data:", error.response.data);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      setApiError("An error occurred during registration. Please try again.");
+      return false;
     }
   };
 
@@ -577,77 +616,25 @@ const SignupPage = () => {
           <BoxContainer>
             <Title>사업자 정보</Title>
 
-            <label>대표자명</label>
+            <label>업무용 이메일</label>
+            <SmallText2>업무용으로 쓰는 이메일을 추가 등록해주세요.</SmallText2>
             <InputField
-              type="text"
-              name="representativeName"
-              placeholder="대표자명을 입력해주세요."
-              value={formData.representativeName}
+              type="email"
+              name="workEmail"
+              placeholder="이메일을 입력해주세요."
+              value={formData.workEmail}
               onChange={handleInputChange}
             />
 
-            <label>대표 전화번호</label>
-            <InputField
-              type="text"
-              name="representativePhone"
-              placeholder="(예시) 01013245678"
-              value={formData.representativePhone}
-              onChange={handleInputChange}
-            />
-
-            <label>회사명(국문 또는 영문)</label>
-            <InputField
-              type="text"
-              name="companyName"
-              placeholder="출판사나 제작사명을 입력해주세요."
-              value={formData.companyName}
-              onChange={handleInputChange}
-            />
-
-            <label>출판사 전화번호</label>
-            <InputField
-              type="text"
-              name="companyPhone"
-              placeholder="(예시) 01013245768"
-              value={formData.companyPhone}
-              onChange={handleInputChange}
-            />
-
-            <label>사업자 번호</label>
+            <label>작품정보(국문 또는 영문)</label>
             <SmallText2>
-              사업자 번호 입력 후 사업자 인증을 진행해주세요.
+              작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.
             </SmallText2>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="businessNumber"
-                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요."
-                value={formData.businessNumber}
-                onChange={handleInputChange}
-              />
-              <Button onClick={() => handleValidationCheck("businessNumber")}>
-                사업자 인증
-              </Button>
-            </InputFieldWithButton>
-
-            <label>사업자 주소</label>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="businessAddress"
-                placeholder="주소를 입력해주세요."
-                value={formData.businessAddress}
-                onChange={handleInputChange}
-              />
-              <Button onClick={() => handleValidationCheck("businessAddress")}>
-                주소 검색
-              </Button>
-            </InputFieldWithButton>
             <InputField
               type="text"
-              name="businessDetailAddress"
-              placeholder="상세 주소를 입력해주세요."
-              value={formData.businessDetailAddress}
+              name="workURL"
+              placeholder="http://www.litmap.com"
+              value={formData.workURL}
               onChange={handleInputChange}
             />
 
@@ -683,9 +670,7 @@ const SignupPage = () => {
                 value={formData.email}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck("email")}>
-                중복확인
-              </Button>
+              {/* <Button onClick={() => handleValidationCheck('email')}>중복확인</Button> */}
             </InputFieldWithButton>
 
             <label>비밀번호</label>
@@ -719,9 +704,7 @@ const SignupPage = () => {
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck("nickname")}>
-                중복확인
-              </Button>
+              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
             </InputFieldWithButton>
           </BoxContainer>
           <BoxContainer>
@@ -736,23 +719,6 @@ const SignupPage = () => {
               value={formData.workEmail}
               onChange={handleInputChange}
             />
-
-            <label>사업자 번호</label>
-            <SmallText2>사업자 등록번호 숫자 10자리를 입력해주세요.</SmallText2>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="workBusinessNumber"
-                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요."
-                value={formData.workBusinessNumber}
-                onChange={handleInputChange}
-              />
-              <Button
-                onClick={() => handleValidationCheck("workBusinessNumber")}
-              >
-                사업자 인증
-              </Button>
-            </InputFieldWithButton>
 
             <label>작품정보(국문 또는 영문)</label>
             <SmallText2>
