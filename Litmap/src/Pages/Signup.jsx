@@ -437,25 +437,38 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async () => {
-    const payload = {
-      litmapEmail: formData.email,
-      workEmail: formData.workEmail,
-      name: formData.name,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      nickname: formData.nickname,
-      memberRoleStatus: selectedOption.toUpperCase(),
-    };
+    let submitData = new FormData();
+    submitData.append("litmapEmail", formData.email);
+    submitData.append("workEmail", formData.workEmail);
+    submitData.append("name", formData.name);
+    submitData.append("password", formData.password);
+    submitData.append("confirmPassword", formData.confirmPassword);
+    submitData.append("nickname", formData.nickname);
+    submitData.append("memberRoleStatus", selectedOption.toUpperCase());
+    console.log(submitData);
+    // const payload = {
+    //   litmapEmail: formData.email,
+    //   workEmail: formData.workEmail,
+    //   name: formData.name,
+    //   password: formData.password,
+    //   confirmPassword: formData.confirmPassword,
+    //   nickname: formData.nickname,
+    //   memberRoleStatus: selectedOption.toUpperCase(),
+    // };
 
-    console.log("Payload:", payload); // 서버로 전송할 데이터를 콘솔에 출력
+    // console.log("Payload:", payload); // 서버로 전송할 데이터를 콘솔에 출력
 
     try {
-      const response = await axios.post("/api/members/register", payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("Response:", response); // 서버 응답을 콘솔에 출력
+      const response = await axios
+        .post("https://api.litmap.store/api/members/register", submitData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((result) => {
+          console.log("Response:", result); // 서버 응답을 콘솔에 출력
+        });
+
       return true;
     } catch (error) {
       console.error("There was an error!", error);
