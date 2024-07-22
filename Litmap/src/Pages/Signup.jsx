@@ -444,7 +444,10 @@ const SignupPage = () => {
     submitData.append("password", formData.password);
     submitData.append("confirmPassword", formData.confirmPassword);
     submitData.append("nickname", formData.nickname);
-    submitData.append("memberRoleStatus", selectedOption.toUpperCase());
+    submitData.append("memberRoleStatus", "ACTIVE_MEMBER");
+    submitData.append("myMessage", "");
+    submitData.append("userImage", "");
+    submitData.append("urlLink", formData.workURL);
     console.log(submitData);
     // const payload = {
     //   litmapEmail: formData.email,
@@ -453,7 +456,7 @@ const SignupPage = () => {
     //   password: formData.password,
     //   confirmPassword: formData.confirmPassword,
     //   nickname: formData.nickname,
-    //   memberRoleStatus: selectedOption.toUpperCase(),
+    //   memberRoleStatus: "ACTIVE_MEMBER",
     // };
 
     // console.log("Payload:", payload); // 서버로 전송할 데이터를 콘솔에 출력
