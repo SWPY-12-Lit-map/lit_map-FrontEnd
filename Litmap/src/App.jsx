@@ -103,7 +103,7 @@ function App() {
               setRead={setRead}
             />
           }
-        ></Route>
+        />
         <Route path="/category2/*" element={<MypageLayout />}>
           <Route path="manage-profile" element={<ProfileManage />} />
           <Route path="edit-member" element={<MemberEdit />} />

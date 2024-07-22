@@ -7,7 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const PageContainer = styled.div`
   display: flex;
   height: 100vh;
-  background-color: #FBF9F6;
+  background-color: #fbf9f6;
 `;
 
 const LeftPanel = styled.div`
@@ -16,7 +16,7 @@ const LeftPanel = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #FBF9F6;
+  background-color: #fbf9f6;
 `;
 
 const Logo = styled.div`
@@ -29,12 +29,12 @@ const RightPanel = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #FBF9F6;
+  background-color: #fbf9f6;
 `;
 
 const LoginBox = styled.div`
   width: 400px;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -59,7 +59,7 @@ const InputLabel = styled.div`
 const InputBox = styled.input`
   width: 100%;
   height: 40px;
-  border: 1px solid #DADADA;
+  border: 1px solid #dadada;
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 20px;
@@ -83,13 +83,13 @@ const TogglePasswordButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #DADADA;
+  color: #dadada;
 `;
 
 const LoginButton = styled.button`
   width: 100%;
   height: 45px;
-  background-color: #E7C6CE;
+  background-color: #e7c6ce;
   color: white;
   font-size: 16px;
   border: none;
@@ -98,13 +98,13 @@ const LoginButton = styled.button`
   margin-top: 20px;
 
   &:hover {
-    background-color: #8B0000;
+    background-color: #8b0000;
   }
 `;
 
 const OrText = styled.div`
   margin: 20px 0;
-  color: #7D7D7D;
+  color: #7d7d7d;
 `;
 
 const SignUpButton = styled(Link)`
@@ -112,7 +112,7 @@ const SignUpButton = styled(Link)`
   width: 100%;
   height: 45px;
   background-color: transparent;
-  border: 1px solid #8B0024;
+  border: 1px solid #8b0024;
   border-radius: 10px;
   color: black;
   font-size: 16px;
@@ -137,7 +137,7 @@ const ResetPasswordLink = styled.div`
 `;
 
 const ResetLink = styled(Link)`
-  color: #7D7D7D;
+  color: #7d7d7d;
   text-decoration: none;
 
   &:hover {
@@ -145,7 +145,7 @@ const ResetLink = styled(Link)`
   }
 `;
 
-const LoginPage = (props) => {
+const Login = ({ setLogin }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -158,14 +158,19 @@ const LoginPage = (props) => {
     }
 
     try {
-      const response = await fetch(`https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "accept": "*/*"
-        },
-        body: '',
-      });
+      const response = await fetch(
+        `https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(
+          email
+        )}&password=${encodeURIComponent(password)}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "*/*",
+          },
+          body: "",
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -174,8 +179,9 @@ const LoginPage = (props) => {
 
       const data = await response.json();
 
-      // 로그인 성공 시 메인 페이지로 이동
+      // 로그인 성공 시 메인 페이지로 이동 및 상태 업데이트
       console.log(`로그인 성공: ${email}`);
+      setLogin(true);
       navigate("/");
     } catch (error) {
       alert(error.message || "로그인 도중 문제가 발생했습니다. 나중에 다시 시도해주세요.");
@@ -234,4 +240,4 @@ const LoginPage = (props) => {
   );
 };
 
-export default LoginPage;
+export default Login;

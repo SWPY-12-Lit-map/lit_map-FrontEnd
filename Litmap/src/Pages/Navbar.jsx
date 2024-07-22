@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
@@ -39,7 +38,6 @@ const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
   width: 40%;
 `;
 
@@ -112,6 +110,7 @@ const SearchInfo = styled.div`
   position: absolute;
   top: 60px;
   z-index: 10;
+  display: none;
 `;
 
 const Right = styled.div`
@@ -158,64 +157,11 @@ const AlertBtn = styled.button`
   background: unset;
 `;
 
-function Navbar(props) {
-  const login = props.login;
-  const [userInput, setUserInput] = useState(
-    localStorage.getItem("recentSearch")
-      ? JSON.parse(localStorage.getItem("recentSearch"))
-      : []
-  ); // 유저가 검색한 값 가져오기
-  useEffect(() => {
-    window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
-  }, [userInput, setUserInput]); // 유저 검색내용 저장
-  const [userSearch, setUserSearch] = useState(); // 유저 검색내용
-  const [searchSort, setSort] = useState(); // 검색 카테고리
-  const [state, setState] = useState(false); // 검색창 활성화 여부
+function Navbar({ login }) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  // 특정 영역 외 클릭 시 발생하는 이벤트
-  const searchRef = useRef(null);
-
-  useEffect(() => {
-    function handleFocus(e) {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        // input 체크 해제
-        setState(false);
-      }
-    }
-
-    document.addEventListener("mouseup", handleFocus);
-    return () => {
-      document.removeEventListener("mouseup", handleFocus);
-    };
-  }, [searchRef]);
-
-  // localstorage에서 가져오기
-  const [recentSearch, setRecentSearch] = useState();
-
-  const getSearches = () => {
-    const getRecentSearch = localStorage.getItem("recentSearch")
-      ? JSON.parse(localStorage.getItem("recentSearch"))
-      : [];
-    setRecentSearch(getRecentSearch);
-  };
-
-  useEffect(() => {
-    getSearches();
-  }, [setUserInput, userInput, userSearch, setUserSearch]);
-
-  const searchKey = (e) => {
-    if (e.key == "Enter") {
-      console.log(userSearch);
-      setUserInput([...userInput, userSearch]);
-      setUserSearch("");
-      getSearches();
-    }
-  };
-
-  const searchBtn = () => {
-    setUserInput([...userInput, userSearch]);
-    setUserSearch("");
-    getSearches();
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
   };
 
   return (
@@ -224,74 +170,23 @@ function Navbar(props) {
         <LogoImg src="/Logo.png" alt="로고" />
       </NavLogo>
 
-      <SearchBarContainer ref={searchRef}>
+      <SearchBarContainer>
         <SearchCategory>
-          <DropBtn
-            id="dropdown-basic-button"
-            title={searchSort ? searchSort : "통합검색"}
-          >
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              작품 제목
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              작가 이름
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              출판사 이름
-            </Dropdown.Item>
+          <DropBtn id="dropdown-basic-button" title="통합검색">
+            <Dropdown.Item onClick={toggleDropdown}>작품 제목</Dropdown.Item>
+            <Dropdown.Item onClick={toggleDropdown}>작가 이름</Dropdown.Item>
+            <Dropdown.Item onClick={toggleDropdown}>출판사 이름</Dropdown.Item>
           </DropBtn>
         </SearchCategory>
-        <SearchBtn
-          onClick={() => {
-            searchBtn();
-          }}
-        >
+        <SearchBtn onClick={toggleDropdown}>
           <SearchIcon icon={faMagnifyingGlass} />
         </SearchBtn>
-        <SearchBar
-          id="searchBar"
-          placeholder="검색어를 입력해주세요"
-          className="search"
-          value={userSearch}
-          style={{
-            borderRadius: state ? "30px 30px 0px 0px" : "30px",
-            borderBottom: state ? "none" : "solid 1px black",
-          }}
-          onChange={(e) => {
-            setUserSearch(e.target.value);
-          }}
-          onKeyDown={searchKey}
-          onClick={() => {
-            state ? setState(false) : setState(true);
-          }}
-        />
-        {state ? (
-          <SearchInfo
-            style={{
-              borderTop: state ? "none" : "black",
-            }}
-          >
-            {recentSearch.map((a, index) => (
-              <p key={index}>{a}</p>
-            ))}
-          </SearchInfo>
-        ) : null}
+        <SearchBar placeholder="검색어를 입력해주세요" />
+        {dropdownVisible && <SearchInfo></SearchInfo>}
       </SearchBarContainer>
 
       <Right>
-        {login == false ? (
+        {!login ? (
           <>
             <SignButton to="/signup">가입하기</SignButton>
             <StyledLink to="/login">로그인</StyledLink>
