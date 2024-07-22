@@ -326,6 +326,7 @@ const SignupPage = () => {
   }, []);
 
   const handleOptionClick = (option) => {
+    console.log("Selected Option:", option); // 선택된 옵션을 콘솔에 출력
     setSelectedOption(option);
   };
 
@@ -340,25 +341,14 @@ const SignupPage = () => {
     } else if (step === 2) {
       let allFieldsFilled = false;
 
-      if (selectedOption === "writer") {
-        allFieldsFilled =
-          formData.name &&
-          formData.email &&
-          formData.password &&
-          formData.confirmPassword &&
-          formData.nickname &&
-          formData.workEmail &&
-          formData.workURL;
-      } else {
-        allFieldsFilled =
-          formData.name &&
-          formData.email &&
-          formData.password &&
-          formData.confirmPassword &&
-          formData.nickname &&
-          formData.workEmail &&
-          formData.workURL;
-      }
+      allFieldsFilled =
+        formData.name &&
+        formData.email &&
+        formData.password &&
+        formData.confirmPassword &&
+        formData.nickname &&
+        formData.workEmail &&
+        formData.workURL;
 
       if (allFieldsFilled) {
         if (formData.password !== formData.confirmPassword) {
@@ -366,7 +356,6 @@ const SignupPage = () => {
           setApiError("Passwords do not match.");
           return;
         }
-        console.log("Form Data at Step 2:", formData);
         setStep(3);
         setValidationFailed(false);
       } else {
@@ -437,6 +426,8 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async () => {
+    const memberRoleStatus = selectedOption === "writer" ? "ACTIVE_MEMBER" : "PUBLISHER_MEMBER";
+
     let submitData = new FormData();
     submitData.append("litmapEmail", formData.email);
     submitData.append("workEmail", formData.workEmail);
@@ -444,22 +435,11 @@ const SignupPage = () => {
     submitData.append("password", formData.password);
     submitData.append("confirmPassword", formData.confirmPassword);
     submitData.append("nickname", formData.nickname);
-    submitData.append("memberRoleStatus", "ACTIVE_MEMBER");
+    submitData.append("memberRoleStatus", memberRoleStatus);
     submitData.append("myMessage", "");
     submitData.append("userImage", "");
     submitData.append("urlLink", formData.workURL);
     console.log(submitData);
-    // const payload = {
-    //   litmapEmail: formData.email,
-    //   workEmail: formData.workEmail,
-    //   name: formData.name,
-    //   password: formData.password,
-    //   confirmPassword: formData.confirmPassword,
-    //   nickname: formData.nickname,
-    //   memberRoleStatus: "ACTIVE_MEMBER",
-    // };
-
-    // console.log("Payload:", payload); // 서버로 전송할 데이터를 콘솔에 출력
 
     try {
       const response = await axios
@@ -565,92 +545,131 @@ const SignupPage = () => {
         </>
       )}
 
-      {step === 2 && selectedOption !== "writer" && (
+      {step === 2 && selectedOption !== 'writer' && (
         <>
           <BoxContainer>
             <Title>기본 정보</Title>
 
             <label>이름</label>
-            <InputField
-              type="text"
-              name="name"
-              placeholder="이름을 입력해주세요."
+            <InputField 
+              type="text" 
+              name="name" 
+              placeholder="이름을 입력해주세요." 
               value={formData.name}
               onChange={handleInputChange}
             />
 
             <label>이메일</label>
             <InputFieldWithButton>
-              <InputField
-                type="email"
-                name="email"
-                placeholder="이메일을 입력해주세요."
+              <InputField 
+                type="email" 
+                name="email" 
+                placeholder="이메일을 입력해주세요." 
                 value={formData.email}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck("email")}>
-                중복확인
-              </Button>
+              <Button onClick={() => handleValidationCheck('email')}>중복확인</Button>
             </InputFieldWithButton>
 
             <label>비밀번호</label>
-            <InputField
-              type="password"
-              name="password"
-              placeholder="비밀번호를 입력해주세요."
+            <InputField 
+              type="password" 
+              name="password" 
+              placeholder="비밀번호를 입력해주세요." 
               value={formData.password}
               onChange={handleInputChange}
             />
 
             <label>비밀번호 확인</label>
-            <InputField
-              type="password"
-              name="confirmPassword"
-              placeholder="비밀번호를 다시 한번 입력해주세요."
+            <InputField 
+              type="password" 
+              name="confirmPassword" 
+              placeholder="비밀번호를 다시 한번 입력해주세요." 
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            <SmallText>
-              영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상
-              16자 이하로 입력해주세요.
-            </SmallText>
+            <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
 
             <label>닉네임</label>
             <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="nickname"
-                placeholder="닉네임을 입력해주세요."
+              <InputField 
+                type="text" 
+                name="nickname" 
+                placeholder="닉네임을 입력해주세요." 
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck("nickname")}>
-                중복확인
-              </Button>
+              <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button>
             </InputFieldWithButton>
           </BoxContainer>
           <BoxContainer>
             <Title>사업자 정보</Title>
 
-            <label>업무용 이메일</label>
-            <SmallText2>업무용으로 쓰는 이메일을 추가 등록해주세요.</SmallText2>
-            <InputField
-              type="email"
-              name="workEmail"
-              placeholder="이메일을 입력해주세요."
-              value={formData.workEmail}
+            <label>대표자명</label>
+            <InputField 
+              type="text" 
+              name="representativeName" 
+              placeholder="대표자명을 입력해주세요." 
+              value={formData.representativeName}
               onChange={handleInputChange}
             />
 
-            <label>작품정보(국문 또는 영문)</label>
-            <SmallText2>
-              작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.
-            </SmallText2>
-            <InputField
-              type="text"
-              name="workURL"
-              placeholder="http://www.litmap.com"
-              value={formData.workURL}
+            <label>대표 전화번호</label>
+            <InputField 
+              type="text" 
+              name="representativePhone" 
+              placeholder="(예시) 01013245678" 
+              value={formData.representativePhone}
+              onChange={handleInputChange}
+            />
+
+            <label>회사명(국문 또는 영문)</label>
+            <InputField 
+              type="text" 
+              name="companyName" 
+              placeholder="출판사나 제작사명을 입력해주세요." 
+              value={formData.companyName}
+              onChange={handleInputChange}
+            />
+
+            <label>출판사 전화번호</label>
+            <InputField 
+              type="text" 
+              name="companyPhone" 
+              placeholder="(예시) 01013245768" 
+              value={formData.companyPhone}
+              onChange={handleInputChange}
+            />
+
+            <label>사업자 번호</label>
+            <SmallText2>사업자 번호 입력 후 사업자 인증을 진행해주세요.</SmallText2>
+            <InputFieldWithButton>
+              <InputField 
+                type="text" 
+                name="businessNumber" 
+                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." 
+                value={formData.businessNumber}
+                onChange={handleInputChange}
+              />
+              <Button onClick={() => handleValidationCheck('businessNumber')}>사업자 인증</Button>
+            </InputFieldWithButton>
+
+            <label>사업자 주소</label>
+            <InputFieldWithButton>
+              <InputField 
+                type="text" 
+                name="businessAddress" 
+                placeholder="주소를 입력해주세요." 
+                value={formData.businessAddress}
+                onChange={handleInputChange}
+              />
+              <Button onClick={() => handleValidationCheck('businessAddress')}>주소 검색</Button>
+            </InputFieldWithButton>
+            <InputField 
+              type="text" 
+              name="businessDetailAddress" 
+              placeholder="상세 주소를 입력해주세요." 
+              value={formData.businessDetailAddress}
               onChange={handleInputChange}
             />
 
@@ -663,26 +682,26 @@ const SignupPage = () => {
         </>
       )}
 
-      {step === 2 && selectedOption === "writer" && (
+      {step === 2 && selectedOption === 'writer' && (
         <>
           <BoxContainer>
             <Title>기본 정보</Title>
 
             <label>이름</label>
-            <InputField
-              type="text"
-              name="name"
-              placeholder="이름을 입력해주세요."
+            <InputField 
+              type="text" 
+              name="name" 
+              placeholder="이름을 입력해주세요." 
               value={formData.name}
               onChange={handleInputChange}
             />
 
             <label>이메일</label>
             <InputFieldWithButton>
-              <InputField
-                type="email"
-                name="email"
-                placeholder="이메일을 입력해주세요."
+              <InputField 
+                type="email" 
+                name="email" 
+                placeholder="이메일을 입력해주세요." 
                 value={formData.email}
                 onChange={handleInputChange}
               />
@@ -690,33 +709,30 @@ const SignupPage = () => {
             </InputFieldWithButton>
 
             <label>비밀번호</label>
-            <InputField
-              type="password"
-              name="password"
-              placeholder="비밀번호를 입력해주세요."
+            <InputField 
+              type="password" 
+              name="password" 
+              placeholder="비밀번호를 입력해주세요." 
               value={formData.password}
               onChange={handleInputChange}
             />
 
             <label>비밀번호 확인</label>
-            <InputField
-              type="password"
-              name="confirmPassword"
-              placeholder="비밀번호를 다시 한번 입력해주세요."
+            <InputField 
+              type="password" 
+              name="confirmPassword" 
+              placeholder="비밀번호를 다시 한번 입력해주세요." 
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            <SmallText>
-              영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상
-              16자 이하로 입력해주세요.
-            </SmallText>
+            <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
 
             <label>닉네임</label>
             <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="nickname"
-                placeholder="닉네임을 입력해주세요."
+              <InputField 
+                type="text" 
+                name="nickname" 
+                placeholder="닉네임을 입력해주세요." 
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
@@ -728,34 +744,28 @@ const SignupPage = () => {
 
             <label>업무용 이메일</label>
             <SmallText2>업무용으로 쓰는 이메일을 추가 등록해주세요.</SmallText2>
-            <InputField
-              type="email"
-              name="workEmail"
-              placeholder="이메일을 입력해주세요."
+            <InputField 
+              type="email" 
+              name="workEmail" 
+              placeholder="이메일을 입력해주세요." 
               value={formData.workEmail}
               onChange={handleInputChange}
             />
 
             <label>작품정보(국문 또는 영문)</label>
-            <SmallText2>
-              작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.
-            </SmallText2>
-            <InputField
-              type="text"
-              name="workURL"
-              placeholder="http://www.litmap.com"
+            <SmallText2>작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.</SmallText2>
+            <InputField 
+              type="text" 
+              name="workURL" 
+              placeholder="http://www.litmap.com" 
               value={formData.workURL}
               onChange={handleInputChange}
             />
 
             <InfoBox>
               <SubTitle>1인 작가 가입 안내사항</SubTitle>
-              <SubTitle2>
-                1인 작가의 경우 별도의 관리자 승인이 필요함으로
-              </SubTitle2>
-              <SubTitle2>
-                가입 정보 작성 후 승인까지 1~3일이 소요될 수 있습니다.
-              </SubTitle2>
+              <SubTitle2>1인 작가의 경우 별도의 관리자 승인이 필요함으로</SubTitle2>
+              <SubTitle2>가입 정보 작성 후 승인까지 1~3일이 소요될 수 있습니다.</SubTitle2>
             </InfoBox>
 
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
@@ -766,6 +776,7 @@ const SignupPage = () => {
           <Footer>릿맵 | 02 |</Footer>
         </>
       )}
+
 
       {step === 3 && (
         <>
