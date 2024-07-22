@@ -50,7 +50,7 @@ const LoginTitle = styled.h2`
 
 const InputLabel = styled.div`
   font-size: 14px;
-  color: #black;
+  color: #000;
   margin-bottom: 5px;
   text-align: left;
   width: 100%;
@@ -157,18 +157,14 @@ const LoginPage = (props) => {
       return;
     }
 
-    // 임시 로그인 로직 (API 호출 부분) -> 이 부분 나중에 수정!
     try {
-      // 임시로 API 호출하는 부분을 설정
-      const response = await fetch("https://example/api/login", {
+      const response = await fetch(`https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "accept": "*/*"
         },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
+        body: '',
       });
 
       if (!response.ok) {
@@ -179,6 +175,7 @@ const LoginPage = (props) => {
       const data = await response.json();
 
       // 로그인 성공 시 메인 페이지로 이동
+      console.log(`로그인 성공: ${email}`);
       navigate("/");
     } catch (error) {
       alert(error.message || "로그인 도중 문제가 발생했습니다. 나중에 다시 시도해주세요.");
