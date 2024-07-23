@@ -138,7 +138,16 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Home mega={mega} setMega={setMega} update={update} />}
+          element={
+            <Home
+              mega={mega}
+              setMega={setMega}
+              update={update}
+              state={state}
+              setState={setState}
+              view={view}
+            />
+          }
         />
         <Route
           path="/category1"
@@ -164,7 +173,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login setLogin={setLogin} />} />
         <Route
-          path="/work"
+          path={`/work/:id`}
           element={
             <Work
               count={count}
