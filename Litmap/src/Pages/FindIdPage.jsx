@@ -186,24 +186,36 @@ const FindIdPage = () => {
   };
 
   const handleFindIdClick = async () => {
+    if (
+      !formData.name ||
+      (selectedOption !== "writer" &&
+        (!formData.publisherName || !formData.publisherNumber)) ||
+      (selectedOption === "writer" && !formData.workEmail)
+    ) {
+      alert("모든 필드를 채워주세요.");
+      return;
+    }
+
     try {
       let response;
+      const params = new URLSearchParams();
+      params.append("name", formData.name);
       if (selectedOption === "writer") {
-        response = await axios.post("https://api.litmap.store/api/members/find-email", {
-          name: formData.name,
-          workEmail: formData.workEmail,
-        });
+        params.append("workEmail", formData.workEmail);
+        response = await axios.post(
+          `https://api.litmap.store/api/members/find-email?${params.toString()}`
+        );
       } else {
-        response = await axios.post("https://api.litmap.store/api/publishers/find-email", {
-          name: formData.name,
-          publisherName: formData.publisherName,
-          publisherNumber: formData.publisherNumber,
-        });
+        params.append("publisherName", formData.publisherName);
+        params.append("publisherNumber", formData.publisherNumber);
+        response = await axios.post(
+          `https://api.litmap.store/api/publishers/find-email?${params.toString()}`
+        );
       }
 
-      if (response.data.success) {
+      if (response.data.resultCode === 200) {
         setUserFound(true);
-        setUserData(response.data);
+        setUserData(response.data.result);
       } else {
         setUserFound(false);
       }
@@ -399,7 +411,7 @@ const FindIdPage = () => {
                 <HighlightedText>가입 아이디가 확인되었습니다</HighlightedText>.
               </SubTitle>
               <div>
-                <HighlightedText>{userData.email}</HighlightedText>
+                <HighlightedText>{userData}</HighlightedText>
               </div>
               <Icon>
                 <img src="/checkmark-circle.png" alt="체크 표시" />
