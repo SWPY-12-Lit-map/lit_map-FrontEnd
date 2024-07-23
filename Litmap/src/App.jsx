@@ -63,7 +63,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar login={login} />
+      <Navbar login={login} setLogin={setLogin} />
       <ScrollTop />
       <Routes>
         <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
