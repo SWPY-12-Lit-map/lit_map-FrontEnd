@@ -6,6 +6,7 @@ import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
+import { useStore } from "../Asset/store";
 
 const Posting = styled.div`
   height: 100%;
@@ -97,6 +98,8 @@ export default function Post(props) {
   const setRead = props.setRead;
   const read = props.read;
 
+  const { workInfos, addWorkInfos } = useStore();
+
   useEffect(() => {
     PrevCountRef.current = count;
   }, [count]); // count가 변경될 때만 실행
@@ -104,43 +107,48 @@ export default function Post(props) {
   const prevCount = PrevCountRef.current;
 
   useEffect(() => {
+    console.log(workInfos);
     setRead(false);
-    if (!mount) {
-      // 컴포넌트가 마운트될 때만 실행
-      const newInfos = Array.from({ length: count }, (_, i) => ({
-        name: "",
-        imageUrl: "",
-        type: "",
-        role: "",
-        gender: "",
-        age: "",
-        mbti: "",
-        contents: "",
-      }));
-      setInfos(newInfos);
-      setMount(true);
-    } else if (prevCount !== count) {
-      const newInfos = Array.from({ length: count }, (_, i) => ({
-        name: "",
-        imageUrl: "",
-        type: "",
-        role: "",
-        gender: "",
-        age: "",
-        mbti: "",
-        contents: "",
-      }));
+    if (workInfos.workId) {
+      setWork(workInfos);
+    } else {
+      if (!mount) {
+        // 컴포넌트가 마운트될 때만 실행
+        const newInfos = Array.from({ length: count }, (_, i) => ({
+          name: "",
+          imageUrl: "",
+          type: "",
+          role: "",
+          gender: "",
+          age: "",
+          mbti: "",
+          contents: "",
+        }));
+        setInfos(newInfos);
+        setMount(true);
+      } else if (prevCount !== count) {
+        const newInfos = Array.from({ length: count }, (_, i) => ({
+          name: "",
+          imageUrl: "",
+          type: "",
+          role: "",
+          gender: "",
+          age: "",
+          mbti: "",
+          contents: "",
+        }));
 
-      if (prevCount < count) {
-        setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
-      } else if (prevCount > count) {
-        setInfos((prevInfos) => prevInfos.slice(0, count));
-      }
+        if (prevCount < count) {
+          setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
+        } else if (prevCount > count) {
+          setInfos((prevInfos) => prevInfos.slice(0, count));
+        }
 
-      if (count <= 1) {
-        setCount(1);
-      } else if (count > 30) {
-        setCount(30);
+        if (count <= 1) {
+          setCount(1);
+        } else if (count > 30) {
+          setCount(30);
+        }
       }
     }
   }, [count, mount, prevCount, work]);

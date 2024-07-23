@@ -29,10 +29,12 @@
     "react-drag-drop-files": "^2.3.10",
     "react-icons": "^5.2.1",
     "react-modal": "^3.16.1",
+    "react-numeric-input": "^2.2.3",
     "react-router-dom": "^6.24.0",
     "react-youtube": "^10.1.0",
     "reactflow": "^11.11.4",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.1.11",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
