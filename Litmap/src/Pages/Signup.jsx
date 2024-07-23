@@ -325,6 +325,7 @@ const SignupPage = () => {
   });
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
+  const [emailCheckResult, setEmailCheckResult] = useState("");
 
   useEffect(() => {
     Modal.setAppElement("#root");
@@ -342,10 +343,11 @@ const SignupPage = () => {
         setValidationFailed(false);
       } else {
         setValidationFailed(true);
+        setApiError("회원 구분을 선택해 주세요.");
       }
     } else if (step === 2) {
       let allFieldsFilled = false;
-
+  
       if (selectedOption === "writer") {
         allFieldsFilled =
           formData.name &&
@@ -368,17 +370,32 @@ const SignupPage = () => {
           formData.publisherPhoneNumber &&
           formData.publisherCeo;
       }
-
+  
       if (allFieldsFilled) {
-        if (formData.password !== formData.confirmPassword) {
+        const passwordPattern = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,20}$/;
+        if (!passwordPattern.test(formData.password)) {
           setValidationFailed(true);
-          setApiError("Passwords do not match.");
+          setApiError("비밀번호가 조건에 맞지 않습니다.");
           return;
         }
-        setStep(3);
-        setValidationFailed(false);
+  
+        if (formData.password !== formData.confirmPassword) {
+          setValidationFailed(true);
+          setApiError("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+  
+        // 이메일 중복체크 결과 확인
+        if (emailCheckResult === "사용 가능한 이메일입니다.") {
+          setStep(3);
+          setValidationFailed(false);
+        } else {
+          setValidationFailed(true);
+          setApiError("이메일이 사용 불가합니다.");
+        }
       } else {
         setValidationFailed(true);
+        setApiError("모든 정보를 채워주세요.");
       }
     } else if (step === 3) {
       if (
@@ -394,10 +411,11 @@ const SignupPage = () => {
         }
       } else {
         setValidationFailed(true);
+        setApiError("모든 필수 항목에 동의해야 합니다.");
       }
     }
-  };
-
+  };  
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -505,6 +523,25 @@ const SignupPage = () => {
     }
   };
   
+  const handleEmailCheck = async () => {
+    try {
+      const response = await axios.get(`https://api.litmap.store/api/publishers/check-email`, {
+        params: {
+          litmapEmail: formData.litmapEmail,
+        },
+      });
+  
+      if (response.data === true) {
+        setEmailCheckResult("이미 사용 중인 이메일입니다.");
+      } else {
+        setEmailCheckResult("사용 가능한 이메일입니다.");
+      }
+    } catch (error) {
+      setEmailCheckResult("이메일 확인 중 오류가 발생했습니다.");
+    }
+  };
+  
+  
   return (
     <PageContainer>
       <Logo>
@@ -605,8 +642,9 @@ const SignupPage = () => {
                 value={formData.litmapEmail}
                 onChange={handleInputChange}
               />
-              {/* <Button onClick={() => handleValidationCheck('litmapEmail')}>중복확인</Button> */}
+              <Button onClick={handleEmailCheck}>중복확인</Button>
             </InputFieldWithButton>
+            {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
 
             <label>비밀번호</label>
             <InputField
@@ -705,7 +743,7 @@ const SignupPage = () => {
 
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
             {validationFailed && (
-              <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+              <ErrorMessage>{apiError}</ErrorMessage>
             )}
           </BoxContainer>
           <Footer>릿맵 | 02 |</Footer>
