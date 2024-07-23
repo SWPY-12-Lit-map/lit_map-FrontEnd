@@ -525,7 +525,11 @@ const SignupPage = () => {
   
   const handleEmailCheck = async () => {
     try {
-      const response = await axios.get(`https://api.litmap.store/api/publishers/check-email`, {
+      const apiUrl = selectedOption === "writer"
+        ? "https://api.litmap.store/api/members/check-email"
+        : "https://api.litmap.store/api/publishers/check-email";
+  
+      const response = await axios.get(apiUrl, {
         params: {
           litmapEmail: formData.litmapEmail,
         },
@@ -537,10 +541,9 @@ const SignupPage = () => {
         setEmailCheckResult("사용 가능한 이메일입니다.");
       }
     } catch (error) {
-      setEmailCheckResult("이메일 확인 중 오류가 발생했습니다.");
+      setEmailCheckResult("이미 사용 중인 이메일입니다.");
     }
   };
-  
   
   return (
     <PageContainer>
@@ -773,8 +776,9 @@ const SignupPage = () => {
                 value={formData.litmapEmail}
                 onChange={handleInputChange}
               />
-              {/* <Button onClick={() => handleValidationCheck('email')}>중복확인</Button> */}
-            </InputFieldWithButton>
+              <Button onClick={handleEmailCheck}>중복확인</Button>
+              {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
+              </InputFieldWithButton>
 
             <label>비밀번호</label>
             <InputField
