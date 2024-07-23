@@ -43,13 +43,16 @@ function Category(props) {
         }}
       />
       <CategoryMenuItem>
-        <StyledLink to="/category1">책_임시작품등록페이지</StyledLink>
+        <StyledLink to="/">홈</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category2">영화_임시마이페이지</StyledLink>
+        <StyledLink to="/category1">도서_임시작품등록페이지</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category3">드라마</StyledLink>
+        <StyledLink to="/category2">드라마_임시마이페이지</StyledLink>
+      </CategoryMenuItem>
+      <CategoryMenuItem>
+        <StyledLink to="/category3">영화</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
         <StyledLink to="/category4">웹툰</StyledLink>
