@@ -9,12 +9,18 @@ export default function DownloadImg(props) {
   const imageHeight = 1080;
   const imgUrl = props.imgUrl;
   const setUrl = props.setUrl;
-  const work = props.work;
+  const workInfo = props.workInfo;
+
+  console.log(workInfo);
+  console.log(imgUrl);
 
   /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
     const a = document.createElement("a");
-    a.setAttribute("download", `${work.title}.${work.userVersion}.png`);
+    a.setAttribute(
+      "download",
+      `${workInfo.title}.${workInfo.versions.versionName}.png`
+    );
     a.setAttribute("href", dataUrl);
     a.click();
   }

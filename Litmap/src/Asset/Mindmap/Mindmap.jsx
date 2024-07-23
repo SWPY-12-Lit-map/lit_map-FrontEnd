@@ -15,10 +15,49 @@ import CustomConnectionLine from "./CustomConnectionLine";
 import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
+import DownloadImg from "../Share/DownloadImg";
 
 const Mapping = styled.div`
   width: 100%;
   height: 100%;
+`;
+
+const CustomControls = styled(Controls)`
+  position: absolute;
+  top: 10%;
+  left: 90% !important;
+  width: 40px;
+  height: 100px;
+  border: none;
+  background-color: unset;
+  box-shadow: unset;
+  & > button {
+    margin: 5px 0;
+    width: 100%;
+    height: 40%;
+    background-color: #dadada;
+    border: none;
+    padding: 0;
+    & > svg {
+      max-width: 20px;
+      min-width: 20px;
+      max-height: 20px;
+    }
+  }
+
+  & > .react-flow__controls-zoomin {
+    border-radius: 10px 10px 0 0;
+  }
+  & > .react-flow__controls-zoomout {
+    border-radius: 0 0 10px 10px;
+  }
+  & > .react-flow__controls-fitview {
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+  & > .react-flow__controls-interactive {
+    display: none;
+  }
 `;
 
 const initialNodes = [];
@@ -136,7 +175,7 @@ const Mindmap = (props) => {
   /* 마인드맵 저장 복구 */
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      const flow = work.relationship;
+      const flow = relationship;
       const readNodes = flow.nodes;
       readNodes.forEach((element) => {
         element.data.read = read;
@@ -247,15 +286,15 @@ const Mindmap = (props) => {
           }}
           variant="none"
         />
-        <Controls />
+        <CustomControls />
         {read ? null : <MiniMap />}
       </ReactFlow>
-      {read ? null : (
+      {/* {read ? null : (
         <>
           <button onClick={onSave}>Save</button>
           <button onClick={onRestore}>restore</button>
         </>
-      )}
+      )} */}
     </Mapping>
   );
 };

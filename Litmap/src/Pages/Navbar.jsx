@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -159,6 +159,9 @@ const AlertBtn = styled.button`
 `;
 
 function Navbar(props) {
+  const location = useLocation();
+
+  const navigate = useNavigate();
   const login = props.login;
   const [userInput, setUserInput] = useState(
     localStorage.getItem("recentSearch")
@@ -168,7 +171,7 @@ function Navbar(props) {
   useEffect(() => {
     window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
   }, [userInput, setUserInput]); // 유저 검색내용 저장
-  const [userSearch, setUserSearch] = useState(); // 유저 검색내용
+  const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
   const [searchSort, setSort] = useState(); // 검색 카테고리
   const [state, setState] = useState(false); // 검색창 활성화 여부
 
@@ -204,11 +207,13 @@ function Navbar(props) {
   }, [setUserInput, userInput, userSearch, setUserSearch]);
 
   const searchKey = (e) => {
-    if (e.key == "Enter") {
+    if (e.key === "Enter") {
       console.log(userSearch);
       setUserInput([...userInput, userSearch]);
       setUserSearch("");
       getSearches();
+      navigate("/searchresult");
+      setState(false);
     }
   };
 
@@ -218,8 +223,20 @@ function Navbar(props) {
     getSearches();
   };
 
+  // 인물 등록페이지면 안보이게
+  const [postPage, setPostPage] = useState(false);
+  useEffect(() => {
+    if (location.pathname == "/category1") {
+      setPostPage(true);
+      console.log(postPage);
+    } else {
+      setPostPage(false);
+      console.log(postPage);
+    }
+  }, [location]);
+
   return (
-    <Nav>
+    <Nav style={{ display: postPage ? "none" : "flex" }}>
       <NavLogo to="/">
         <LogoImg src="/Logo.png" alt="로고" />
       </NavLogo>
@@ -291,7 +308,7 @@ function Navbar(props) {
       </SearchBarContainer>
 
       <Right>
-        {login == false ? (
+        {login === false ? (
           <>
             <SignButton to="/signup">가입하기</SignButton>
             <StyledLink to="/login">로그인</StyledLink>

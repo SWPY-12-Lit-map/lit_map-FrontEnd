@@ -12,6 +12,16 @@ const InfoTab = styled.div`
   position: absolute;
 `;
 
+const NodeName = styled.div`
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 50px;
+  border-radius: 5px;
+  padding: 0 0 0 5px;
+  background-color: white;
+`;
+
 export default function CustomNode({ id, data, selected }) {
   const [show, setShow] = useState(false);
   const connectionNodeId = useStore(connectionNodeIdSelector);
@@ -41,16 +51,16 @@ export default function CustomNode({ id, data, selected }) {
           />
         )}
         <div>
-          <Button
+          {/* <Button
             onClick={() => {
               setShow(!show);
             }}
           >
             다운
-          </Button>
+          </Button> */}
           <img src={data.imageUrl || basicImg} width={100} alt="Profile"></img>
-
-          {show && (
+          <NodeName>{data.name}</NodeName>
+          {/* {show && (
             <InfoTab>
               <p>이름: {data.name}</p>
               <p>종족: {data.type}</p>
@@ -60,7 +70,7 @@ export default function CustomNode({ id, data, selected }) {
               <p>mbti: {data.mbti}</p>
               <p>기타내용: {data.contents}</p>
             </InfoTab>
-          )}
+          )} */}
         </div>
 
         <Handle

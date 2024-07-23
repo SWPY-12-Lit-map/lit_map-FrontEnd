@@ -111,6 +111,7 @@ function FloatingEdge({
             onChange={handleTextChange}
             style={{
               border: data.read ? "none" : null,
+              textAlign: "center",
               // ...ChangeinputStyle,
             }}
             readOnly={data.read ? true : false}

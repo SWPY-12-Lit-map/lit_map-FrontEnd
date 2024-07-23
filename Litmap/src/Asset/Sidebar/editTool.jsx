@@ -5,8 +5,98 @@ import styled from "styled-components";
 import { FileUploader } from "react-drag-drop-files";
 import { useColor, ColorPicker } from "react-color-palette";
 import "react-color-palette/css";
+import { IoFolderOpenOutline } from "react-icons/io5";
+import { BsPaperclip } from "react-icons/bs";
 
-const SelectBackground = styled.div``;
+const SelectBackground = styled.div`
+  margin-top: 10%;
+
+  & > span {
+    color: #7d7d7d;
+    font-weight: 600;
+  }
+
+  & > label {
+    width: 100%;
+  }
+`;
+const Dropzone = styled.div`
+  height: 150px;
+  width: 100%;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// const Filename = styled.div`
+//   background-color: #f5f5f5;
+//   border-radius: 5px;
+//   margin-top: 10px;
+//   height: 30px;
+//   text-align: center;
+// `;
+
+const LineSelect = styled.div`
+  margin-top: 10%;
+  color: #7d7d7d;
+  font-weight: 600;
+`;
+
+const SelectBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin: 5% 0 3% 0;
+`;
+
+const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 10px;
+
+  span {
+    font-size: 24px;
+    margin-right: 5px;
+    color: ${({ checked }) => (checked ? "black" : "gray")};
+  }
+
+  input {
+    display: none;
+  }
+`;
+const CustomDropdownButton = styled(DropdownButton)`
+  > .btn {
+    text-align: left;
+    width: 100%;
+    background-color: unset;
+    border-color: #575757;
+    color: #575757;
+    margin-top: 5%;
+    border-radius: 10px;
+    &:hover,
+    &:active,
+    &:focus {
+      border: 2px solid #8b0024;
+      background-color: unset !important;
+      color: #8b0024 !important;
+    }
+  }
+  > div {
+    width: 100%;
+  }
+`;
+
+const CustomDropItem = styled(Dropdown.Item)`
+  &:active,
+  &:hover,
+  &:focus {
+    border-color: black;
+    background-color: #8b0024 !important;
+    color: white !important;
+  }
+`;
 
 export default function EditTool(props) {
   const {
@@ -17,6 +107,7 @@ export default function EditTool(props) {
     setBackImg,
     setBackground,
     backgroundType,
+    backgroundImg,
   } = props;
 
   const fileTypes = ["JPG", "PNG", "JPEG"];
@@ -25,17 +116,30 @@ export default function EditTool(props) {
   function DragDrop() {
     const handleChange = (file) => {
       setBackImg(URL.createObjectURL(file));
+      console.log(backgroundImg);
     };
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
-        <div id="dropzone">Click or drag file to this area to upload</div>
+        <Dropzone id="dropzone">
+          {backgroundImg ? (
+            "Dropped!"
+          ) : (
+            <IoFolderOpenOutline
+              style={{ fontSize: "100px", color: "#C5C5C5" }}
+            />
+          )}
+        </Dropzone>
+        {/* <Filename>
+          <BsPaperclip />
+          {backgroundImg.name}
+        </Filename> */}
       </FileUploader>
     );
   }
 
   // 색깔 고르기
   const ColorPick = () => {
-    const [color, setColor] = useColor("#123123");
+    const [color, setColor] = useColor("#FBF9F6");
 
     const onChangeComplete = (color) => {
       localStorage.setItem("color", color.hex);
@@ -58,44 +162,68 @@ export default function EditTool(props) {
   return (
     <div>
       <SelectBackground>
-        <div>
-          <>
-            <input
-              type="radio"
-              name="select"
-              onClick={() => {
-                setBackground(true);
+        <span>배경설정</span>
+        <SelectBar>
+          <RadioLabel
+            onClick={() => {
+              setBackground(true);
+            }}
+          >
+            <input type="radio" name="BackroundType" />
+            <span
+              className="material-symbols-outlined"
+              style={{
+                backgroundColor: backgroundType ? "#af3131" : "unset",
+                color: backgroundType ? "white" : "gray",
+                borderRadius: "50%",
               }}
-              defaultChecked
-            />
-            <span>이미지</span>
-            <input
-              type="radio"
-              name="select"
-              onClick={() => {
-                setBackground(false);
+            >
+              check_circle
+            </span>
+            이미지
+          </RadioLabel>
+          <RadioLabel
+            onClick={() => {
+              setBackground(false);
+            }}
+          >
+            <input type="radio" name="BackroundType" />
+            <span
+              className="material-symbols-outlined"
+              style={{
+                backgroundColor: backgroundType ? "unset" : "#af3131",
+                color: backgroundType ? "gray" : "white",
+                borderRadius: "50%",
               }}
-            />{" "}
-            <span>단색</span>
-          </>
-          {backgroundType ? <DragDrop /> : <ColorPick />}
-        </div>
+            >
+              check_circle
+            </span>
+            색상
+          </RadioLabel>
+        </SelectBar>
+        {backgroundType ? <DragDrop /> : <ColorPick />}
       </SelectBackground>
-      <DropdownButton
-        id="dropdown-basic-button"
-        title={edgeType ? edgeType : "선을 선택하세요"}
-      >
-        <Dropdown.Item onClick={() => setEdgetype("직선")}>직선</Dropdown.Item>
-        <Dropdown.Item onClick={() => setEdgetype("곡선")}>곡선</Dropdown.Item>
-      </DropdownButton>
-
-      <DropdownButton
-        id="dropdown-basic-button"
-        title={lineStyle ? lineStyle : "선을 선택하세요"}
-      >
-        <Dropdown.Item onClick={() => setLine("실선")}>실선</Dropdown.Item>
-        <Dropdown.Item onClick={() => setLine("점선")}>점선</Dropdown.Item>
-      </DropdownButton>
+      <LineSelect>
+        관계선 설정
+        <CustomDropdownButton
+          id="dropdown-basic-button"
+          title={edgeType ? edgeType : "선을 선택하세요"}
+        >
+          <CustomDropItem onClick={() => setEdgetype("직선")}>
+            직선
+          </CustomDropItem>
+          <CustomDropItem onClick={() => setEdgetype("곡선")}>
+            곡선
+          </CustomDropItem>
+        </CustomDropdownButton>
+        <CustomDropdownButton
+          id="dropdown-basic-button"
+          title={lineStyle ? lineStyle : "선을 선택하세요"}
+        >
+          <CustomDropItem onClick={() => setLine("실선")}>실선</CustomDropItem>
+          <CustomDropItem onClick={() => setLine("점선")}>점선</CustomDropItem>
+        </CustomDropdownButton>
+      </LineSelect>
     </div>
   );
 }

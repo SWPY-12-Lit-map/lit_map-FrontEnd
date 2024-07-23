@@ -5,21 +5,124 @@ import { FileUploader } from "react-drag-drop-files";
 import { useEffect, useState } from "react";
 import Calendar from "../Calender";
 import axios from "axios";
+import { IoFolderOpenOutline } from "react-icons/io5";
+import { BsPaperclip } from "react-icons/bs";
+import { CiCirclePlus } from "react-icons/ci";
+import NumericInput from "react-numeric-input";
 
 const Input = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   margin: 20px 0;
+  color: #575757;
+`;
+
+const AuthorAddBtn = styled.button`
+  background-color: unset;
+  border: none;
+  position: relative;
+  top: 5px;
+  left: -10px;
+  width: 50%;
+  color: inherit;
+  &:hover {
+    color: #8b0024;
+  }
+  > svg {
+    font-size: 20px;
+  }
+`;
+
+const Radio = styled.input`
+  position: absolute;
+  left: 27%;
+`;
+const RadioLabel = styled.label`
+  position: absolute;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  span {
+    font-size: 24px;
+    margin-right: 5px;
+    color: ${({ checked }) => (checked ? "#8B0024" : "gray")};
+  }
+
+  input {
+    display: none;
+  }
+`;
+
+const CustomDropdownButton = styled(DropdownButton)`
+  > .btn {
+    text-align: left;
+    width: 100%;
+    background-color: unset;
+    border-color: #575757;
+    color: #575757;
+    &:hover,
+    &:active,
+    &:focus {
+      border-color: black;
+      background-color: unset !important;
+      color: inherit !important;
+    }
+  }
+  > div {
+    width: 100%;
+  }
+`;
+
+const CustomDropItem = styled(Dropdown.Item)`
+  &:active,
+  &:hover,
+  &:focus {
+    border-color: black;
+    background-color: #8b0024 !important;
+    color: white !important;
+  }
 `;
 
 const Dropzone = styled.div`
-  width: 200px;
-  height: 200px;
-  border: solid 1px black;
+  height: 150px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
-const RedStar = styled.span`
-  color: red;
+
+const Filename = styled.div`
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  margin-top: 10px;
+  height: 30px;
+  text-align: center;
+`;
+
+const TextInput = styled.input`
+  background-color: unset;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #575757;
+  border-radius: 5px;
+  ::placeholder {
+    color: #7d7d7d;
+  }
+`;
+
+const InputArea = styled.div`
+  display: flex;
+`;
+
+const HumanInput = styled(TextInput)`
+  text-align: center;
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+  }
 `;
 
 export default function InfoInput(props) {
@@ -29,10 +132,12 @@ export default function InfoInput(props) {
   const setWork = props.setWork;
   const setNext = props.setNext;
   const setMainauth = props.setMainauth;
+
   const [releaseDate, setReleaseDate] = useState(new Date());
   const [getGenres, setGenre] = useState([]);
   const [getCategory, setCategory] = useState([]);
-  const [imageFile, setFile] = useState(null);
+  const [imageFile, setFile] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   // 장르 변경
   function ChangeDrop(id, sort, data) {
@@ -48,6 +153,7 @@ export default function InfoInput(props) {
   function DragDrop() {
     const handleChange = (file) => {
       setFile(file);
+      console.log(file.name);
       const formData = new FormData();
       formData.append("image", file); // 여기를 imageFile 대신 file로 수정
       formData.append("path", "img");
@@ -69,10 +175,18 @@ export default function InfoInput(props) {
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
         <Dropzone id="dropzone">
-          {work.thumbnail
-            ? "Dropped!"
-            : "Click or drag file to this area to upload"}
+          {work.thumbnail ? (
+            "Dropped!"
+          ) : (
+            <IoFolderOpenOutline
+              style={{ fontSize: "100px", color: "#C5C5C5" }}
+            />
+          )}
         </Dropzone>
+        <Filename>
+          <BsPaperclip />
+          {imageFile.name}
+        </Filename>
       </FileUploader>
     );
   }
@@ -95,6 +209,22 @@ export default function InfoInput(props) {
 
   const authors = inputs.map((input) => input.value);
 
+  // 라디오 기능
+  const radioChange = (index) => {
+    const names = authors;
+    const name = authors[index];
+    setMainauth(name);
+    setSelectedOptions(
+      inputs.map((_, i) =>
+        i === index ? { checked: true } : { checked: false }
+      )
+    );
+  };
+
+  const isChecked = (index) => {
+    return selectedOptions[index] && selectedOptions[index].checked;
+  };
+
   // 빈값 확인
   const CheckInputs = () => {
     const works = Object.values(work);
@@ -103,157 +233,91 @@ export default function InfoInput(props) {
       setNext(true);
     }
   };
-
   useEffect(() => {
     CheckInputs();
   }, [work, setWork]);
-  // // 장르 가져오기
-  // useEffect(() => {
-  //   axios
-  //     .get("https://api.litmap.store/api/genre")
-  //     .then((result) => {
-  //       console.log(result.data.result);
-  //       setGenre(result.data.result);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, []);
 
-  // // 카테고리 가져오기
-  // useEffect(() => {
-  //   axios
-  //     .get("https://api.litmap.store/api/category")
-  //     .then((result) => {
-  //       console.log(result.data.result);
-  //       setCategory(result.data.result);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, []);
+  // 장르 가져오기
+  useEffect(() => {
+    axios
+      .get("https://api.litmap.store/api/genre")
+      .then((result) => {
+        console.log(result.data.result);
+        setGenre(result.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  // 카테고리 가져오기
+  useEffect(() => {
+    axios
+      .get("https://api.litmap.store/api/category")
+      .then((result) => {
+        console.log(result.data.result);
+        setCategory(result.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
     <>
       {/* 제목입력 */}
       <Input id="title">
-        <span>
-          <RedStar>*</RedStar> 제목:{" "}
-        </span>
-        <input
-          placeholder="제목을 입력해주세요"
+        <div>작품명 </div>
+        <TextInput
+          placeholder="작품명을 입력해주세요"
           value={work.title}
           onChange={(e) => {
             const info = { ...work, title: e.target.value };
             setWork(info);
           }}
-        ></input>
-      </Input>
-      {/* 시스템 버전 */}
-      <Input id="version">
-        <span>
-          {" "}
-          <RedStar>*</RedStar>버전:{" "}
-        </span>
-        <input
-          type="text"
-          style={{ background: "light gray" }}
-          value={work.version}
-          disabled
-        ></input>
-      </Input>
-      {/* 사용자 임의 버전등록 */}
-      <Input id="versionName">
-        <span>
-          {" "}
-          <RedStar>*</RedStar> 버전명:{" "}
-        </span>
-        <input
-          placeholder="버전명을 입력해주세요"
-          value={work.versionName}
-          onChange={(e) => {
-            const info = { ...work, versionName: e.target.value };
-            setWork(info);
-          }}
-        ></input>
-      </Input>
-      {/* 카테고리 */}
-      <Input id="category">
-        <span>
-          {" "}
-          <RedStar>*</RedStar> 카테고리
-        </span>
-        <DropdownButton
-          id="카테고리"
-          title={work.category ? work.category : "카테고리를 선택하세요"}
-        >
-          {getCategory.map((category, i) => {
-            return (
-              <Dropdown.Item
-                key={i}
-                onClick={() => {
-                  ChangeDrop("카테고리", "category", category.name);
-                }}
-              >
-                {category.name}
-              </Dropdown.Item>
-            );
-          })}
-        </DropdownButton>
+        ></TextInput>
       </Input>{" "}
-      {/* 장르입력 */}
-      <Input id="genre">
-        <span>
-          {" "}
-          <RedStar>*</RedStar> 장르
-        </span>
-        <DropdownButton
-          id="장르"
-          title={work.genre ? work.genre : "장르를 선택하세요"}
-        >
-          {getGenres.map((genre, i) => {
-            return (
-              <Dropdown.Item
-                key={i}
-                onClick={() => {
-                  ChangeDrop("장르", "genre", genre.name);
-                }}
-              >
-                {genre.name}
-              </Dropdown.Item>
-            );
-          })}
-        </DropdownButton>
-      </Input>
-      {/* 출판일 선택 */}
-      <Calendar
-        setReleaseDate={setReleaseDate}
-        releaseDate={releaseDate}
-        work={work}
-        setWork={setWork}
-      ></Calendar>
       {/* 작가 이름 */}
-      <Input>
-        <RedStar>*</RedStar>
-        <span>작가명</span>
+      <Input id="author">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: "0 5px",
+          }}
+        >
+          작가
+          <span
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              color: "#8B0024",
+              fontSize: "14px",
+            }}
+          >
+            <span className="material-symbols-outlined">check</span>대표작가
+          </span>
+        </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {inputs.map((data) => (
-            <div key={data.id}>
-              <input
-                type="radio"
-                name="main"
-                id={data.id}
-                value={data.value}
-                onClick={() => {
-                  const names = authors;
-                  const name = authors.find((name) => name === data.value);
-                  const position = names.indexOf(name);
-                  [names[0], names[position]] = [names[position], names[0]];
-                  setMainauth(name);
-                }}
-              ></input>
-              <input
-                placeholder="작가명을 입력해주세요"
+          {inputs.map((data, index) => (
+            <div
+              key={data.id}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <RadioLabel checked={isChecked(index)}>
+                <Radio
+                  type="radio"
+                  name="mainAuthor"
+                  id={data.id}
+                  value={data.value}
+                  checked={isChecked(index)}
+                  onChange={() => radioChange(index)}
+                />
+                <span className="material-symbols-outlined">check</span>
+              </RadioLabel>
+              <TextInput
+                placeholder="작가를 입력해주세요"
                 value={data.value}
                 onChange={(e) => {
                   const updatedInputs = inputs.map((item) =>
@@ -273,13 +337,86 @@ export default function InfoInput(props) {
           ))}
         </div>
 
-        <button onClick={handleAddInput}>+</button>
+        <AuthorAddBtn onClick={handleAddInput}>
+          <CiCirclePlus /> 작가 추가하기
+        </AuthorAddBtn>
       </Input>
-      {/* 이미지 업로드 */}
-      <Input id="imageUrl" style={{ display: "flex" }}>
+      {/* 시스템 버전 */}
+      {/* <Input id="version">
         <span>
-          <RedStar>*</RedStar> 대표 이미지:{" "}
+          {" "}
+          <RedStar>*</RedStar>버전:{" "}
         </span>
+        <input
+          type="text"
+          style={{ background: "light gray" }}
+          value={work.version}
+          disabled
+        ></input>
+      </Input> */}
+      {/* 사용자 임의 버전등록 */}
+      <Input id="versionName">
+        <span>버전명: </span>
+        <TextInput
+          placeholder="버전명을 입력해주세요"
+          value={work.versionName}
+          onChange={(e) => {
+            const info = { ...work, versionName: e.target.value };
+            setWork(info);
+          }}
+        ></TextInput>
+      </Input>
+      {/* 카테고리 */}
+      <Input id="category">
+        <div>카테고리</div>
+        <CustomDropdownButton
+          id="카테고리"
+          title={work.category ? work.category : "카테고리 (필수)"}
+        >
+          {getCategory.map((category, i) => {
+            return (
+              <CustomDropItem
+                key={i}
+                onClick={() => {
+                  ChangeDrop("카테고리", "category", category.name);
+                }}
+              >
+                {category.name}
+              </CustomDropItem>
+            );
+          })}
+        </CustomDropdownButton>
+      </Input>{" "}
+      {/* 장르입력 */}
+      <Input id="genre">
+        <CustomDropdownButton
+          id="장르"
+          title={work.genre ? work.genre : "장르 (필수)"}
+        >
+          {getGenres.map((genre, i) => {
+            return (
+              <CustomDropItem
+                key={i}
+                onClick={() => {
+                  ChangeDrop("장르", "genre", genre.name);
+                }}
+              >
+                {genre.name}
+              </CustomDropItem>
+            );
+          })}
+        </CustomDropdownButton>
+      </Input>
+      {/* 출판일 선택 */}
+      <Calendar
+        setReleaseDate={setReleaseDate}
+        releaseDate={releaseDate}
+        work={work}
+        setWork={setWork}
+      ></Calendar>
+      {/* 이미지 업로드 */}
+      <Input id="imageUrl" style={{ display: "flex", width: " 100%" }}>
+        <span>대표 이미지: </span>
         <DragDrop></DragDrop>
       </Input>
       {/* 대체 이미지 업로드 */}
@@ -295,34 +432,58 @@ export default function InfoInput(props) {
         ></input>{" "}
         <label htmlFor="checkbox">대체 이미지 등록하기</label>
       </p>
-      {/* 등장인물 수 */}
-      <Input id="count">
-        <span>
-          {" "}
-          <RedStar>*</RedStar> 등장인물:{" "}
-        </span>
-        <input
-          value={count}
-          onChange={(e) => {
-            setCount(e.target.value);
-            console.log(work);
-          }}
-          type="number"
-        ></input>
-      </Input>
       {/* 작품 설명 */}
       <Input id="contents">
         {" "}
-        <RedStar>*</RedStar> 부가설명:{" "}
-        <input
+        설명:{" "}
+        <TextInput
           id="text"
-          placeholder="부가설명을 입력해주세요"
+          placeholder="작품 설명을 입력해주세요"
           value={work.contents}
           onChange={(e) => {
             const info = { ...work, contents: e.target.value };
             setWork(info);
           }}
-        ></input>
+        ></TextInput>
+      </Input>
+      {/* 등장인물 수 */}
+      <Input id="count">
+        <span>
+          등장인물 수 설정{" "}
+          <span
+            style={{
+              margin: "0 21px",
+              color: "red",
+              fontSize: "10px",
+            }}
+          >
+            1명 이하로 설정할 수 없습니다.
+          </span>
+        </span>{" "}
+        <InputArea>
+          <button
+            onClick={() => {
+              setCount(count - 1);
+            }}
+          >
+            -
+          </button>
+          <HumanInput
+            value={count}
+            onChange={(e) => {
+              setCount(e.target.value);
+              console.log(work);
+            }}
+            type="number"
+          ></HumanInput>
+          <button
+            onClick={() => {
+              setCount(count + 1);
+            }}
+          >
+            +
+          </button>
+        </InputArea>
       </Input>
     </>
   );

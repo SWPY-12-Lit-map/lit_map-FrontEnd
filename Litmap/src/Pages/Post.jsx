@@ -6,50 +6,63 @@ import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
-import { useColor } from "react-color-palette";
 
 const Posting = styled.div`
-  height: 90vh;
+  height: 100%;
   display: flex;
+  background-color: #fbf9f6;
 `;
 
 const Edit = styled.div`
-  width: 100%;
+  width: 80%;
   height: 100%;
-  background-color: white;
+  background-color: #fbf9f6;
+  transition: all 1s;
 `;
 
 const Main = styled.div`
-  height: 90%;
   width: 100%;
+  height: 100%;
 `;
 
-const Side = styled.div``;
+const Side = styled.div`
+  width: 30%;
+  height: 100%;
+  border: none;
+  position: absolute;
+`;
 
 const Foot = styled.div`
   display: flex;
   align-items: center;
   height: 10%;
-  background-color: lightgray;
+  position: relative;
+  bottom: 100px;
 `;
 
 const Prevbtn = styled.button`
-  background-color: white;
-  border: none;
+  color: #8b0024;
+  background-color: unset;
+  border: 1px solid #8b0024;
+  border-radius: 5px;
   padding: 5px 20px;
   width: 110px;
 `;
 
 const Nextbtn = styled.button`
-  color: white;
-  background-color: #0d6efd;
-  border: none;
+  color: #8b0024;
+  background-color: unset;
+  border: 1px solid #8b0024;
+  border-radius: 5px;
   padding: 5px 20px;
   width: 110px;
 `;
 
 const ExtraSave = styled.button`
-  border: none;
+  color: #8b0024;
+  border: 1px solid #8b0024;
+  border-radius: 5px;
+  background-color: unset;
   padding: 5px 20px;
   width: 110px;
   margin-right: 10px;
@@ -67,6 +80,9 @@ export default function Post(props) {
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
   const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
+
+  // nav 조작
+  const [hideNav, setHide] = useState(false);
 
   const count = props.count;
   const setCount = props.setCount;
@@ -92,10 +108,10 @@ export default function Post(props) {
     if (!mount) {
       // 컴포넌트가 마운트될 때만 실행
       const newInfos = Array.from({ length: count }, (_, i) => ({
-        id: i, // 제외하고 post
         name: "",
         imageUrl: "",
         type: "",
+        role: "",
         gender: "",
         age: "",
         mbti: "",
@@ -105,10 +121,10 @@ export default function Post(props) {
       setMount(true);
     } else if (prevCount !== count) {
       const newInfos = Array.from({ length: count }, (_, i) => ({
-        id: i,
         name: "",
         imageUrl: "",
         type: "",
+        role: "",
         gender: "",
         age: "",
         mbti: "",
@@ -148,7 +164,7 @@ export default function Post(props) {
         );
       case 2:
         return (
-          <p style={{ height: "100%" }}>
+          <p style={{ height: "100%", width: "100%" }}>
             <ReactFlowProvider>
               <Mindmap
                 count={count}
@@ -192,12 +208,20 @@ export default function Post(props) {
           lineStyle={lineStyle}
           setLine={setLine}
           setBackground={setBackground}
+          backgroundImg={backgroundImg}
           setBackImg={setBackImg}
           backgroundType={backgroundType}
           setMainauth={setMainauth}
+          hideNav={hideNav}
+          setHide={setHide}
         />
       </Side>
-      <Edit>
+      <Edit
+        style={{
+          width: hideNav ? "100%" : "70%",
+          transform: hideNav ? "translateX(0)" : "translateX(42.8%)",
+        }}
+      >
         <Main>{Mainpart()}</Main>
         <Foot
           style={{
@@ -220,6 +244,16 @@ export default function Post(props) {
             <>
               <ExtraSave
                 onClick={() => {
+                  const names = work.author;
+                  const name = names.find((name) => name == mainAuthor);
+                  const position = names.indexOf(name);
+                  if (position !== -1) {
+                    [names[0], names[position]] = [names[position], names[0]];
+                  }
+                  const namesString = names.join(",");
+                  console.log(namesString);
+                  setWork({ ...work, author: namesString });
+                  console.log(work);
                   const Extrasave = { ...work, confirmCheck: false };
                   setWork(Extrasave);
                   axios
@@ -234,7 +268,10 @@ export default function Post(props) {
               >
                 임시저장
               </ExtraSave>
-              <Nextbtn disabled style={{ background: "gray", border: "none" }}>
+              <Nextbtn
+                disabled
+                style={{ borderColor: "#9F9F9F", color: "#9F9F9F" }}
+              >
                 다음
               </Nextbtn>
             </>
