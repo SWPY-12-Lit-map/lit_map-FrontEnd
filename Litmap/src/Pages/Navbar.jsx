@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -159,30 +159,17 @@ const AlertBtn = styled.button`
   border: none;
   background: unset;
 `;
+
 const LogoutDropdown = styled(Dropdown)`
   display: flex;
   align-items: center;
   margin-right: 40px;
 `;
-function Navbar(props) {  
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const setLogin = props.setLogin;
-  const login = props.login;
 
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };  
-  
-  const handleLogout = async () => {
-    try {
-      const response = await axios.get("https://api.litmap.store/api/members/logout");
-      if (response.status === 200) {
-        setLogin(false);
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+function Navbar({ login, setLogin }) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [userInput, setUserInput] = useState(
     localStorage.getItem("recentSearch")
@@ -192,9 +179,27 @@ function Navbar(props) {
   useEffect(() => {
     window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
   }, [userInput, setUserInput]); // 유저 검색내용 저장
-  const [userSearch, setUserSearch] = useState(); // 유저 검색내용
+  const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
   const [searchSort, setSort] = useState(); // 검색 카테고리
   const [state, setState] = useState(false); // 검색창 활성화 여부
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(
+        "https://api.litmap.store/api/members/logout"
+      );
+      if (response.status === 200) {
+        setLogin(false);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   // 특정 영역 외 클릭 시 발생하는 이벤트
   const searchRef = useRef(null);
@@ -206,7 +211,6 @@ function Navbar(props) {
         setState(false);
       }
     }
-
     document.addEventListener("mouseup", handleFocus);
     return () => {
       document.removeEventListener("mouseup", handleFocus);
@@ -228,11 +232,13 @@ function Navbar(props) {
   }, [setUserInput, userInput, userSearch, setUserSearch]);
 
   const searchKey = (e) => {
-    if (e.key == "Enter") {
+    if (e.key === "Enter") {
       console.log(userSearch);
       setUserInput([...userInput, userSearch]);
       setUserSearch("");
       getSearches();
+      navigate("/searchresult");
+      setState(false);
     }
   };
 
@@ -276,7 +282,7 @@ function Navbar(props) {
       </SearchBarContainer>
 
       <Right>
-        {!login ? (
+        {login === false ? (
           <>
             <SignButton to="/signup">가입하기</SignButton>
             <StyledLink to="/login">로그인</StyledLink>
