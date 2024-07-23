@@ -136,7 +136,10 @@ function App() {
       <Navbar login={login} setLogin={setLogin} />
       <ScrollTop />
       <Routes>
-        <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
+        <Route
+          path="/"
+          element={<Home mega={mega} setMega={setMega} update={update} />}
+        />
         <Route
           path="/category1"
           element={
