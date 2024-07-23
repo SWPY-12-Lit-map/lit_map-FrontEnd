@@ -15,7 +15,7 @@ import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
 import FindIdPage from "./Pages/FindIdPage";
 import FindPasswordPage from "./Pages/FindPasswordPage";
-import SearchResult from "./Pages/SearchResult";
+// import SearchResult from "./Pages/SearchResult";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
 
