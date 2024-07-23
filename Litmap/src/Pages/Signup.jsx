@@ -306,17 +306,23 @@ const SignupPage = () => {
     privacyPolicy: false,
   });
   const [validationFailed, setValidationFailed] = useState(false);
+  const [validationErrorMessage, setValidationErrorMessage] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    litmapEmail: "",
     password: "",
     confirmPassword: "",
     nickname: "",
     workEmail: "",
     workURL: "",
+    publisherNumber: "",
+    publisherName: "",
+    publisherAddress: "",
+    publisherPhoneNumber: "",
+    publisherCeo: ""
   });
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
@@ -326,7 +332,6 @@ const SignupPage = () => {
   }, []);
 
   const handleOptionClick = (option) => {
-    console.log("Selected Option:", option); // 선택된 옵션을 콘솔에 출력
     setSelectedOption(option);
   };
 
@@ -337,29 +342,50 @@ const SignupPage = () => {
         setValidationFailed(false);
       } else {
         setValidationFailed(true);
+        setValidationErrorMessage("회원 구분을 선택해 주세요.");
       }
     } else if (step === 2) {
       let allFieldsFilled = false;
 
-      allFieldsFilled =
-        formData.name &&
-        formData.email &&
-        formData.password &&
-        formData.confirmPassword &&
-        formData.nickname &&
-        formData.workEmail &&
-        formData.workURL;
+      if (selectedOption === "writer") {
+        allFieldsFilled =
+          formData.name &&
+          formData.litmapEmail &&
+          formData.password &&
+          formData.confirmPassword &&
+          formData.nickname &&
+          formData.workEmail &&
+          formData.workURL;
+      } else {
+        allFieldsFilled =
+          formData.name &&
+          formData.litmapEmail &&
+          formData.password &&
+          formData.confirmPassword &&
+          formData.nickname &&
+          formData.publisherNumber &&
+          formData.publisherName &&
+          formData.publisherAddress &&
+          formData.publisherPhoneNumber &&
+          formData.publisherCeo;
+      }
 
       if (allFieldsFilled) {
         if (formData.password !== formData.confirmPassword) {
           setValidationFailed(true);
-          setApiError("Passwords do not match.");
+          setValidationErrorMessage("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+        if (!isValidPassword(formData.password)) {
+          setValidationFailed(true);
+          setValidationErrorMessage("비밀번호 조건에 부합하지 않습니다.");
           return;
         }
         setStep(3);
         setValidationFailed(false);
       } else {
         setValidationFailed(true);
+        setValidationErrorMessage("모든 정보가 채워져야 합니다.");
       }
     } else if (step === 3) {
       if (
@@ -375,8 +401,14 @@ const SignupPage = () => {
         }
       } else {
         setValidationFailed(true);
+        setValidationErrorMessage("모든 필수 항목에 동의해야 합니다.");
       }
     }
+  };
+
+  const isValidPassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,20}$/;
+    return regex.test(password);
   };
 
   const handleInputChange = (e) => {
@@ -426,45 +458,108 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async () => {
-    const memberRoleStatus = selectedOption === "writer" ? "ACTIVE_MEMBER" : "PUBLISHER_MEMBER";
-
-    let submitData = new FormData();
-    submitData.append("litmapEmail", formData.email);
-    submitData.append("workEmail", formData.workEmail);
-    submitData.append("name", formData.name);
-    submitData.append("password", formData.password);
-    submitData.append("confirmPassword", formData.confirmPassword);
-    submitData.append("nickname", formData.nickname);
-    submitData.append("memberRoleStatus", memberRoleStatus);
-    submitData.append("myMessage", "");
-    submitData.append("userImage", "");
-    submitData.append("urlLink", formData.workURL);
-    console.log(submitData);
-
-    try {
-      const response = await axios
-        .post("https://api.litmap.store/api/members/register", submitData, {
+    if (selectedOption === "writer") {
+      let submitData = {
+        litmapEmail: formData.litmapEmail,
+        workEmail: formData.workEmail,
+        name: formData.name,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        nickname: formData.nickname,
+        memberRoleStatus: "ACTIVE_MEMBER",
+        myMessage: "",
+        userImage: "",
+        urlLink: formData.workURL
+      };
+  
+      try {
+        const response = await axios.post("https://api.litmap.store/api/members/register", submitData, {
           headers: {
             "Content-Type": "application/json",
           },
-        })
-        .then((result) => {
-          console.log("Response:", result); // 서버 응답을 콘솔에 출력
         });
-
-      return true;
-    } catch (error) {
-      console.error("There was an error!", error);
-      if (error.response) {
-        console.error("Server responded with status:", error.response.status);
-        console.error("Data:", error.response.data);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error setting up request:", error.message);
+  
+        console.log("Response:", response);
+        return true;
+      } catch (error) {
+        console.error("There was an error!", error);
+        if (error.response) {
+          console.error("Server responded with status:", error.response.status);
+          console.error("Data:", error.response.data);
+          if (error.response.data.reason === "이미 존재하는 이메일입니다.") {
+            alert("이미 존재하는 이메일입니다.");
+            return false; // 중복 이메일일 경우 false 반환하여 다음 단계로 가지 않게 함
+          }
+        } else if (error.request) {
+          console.error("No response received:", error.request);
+        } else {
+          console.error("Error setting up request:", error.message);
+        }
+        setApiError("An error occurred during registration. Please try again.");
+        return false;
       }
-      setApiError("An error occurred during registration. Please try again.");
-      return false;
+    } else {
+      let submitData = {
+        publisherNumber: formData.publisherNumber,
+        publisherName: formData.publisherName,
+        publisherAddress: formData.publisherAddress,
+        publisherPhoneNumber: formData.publisherPhoneNumber,
+        publisherCeo: formData.publisherCeo,
+        litmapEmail: formData.litmapEmail,
+        name: formData.name,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        nickname: formData.nickname,
+        myMessage: "",
+        userImage: ""
+      };
+  
+      try {
+        const response = await axios.post("https://api.litmap.store/api/publishers/register", submitData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        console.log("Response:", response);
+        return true;
+      } catch (error) {
+        console.error("There was an error!", error);
+        if (error.response) {
+          console.error("Server responded with status:", error.response.status);
+          console.error("Data:", error.response.data);
+          if (error.response.data.reason === "이미 존재하는 이메일입니다.") {
+            alert("이미 존재하는 이메일입니다.");
+            return false; // 중복 이메일일 경우 false 반환하여 다음 단계로 가지 않게 함
+          }
+        } else if (error.request) {
+          console.error("No response received:", error.request);
+        } else {
+          console.error("Error setting up request:", error.message);
+        }
+        setApiError("An error occurred during registration. Please try again.");
+        return false;
+      }
+    }
+  };
+
+  const handleEmailCheck = async () => {
+    try {
+      const response = await axios.get("https://api.litmap.store/api/members/check-email", {
+        params: {
+          litmapEmail: formData.litmapEmail,
+        },
+      });
+  
+      if (response.status === 200) {
+        alert("사용 가능한 이메일입니다.");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("이미 존재하는 이메일입니다.");
+      } else {
+        alert("이메일 확인 중 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -538,7 +633,7 @@ const SignupPage = () => {
             </OptionGrid>
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
             {validationFailed && (
-              <ErrorMessage>회원 구분을 선택해 주세요.</ErrorMessage>
+              <ErrorMessage>{validationErrorMessage}</ErrorMessage>
             )}
           </BoxContainer>
           <Footer>릿맵 | 01 |</Footer>
@@ -563,12 +658,12 @@ const SignupPage = () => {
             <InputFieldWithButton>
               <InputField 
                 type="email" 
-                name="email" 
+                name="litmapEmail" 
                 placeholder="이메일을 입력해주세요." 
-                value={formData.email}
+                value={formData.litmapEmail}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck('email')}>중복확인</Button>
+              {/* <Button onClick={handleEmailCheck}>중복확인</Button> */}
             </InputFieldWithButton>
 
             <label>비밀번호</label>
@@ -588,7 +683,7 @@ const SignupPage = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+            <SmallText>영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력해주세요.</SmallText>
 
             <label>닉네임</label>
             <InputFieldWithButton>
@@ -599,45 +694,37 @@ const SignupPage = () => {
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button>
+              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
             </InputFieldWithButton>
           </BoxContainer>
+          
           <BoxContainer>
             <Title>사업자 정보</Title>
 
             <label>대표자명</label>
             <InputField 
               type="text" 
-              name="representativeName" 
+              name="publisherCeo" 
               placeholder="대표자명을 입력해주세요." 
-              value={formData.representativeName}
-              onChange={handleInputChange}
-            />
-
-            <label>대표 전화번호</label>
-            <InputField 
-              type="text" 
-              name="representativePhone" 
-              placeholder="(예시) 01013245678" 
-              value={formData.representativePhone}
+              value={formData.publisherCeo}
               onChange={handleInputChange}
             />
 
             <label>회사명(국문 또는 영문)</label>
             <InputField 
               type="text" 
-              name="companyName" 
+              name="publisherName" 
               placeholder="출판사나 제작사명을 입력해주세요." 
-              value={formData.companyName}
+              value={formData.publisherName}
               onChange={handleInputChange}
             />
 
             <label>출판사 전화번호</label>
             <InputField 
               type="text" 
-              name="companyPhone" 
+              name="publisherPhoneNumber" 
               placeholder="(예시) 01013245768" 
-              value={formData.companyPhone}
+              value={formData.publisherPhoneNumber}
               onChange={handleInputChange}
             />
 
@@ -646,36 +733,36 @@ const SignupPage = () => {
             <InputFieldWithButton>
               <InputField 
                 type="text" 
-                name="businessNumber" 
+                name="publisherNumber"
                 placeholder="사업자 등록번호 숫자 10자리를 입력해주세요." 
-                value={formData.businessNumber}
+                value={formData.publisherNumber}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck('businessNumber')}>사업자 인증</Button>
+              {/* <Button onClick={() => handleValidationCheck('publisherNumber')}>사업자 인증</Button> */}
             </InputFieldWithButton>
 
             <label>사업자 주소</label>
             <InputFieldWithButton>
               <InputField 
                 type="text" 
-                name="businessAddress" 
+                name="publisherAddress" 
                 placeholder="주소를 입력해주세요." 
-                value={formData.businessAddress}
+                value={formData.publisherAddress}
                 onChange={handleInputChange}
               />
-              <Button onClick={() => handleValidationCheck('businessAddress')}>주소 검색</Button>
+              {/* <Button onClick={() => handleValidationCheck('publisherAddress')}>주소 검색</Button> */}
             </InputFieldWithButton>
-            <InputField 
+            {/* <InputField 
               type="text" 
               name="businessDetailAddress" 
               placeholder="상세 주소를 입력해주세요." 
               value={formData.businessDetailAddress}
               onChange={handleInputChange}
-            />
+            /> */}
 
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
             {validationFailed && (
-              <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+              <ErrorMessage>{validationErrorMessage}</ErrorMessage>
             )}
           </BoxContainer>
           <Footer>릿맵 | 02 |</Footer>
@@ -700,12 +787,12 @@ const SignupPage = () => {
             <InputFieldWithButton>
               <InputField 
                 type="email" 
-                name="email" 
+                name="litmapEmail" 
                 placeholder="이메일을 입력해주세요." 
-                value={formData.email}
+                value={formData.litmapEmail}
                 onChange={handleInputChange}
               />
-              {/* <Button onClick={() => handleValidationCheck('email')}>중복확인</Button> */}
+              {/* <Button onClick={handleEmailCheck}>중복확인</Button> */}
             </InputFieldWithButton>
 
             <label>비밀번호</label>
@@ -725,7 +812,7 @@ const SignupPage = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+            <SmallText>영문 소문자와 숫자를 조합하여 8자 이상 20자 이하로 입력해주세요.</SmallText>
 
             <label>닉네임</label>
             <InputFieldWithButton>
@@ -770,12 +857,13 @@ const SignupPage = () => {
 
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
             {validationFailed && (
-              <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+              <ErrorMessage>{validationErrorMessage}</ErrorMessage>
             )}
           </BoxContainer>
           <Footer>릿맵 | 02 |</Footer>
         </>
       )}
+
 
 
       {step === 3 && (
@@ -890,7 +978,7 @@ const SignupPage = () => {
               회원가입 완료
             </FullWidthButton>
             {validationFailed && (
-              <ErrorMessage>모든 필수 항목에 동의해야 합니다.</ErrorMessage>
+              <ErrorMessage>{validationErrorMessage}</ErrorMessage>
             )}
           </BoxContainer>
           <Footer>릿맵 | 03 |</Footer>
