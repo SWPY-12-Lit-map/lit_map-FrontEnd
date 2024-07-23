@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
+import axios from "axios";
 
 const Nav = styled.div`
   font-size: 20px;
@@ -39,7 +40,6 @@ const SearchBarContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
   width: 40%;
 `;
 
@@ -112,6 +112,7 @@ const SearchInfo = styled.div`
   position: absolute;
   top: 60px;
   z-index: 10;
+  display: none;
 `;
 
 const Right = styled.div`
@@ -123,10 +124,11 @@ const Right = styled.div`
   }
 `;
 
-const Profile = styled(Link)`
+const Profile = styled.div`
   display: flex;
   font-size: 24px;
   margin-right: 40px;
+  cursor: pointer;
 `;
 
 const ProfileImg = styled.img`
@@ -157,12 +159,31 @@ const AlertBtn = styled.button`
   border: none;
   background: unset;
 `;
-
-function Navbar(props) {
-  const location = useLocation();
-
-  const navigate = useNavigate();
+const LogoutDropdown = styled(Dropdown)`
+  display: flex;
+  align-items: center;
+  margin-right: 40px;
+`;
+function Navbar(props) {  
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const setLogin = props.setLogin;
   const login = props.login;
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };  
+  
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get("https://api.litmap.store/api/members/logout");
+      if (response.status === 200) {
+        setLogin(false);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+
   const [userInput, setUserInput] = useState(
     localStorage.getItem("recentSearch")
       ? JSON.parse(localStorage.getItem("recentSearch"))
@@ -171,7 +192,7 @@ function Navbar(props) {
   useEffect(() => {
     window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
   }, [userInput, setUserInput]); // 유저 검색내용 저장
-  const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
+  const [userSearch, setUserSearch] = useState(); // 유저 검색내용
   const [searchSort, setSort] = useState(); // 검색 카테고리
   const [state, setState] = useState(false); // 검색창 활성화 여부
 
@@ -207,13 +228,11 @@ function Navbar(props) {
   }, [setUserInput, userInput, userSearch, setUserSearch]);
 
   const searchKey = (e) => {
-    if (e.key === "Enter") {
+    if (e.key == "Enter") {
       console.log(userSearch);
       setUserInput([...userInput, userSearch]);
       setUserSearch("");
       getSearches();
-      navigate("/searchresult");
-      setState(false);
     }
   };
 
@@ -241,74 +260,23 @@ function Navbar(props) {
         <LogoImg src="/Logo.png" alt="로고" />
       </NavLogo>
 
-      <SearchBarContainer ref={searchRef}>
+      <SearchBarContainer>
         <SearchCategory>
-          <DropBtn
-            id="dropdown-basic-button"
-            title={searchSort ? searchSort : "통합검색"}
-          >
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              작품 제목
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              작가 이름
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-              }}
-            >
-              출판사 이름
-            </Dropdown.Item>
+          <DropBtn id="dropdown-basic-button" title="통합검색">
+            <Dropdown.Item onClick={toggleDropdown}>작품 제목</Dropdown.Item>
+            <Dropdown.Item onClick={toggleDropdown}>작가 이름</Dropdown.Item>
+            <Dropdown.Item onClick={toggleDropdown}>출판사 이름</Dropdown.Item>
           </DropBtn>
         </SearchCategory>
-        <SearchBtn
-          onClick={() => {
-            searchBtn();
-          }}
-        >
+        <SearchBtn onClick={toggleDropdown}>
           <SearchIcon icon={faMagnifyingGlass} />
         </SearchBtn>
-        <SearchBar
-          id="searchBar"
-          placeholder="검색어를 입력해주세요"
-          className="search"
-          value={userSearch}
-          style={{
-            borderRadius: state ? "30px 30px 0px 0px" : "30px",
-            borderBottom: state ? "none" : "solid 1px black",
-          }}
-          onChange={(e) => {
-            setUserSearch(e.target.value);
-          }}
-          onKeyDown={searchKey}
-          onClick={() => {
-            state ? setState(false) : setState(true);
-          }}
-        />
-        {state ? (
-          <SearchInfo
-            style={{
-              borderTop: state ? "none" : "black",
-            }}
-          >
-            {recentSearch.map((a, index) => (
-              <p key={index}>{a}</p>
-            ))}
-          </SearchInfo>
-        ) : null}
+        <SearchBar placeholder="검색어를 입력해주세요" />
+        {dropdownVisible && <SearchInfo></SearchInfo>}
       </SearchBarContainer>
 
       <Right>
-        {login === false ? (
+        {!login ? (
           <>
             <SignButton to="/signup">가입하기</SignButton>
             <StyledLink to="/login">로그인</StyledLink>
@@ -325,9 +293,14 @@ function Navbar(props) {
                 <path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v25.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416H424c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm0 96c61.9 0 112 50.1 112 112v25.4c0 47.9 13.9 94.6 39.7 134.6H72.3C98.1 328 112 281.3 112 233.4V208c0-61.9 50.1-112 112-112zm64 352H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7s18.7-28.3 18.7-45.3z" />
               </svg>
             </AlertBtn>
-            <Profile to="/mypage">
-              <ProfileImg src="profile.png" alt="프로필" />
-            </Profile>
+            <LogoutDropdown>
+              <Dropdown.Toggle as={Profile} id="dropdown-custom-components">
+                <ProfileImg src="profile.png" alt="프로필" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={handleLogout}>로그아웃</Dropdown.Item>
+              </Dropdown.Menu>
+            </LogoutDropdown>
           </>
         )}
       </Right>

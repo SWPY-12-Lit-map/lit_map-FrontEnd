@@ -132,74 +132,58 @@ function App() {
   const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
 
   return (
-    <Main>
-      <GlobalStyle />
-      <Router>
-        <Navbar login={login} />
-        <ScrollTop />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                mega={mega}
-                setMega={setMega}
-                view={view}
-                update={update}
-                state={state}
-                setState={setState}
-              />
-            }
-          />
-          <Route path="/searchresult" element={<SearchResult />} />
-          <Route
-            path="/category1"
-            element={
-              <Post
-                count={count}
-                setCount={setCount}
-                characterInfos={characterInfos}
-                setInfos={setInfos}
-                work={work}
-                setWork={setWork}
-                edgeType={edgeType}
-                setEdgetype={setEdgetype}
-                lineStyle={lineStyle}
-                setLine={setLine}
-                read={read}
-                setRead={setRead}
-              />
-            }
-          />
-          <Route path="/category1/postdone" element={<Postdone />} />
-          <Route path="/category2" element={<MypageLayout />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login setLogin={setLogin} />} />
-          <Route
-            path="work/:id"
-            element={
-              <Work
-                count={count}
-                characterInfos={characterInfos}
-                work={work}
-                edgeType={edgeType}
-                lineStyle={lineStyle}
-                read={read}
-                setRead={setRead}
-              />
-            }
-          />
-          <Route path="/category2/*" element={<MypageLayout />}>
-            <Route path="manage-profile" element={<ProfileManage />} />
-            <Route path="edit-member" element={<MemberEdit />} />
-            <Route path="manage-artworks" element={<ArtworkManagement />} />
-          </Route>
-          <Route path="/adminpage" element={<AdminPage />} />
-          <Route path="/find-id" element={<FindIdPage />} />
-          <Route path="/reset-password" element={<FindPasswordPage />} />
-        </Routes>
-      </Router>
-    </Main>
+    <Router>
+      <Navbar login={login} setLogin={setLogin} />
+      <ScrollTop />
+      <Routes>
+        <Route path="/" element={<Home mega={mega} setMega={setMega} />} />
+        <Route
+          path="/category1"
+          element={
+            <Post
+              count={count}
+              setCount={setCount}
+              characterInfos={characterInfos}
+              setInfos={setInfos}
+              work={work}
+              setWork={setWork}
+              edgeType={edgeType}
+              setEdgetype={setEdgetype}
+              lineStyle={lineStyle}
+              setLine={setLine}
+              read={read}
+              setRead={setRead}
+            />
+          }
+        />
+        <Route path="/category1/postdone" element={<Postdone />} />
+        <Route path="/category2" element={<MypageLayout />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login setLogin={setLogin} />} />
+        <Route
+          path="/work"
+          element={
+            <Work
+              count={count}
+              characterInfos={characterInfos}
+              work={work}
+              edgeType={edgeType}
+              lineStyle={lineStyle}
+              read={read}
+              setRead={setRead}
+            />
+          }
+        ></Route>
+        <Route path="/category2/*" element={<MypageLayout />}>
+          <Route path="manage-profile" element={<ProfileManage />} />
+          <Route path="edit-member" element={<MemberEdit />} />
+          <Route path="manage-artworks" element={<ArtworkManagement />} />
+        </Route>
+        <Route path="/adminpage" element={<AdminPage />} />
+        <Route path="/find-id" element={<FindIdPage />} />
+        <Route path="/reset-password" element={<FindPasswordPage />} />
+      </Routes>
+    </Router>
   );
 }
 
