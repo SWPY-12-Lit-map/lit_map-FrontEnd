@@ -164,6 +164,7 @@ const FindIdPage = () => {
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
+    memberName: "",
     publisherName: "",
     publisherNumber: "",
     workEmail: "",
@@ -187,7 +188,7 @@ const FindIdPage = () => {
 
   const handleFindIdClick = async () => {
     if (
-      !formData.name ||
+      !formData.memberName ||
       (selectedOption !== "writer" &&
         (!formData.publisherName || !formData.publisherNumber)) ||
       (selectedOption === "writer" && !formData.workEmail)
@@ -206,6 +207,7 @@ const FindIdPage = () => {
           `https://api.litmap.store/api/members/find-email?${params.toString()}`
         );
       } else {
+        params.append("memberName", formData.memberName);
         params.append("publisherName", formData.publisherName);
         params.append("publisherNumber", formData.publisherNumber);
         response = await axios.post(
@@ -327,9 +329,9 @@ const FindIdPage = () => {
               <OptionTitle>이름</OptionTitle>
               <Input
                 type="text"
-                name="name"
+                name="memberName"
                 placeholder="가입자의 이름을 입력해주세요."
-                value={formData.name}
+                value={formData.memberName}
                 onChange={handleInputChange}
               />
             </div>
