@@ -82,8 +82,6 @@ const defaultEdgeOptions = {
 };
 const defaultViewport = { x: 0, y: 0, zoom: 0 };
 
-const flowKey = "flow-data";
-
 const Mindmap = (props) => {
   const {
     edgeType,
@@ -207,7 +205,7 @@ const Mindmap = (props) => {
   // 이미지나 컬러가 업데이트 될 때 재렌더링
   useEffect(() => {
     setBackgroundImg(backgroundImg);
-  }, [setBackImg, , backgroundImg]);
+  }, [setBackImg, backgroundImg]);
 
   useEffect(() => {
     const checkLocalStorage = () => {
@@ -220,6 +218,7 @@ const Mindmap = (props) => {
     const intervalId = setInterval(checkLocalStorage, 100);
     return () => clearInterval(intervalId);
   }, [backColor]);
+
   /* 선 지우기 */
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -233,12 +232,12 @@ const Mindmap = (props) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedEdgeId, createNodes, setEdges]);
+  }, [selectedEdgeId, setEdges]);
 
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
     createNodes();
-  }, [count, createNodes, read, backgroundImg]);
+  }, [count, createNodes, backgroundImg]);
 
   useEffect(() => {
     if (read == true) {
@@ -248,8 +247,17 @@ const Mindmap = (props) => {
   }, [read, onRestore]);
 
   useEffect(() => {
-    onSave();
-  }, [nodes, edges, backgroundImage, backColor, selectedEdgeId]);
+    if (!read) {
+      if (
+        nodes.length > 0 ||
+        edges.length > 0 ||
+        backgroundImage ||
+        backColor
+      ) {
+        onSave();
+      }
+    }
+  }, [nodes, edges, backgroundImage, backColor, read, onSave]);
 
   return (
     <Mapping>
