@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSearch,
-  faChevronRight,
-  faRotateRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSearch,faRotateRight, faChevronRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
@@ -73,9 +69,47 @@ const Td = styled.td`
   }
 `;
 
-const CheckBox = styled.img`
-  margin-right: 10px;
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
   cursor: pointer;
+`;
+
+const CheckboxInput = styled.input`
+  display: none;
+
+  &:checked + span {
+    background-color: #8B0024;
+    border-color: #8B0024;
+  }
+
+  &:checked + span::after {
+    display: block;
+  }
+`;
+
+const CheckboxCustom = styled.span`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #9F9F9F;
+  border-radius: 50%;
+  position: relative;
+  background-color: white;
+  margin-right: 10px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+    display: none;
+  }
 `;
 
 const Pagination = styled.div`
@@ -117,16 +151,49 @@ const Status = styled.div`
   border: none;
   color: #121212;
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: 20px;
   display: inline-block;
 `;
 
-const DropDown = styled.select`
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownButton = styled.button`
+  background-color: #F5F5F5;
+  color: #7D7D7D;
   padding: 5px 10px;
-  border: 1px solid #7d7d7d;
+  border: 1px solid #7D7D7D;
   border-radius: 8px;
-  margin-right: 10px;
-  color: #7d7d7d;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+const DropdownContent = styled.div`
+  display: ${({ show }) => (show ? "block" : "none")};
+  position: absolute;
+  background-color: #fff;
+  min-width: 160px;
+  border: 1px solid #ddd;
+  z-index: 1;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+`;
+
+const DropdownItem = styled.div`
+  color: ${({ selected }) => (selected ? "#fff" : "#7D7D7D")};
+  background-color: ${({ selected }) => (selected ? "#8B0024" : "#fff")};
+  padding: 10px 16px;
+  cursor: pointer;
+  display: block;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: #8B0024;
+    color: #fff;
+  }
 `;
 
 const SearchBar = styled.div`
@@ -135,8 +202,8 @@ const SearchBar = styled.div`
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 0 10px;
-  background-color: #c5c5c5;
-  color: #e9e9e9;
+  background-color: #F5F5F5;
+  color: #9F9F9F;
 `;
 
 const SearchInput = styled.input`
@@ -145,8 +212,8 @@ const SearchInput = styled.input`
   outline: none;
   padding: 5px;
   flex-grow: 1;
-  background-color: #c5c5c5;
-  color: #e9e9e9;
+  background-color: #F5F5F5;
+  color: #9F9F9F;
 `;
 
 const Controls = styled.div`
@@ -163,7 +230,7 @@ const Divider = styled.div`
 `;
 
 const ArtworkManagement = () => {
-  const { workInfos, addWorkInfos } = useStore();
+  const { addWorkInfos } = useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([
     {
@@ -222,11 +289,12 @@ const ArtworkManagement = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
-    data.forEach((item) => {
+    currentItems.forEach((item) => {
       newCheckedItems[item.id] = !allChecked;
     });
     setCheckedItems(newCheckedItems);
@@ -293,20 +361,43 @@ const ArtworkManagement = () => {
       </RefreshSection>
 
       <Controls>
-        <div>
-          <CheckBox
-            src={allChecked ? "/list_color_check.png" : "/list_check.png"}
-            onClick={handleCheckAll}
-          />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <CheckboxContainer onClick={handleCheckAll}>
+            <CheckboxInput
+              type="checkbox"
+              checked={allChecked}
+              readOnly
+            />
+            <CheckboxCustom />
+          </CheckboxContainer>
           <span>전체보기 (456개)</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <DropDown onChange={(e) => setFilterStatus(e.target.value)}>
-            <option value="all">상태순</option>
-            <option value="임시 저장">임시저장</option>
-            <option value="승인 중">승인중</option>
-            <option value="게시 완료">게시완료</option>
-          </DropDown>
+          <DropdownContainer>
+            <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
+              상태순 <FontAwesomeIcon icon={faCaretDown} />
+            </DropdownButton>
+            <DropdownContent show={showDropdown}>
+              <DropdownItem
+                selected={filterStatus === "임시 저장"}
+                onClick={() => setFilterStatus("임시 저장")}
+              >
+                임시저장
+              </DropdownItem>
+              <DropdownItem
+                selected={filterStatus === "승인 중"}
+                onClick={() => setFilterStatus("승인 중")}
+              >
+                승인중
+              </DropdownItem>
+              <DropdownItem
+                selected={filterStatus === "게시 완료"}
+                onClick={() => setFilterStatus("게시 완료")}
+              >
+                게시완료
+              </DropdownItem>
+            </DropdownContent>
+          </DropdownContainer>
           <SearchBar>
             <SearchInput
               placeholder="검색어 입력"
@@ -325,14 +416,14 @@ const ArtworkManagement = () => {
           {currentItems.map((item) => (
             <tr key={item.id}>
               <Td>
-                <CheckBox
-                  src={
-                    checkedItems[item.id]
-                      ? "/list_color_check.png"
-                      : "/list_check.png"
-                  }
-                  onClick={() => handleCheckItem(item.id)}
-                />
+                <CheckboxContainer onClick={() => handleCheckItem(item.id)}>
+                  <CheckboxInput
+                    type="checkbox"
+                    checked={checkedItems[item.id] || false}
+                    readOnly
+                  />
+                  <CheckboxCustom />
+                </CheckboxContainer>
               </Td>
               <Td>{item.modifyDate}</Td>
               <Td>{item.name}</Td>
@@ -358,8 +449,6 @@ const ArtworkManagement = () => {
                           console.log(error);
                         });
                     }
-
-                    // console.log()
                   }
                 >
                   수정하기
