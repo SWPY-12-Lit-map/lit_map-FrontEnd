@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import WithdrawalPage from "./WithdrawalPage"; // 새로 추가한 컴포넌트
 
 const Content = styled.div`
     padding: 20px;
@@ -181,6 +182,7 @@ const MemberEdit = ({ onImageChange }) => {
     const [isPhoneEditable, setIsPhoneEditable] = useState(false);
     const [isWebsiteEditable, setIsWebsiteEditable] = useState(false);
     const [isAddressEditable, setIsAddressEditable] = useState(false);
+    const [showWithdrawalPage, setShowWithdrawalPage] = useState(false); // 추가된 상태
 
     const handlePasswordVisibilityToggle = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -232,7 +234,15 @@ const MemberEdit = ({ onImageChange }) => {
         setEditing(false);
     };
 
-    const handleServiceWithdrawal = async () => {
+    const handleServiceWithdrawal = () => {
+        setShowWithdrawalPage(true); // 탈퇴 페이지를 표시
+    };
+
+    const handleCancelWithdrawal = () => {
+        setShowWithdrawalPage(false); // 탈퇴 페이지를 숨김
+    };
+
+    const handleConfirmWithdrawal = async () => {
         try {
             const response = await fetch("", {
                 method: "POST",
@@ -251,6 +261,10 @@ const MemberEdit = ({ onImageChange }) => {
             setErrorMessage("서비스 탈퇴에 실패했습니다.");
         }
     };
+
+    if (showWithdrawalPage) {
+        return <WithdrawalPage onCancel={handleCancelWithdrawal} onConfirm={handleConfirmWithdrawal} />;
+    }
 
     return (
         <Content>
