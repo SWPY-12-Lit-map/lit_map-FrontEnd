@@ -101,26 +101,22 @@ const Blank = styled.div`
 
 const FindPasswordPage = () => {
   const [step, setStep] = useState(1);
-  const [name, setName] = useState("");
-  const [company, setCompany] = useState("");
-  const [email, setEmail] = useState("");
+  const [litmapEmail, setLitmapEmail] = useState("");
   const [error, setError] = useState("");
 
   const handleFindPasswordClick = async () => {
     try {
       const passwordResponse = await axios.post("https://api.litmap.store/api/email/find-password", {
-        memberId: 0,  // memberId는 백엔드에서 시큐리티 수정되면 테스트하면서 바꾸기
-        email: email,
-        address: "",
-        title: "임시 비밀번호 발급",
-        message: "임시 비밀번호가 발급되었습니다.",
+        email: litmapEmail
       });
 
-      if (passwordResponse.data) {
+      console.log("서버 응답:", passwordResponse.data); // 응답 데이터를 로그로 출력하여 구조 확인
+
+      if (passwordResponse.status === 200 && passwordResponse.data.resultCode === 200) {
         console.log("비밀번호 재설정 요청 성공:", passwordResponse.data);
         setStep(2);
       } else {
-        setError("비밀번호 재설정 요청에 실패했습니다.");
+        setError(passwordResponse.data.result || "비밀번호 재설정 요청에 실패했습니다.");
       }
     } catch (error) {
       console.error("비밀번호 재설정 요청 오류:", error);
@@ -129,7 +125,6 @@ const FindPasswordPage = () => {
   };
 
   const handleLoginClick = () => {
-    // 로그인 페이지로 이동하는 로직을 여기에 추가
     window.location.href = "/login";
   };
 
@@ -150,30 +145,12 @@ const FindPasswordPage = () => {
           <Blank></Blank>
 
           <div>
-            <OptionTitle>이름</OptionTitle>
-            <Input
-              type="text"
-              placeholder="가입자의 이름을 입력해주세요."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div>
-            <OptionTitle>회사명(국문 또는 영문)</OptionTitle>
-            <Input
-              type="text"
-              placeholder="회사명을 입력해주세요."
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-            />
-          </div>
-          <div>
-            <OptionTitle>아이디</OptionTitle>
+            <OptionTitle>아이디 (릿맵 이메일)</OptionTitle>
             <Input
               type="email"
               placeholder="아이디를 이메일 형식으로 입력해주세요."
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={litmapEmail}
+              onChange={(e) => setLitmapEmail(e.target.value)}
             />
           </div>
           <FullWidthButton onClick={handleFindPasswordClick}>비밀번호 재설정</FullWidthButton>
