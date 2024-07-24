@@ -142,6 +142,30 @@ const ButtonContainer = styled.div`
     }
 `;
 
+const CloseButton = styled(Button)`
+    width: 100px;
+    background-color: white;
+    border: 1px solid #7D7D7D;
+    color: #7D7D7D;
+    font-size: 15px;
+
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const RestoreButton = styled(Button)`
+    width: 100px;
+    background-color: #E7C6CE;
+    color: white;
+    border: none;
+    font-size: 15px;
+
+    &:hover {
+        background-color: #8B0024;
+    }
+`;
+
 const Note = styled.div`
     font-size: 12px;
     color: #6c757d;
@@ -258,8 +282,8 @@ const ProfileManage = ({ profileImage, setProfileImage }) => {
                 </ProfileImage>
                 {editing ? (
                     <ButtonContainer>
-                        <Button onClick={handleSave}>저장하기</Button>
-                        <Button onClick={handleCancel}>취소하기</Button>
+                        <RestoreButton onClick={handleSave}>저장하기</RestoreButton>
+                        <CloseButton onClick={handleCancel}>취소하기</CloseButton>
                     </ButtonContainer>
                 ) : (
                     <Button onClick={handleEdit}>편집하기</Button>
