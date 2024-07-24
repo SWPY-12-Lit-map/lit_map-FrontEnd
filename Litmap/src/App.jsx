@@ -94,16 +94,16 @@ function App() {
   const [characterInfos, setInfos] = useState([]); // 인물정보
   const [work, setWork] = useState({
     confirmCheck: false,
-    category: "1", // 책이나 영화 뭐 이런거
-    genre: "1", // 장르
-    author: "1", // 작가
-    imageUrl: "1", // 썸넬 이미지
-    memberId: 1, // 작성자 id
-    title: "1", // 제목
-    contents: "1", // 설명
+    category: "", // 책이나 영화 뭐 이런거
+    genre: [], // 장르
+    author: [], // 작가
+    imageUrl: "", // 썸넬 이미지
+    memberId: 24, // 작성자 id
+    title: "", // 제목
+    contents: "", // 설명
     publisherDate: date, // 출판일자
     version: 0.1, // 시스템 버전
-    versionName: "1화", // 작성자 임의 버전
+    versionName: "", // 작성자 임의 버전
     publisherName: "민음사",
     casts: [
       {
@@ -132,70 +132,73 @@ function App() {
   const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
 
   return (
-    <Router>
-      <Navbar login={login} setLogin={setLogin} />
-      <ScrollTop />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Home
-              mega={mega}
-              setMega={setMega}
-              update={update}
-              state={state}
-              setState={setState}
-              view={view}
-            />
-          }
-        />
-        <Route
-          path="/category1"
-          element={
-            <Post
-              count={count}
-              setCount={setCount}
-              characterInfos={characterInfos}
-              setInfos={setInfos}
-              work={work}
-              setWork={setWork}
-              edgeType={edgeType}
-              setEdgetype={setEdgetype}
-              lineStyle={lineStyle}
-              setLine={setLine}
-              read={read}
-              setRead={setRead}
-            />
-          }
-        />
-        <Route path="/category1/postdone" element={<Postdone />} />
-        <Route path="/category2" element={<MypageLayout />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login setLogin={setLogin} />} />
-        <Route
-          path={`/work/:id`}
-          element={
-            <Work
-              count={count}
-              characterInfos={characterInfos}
-              work={work}
-              edgeType={edgeType}
-              lineStyle={lineStyle}
-              read={read}
-              setRead={setRead}
-            />
-          }
-        ></Route>
-        <Route path="/category2/*" element={<MypageLayout />}>
-          <Route path="manage-profile" element={<ProfileManage />} />
-          <Route path="edit-member" element={<MemberEdit />} />
-          <Route path="manage-artworks" element={<ArtworkManagement />} />
-        </Route>
-        <Route path="/adminpage" element={<AdminPage />} />
-        <Route path="/find-id" element={<FindIdPage />} />
-        <Route path="/reset-password" element={<FindPasswordPage />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <GlobalStyle></GlobalStyle>
+        <Navbar login={login} setLogin={setLogin} />
+        <ScrollTop />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                mega={mega}
+                setMega={setMega}
+                update={update}
+                state={state}
+                setState={setState}
+                view={view}
+              />
+            }
+          />
+          <Route
+            path="/category1"
+            element={
+              <Post
+                count={count}
+                setCount={setCount}
+                characterInfos={characterInfos}
+                setInfos={setInfos}
+                work={work}
+                setWork={setWork}
+                edgeType={edgeType}
+                setEdgetype={setEdgetype}
+                lineStyle={lineStyle}
+                setLine={setLine}
+                read={read}
+                setRead={setRead}
+              />
+            }
+          />
+          <Route path="/category1/postdone" element={<Postdone />} />
+          <Route path="/category2" element={<MypageLayout />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login setLogin={setLogin} />} />
+          <Route
+            path={`/work/:id`}
+            element={
+              <Work
+                count={count}
+                characterInfos={characterInfos}
+                work={work}
+                edgeType={edgeType}
+                lineStyle={lineStyle}
+                read={read}
+                setRead={setRead}
+              />
+            }
+          ></Route>
+          <Route path="/category2/*" element={<MypageLayout />}>
+            <Route path="manage-profile" element={<ProfileManage />} />
+            <Route path="edit-member" element={<MemberEdit />} />
+            <Route path="manage-artworks" element={<ArtworkManagement />} />
+          </Route>
+          <Route path="/adminpage" element={<AdminPage />} />
+          <Route path="/find-id" element={<FindIdPage />} />
+          <Route path="/reset-password" element={<FindPasswordPage />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 

@@ -8,7 +8,6 @@ import axios from "axios";
 import { IoFolderOpenOutline } from "react-icons/io5";
 import { BsPaperclip } from "react-icons/bs";
 import { CiCirclePlus } from "react-icons/ci";
-import NumericInput from "react-numeric-input";
 
 const Input = styled.div`
   display: flex;
@@ -78,6 +77,7 @@ const CustomDropdownButton = styled(DropdownButton)`
 
 const CustomDropItem = styled(Dropdown.Item)`
   &:active,
+  &.active,
   &:hover,
   &:focus {
     border-color: black;
@@ -124,7 +124,6 @@ const HumanInput = styled(TextInput)`
     -webkit-appearance: none !important;
   }
 `;
-
 export default function InfoInput(props) {
   const count = props.count;
   const setCount = props.setCount;
@@ -192,33 +191,28 @@ export default function InfoInput(props) {
   }
 
   // 작가 수에 따라 input 추가
-  const [inputs, setInputs] = useState([
-    {
-      id: "0",
-      value: "",
-    },
-  ]);
+  const [inputs, setInputs] = useState([{ id: Date.now(), value: "" }]);
 
   const handleAddInput = () => {
-    const newInput = {
-      id: inputs.length,
-      value: "",
-    };
-    setInputs([...inputs, newInput]);
+    setInputs([...inputs, { id: Date.now(), value: "" }]);
   };
-
-  const authors = inputs.map((input) => input.value);
 
   // 라디오 기능
   const radioChange = (index) => {
-    const names = authors;
-    const name = authors[index];
-    setMainauth(name);
+    const updatedInputs = [...inputs];
+    const selectedInput = updatedInputs.splice(index, 1)[0];
+    updatedInputs.unshift(selectedInput);
+    setInputs(updatedInputs);
     setSelectedOptions(
-      inputs.map((_, i) =>
-        i === index ? { checked: true } : { checked: false }
+      updatedInputs.map((_, i) =>
+        i === 0 ? { checked: true } : { checked: false }
       )
     );
+    setWork({
+      ...work,
+      author: updatedInputs.map((item) => item.value),
+    });
+    setMainauth(updatedInputs[0].value);
   };
 
   const isChecked = (index) => {
@@ -233,6 +227,21 @@ export default function InfoInput(props) {
       setNext(true);
     }
   };
+
+  // 장르 복수 선택
+  const handleGenreSelection = (data) => {
+    let updatedGenres = [...work.genre];
+    if (updatedGenres.includes(data)) {
+      updatedGenres = updatedGenres.filter((g) => g !== data);
+    } else {
+      if (updatedGenres.length >= 2) {
+        updatedGenres.shift(); // 가장 오래된 선택된 항목 제거
+      }
+      updatedGenres.push(data);
+    }
+    setWork({ ...work, genre: updatedGenres });
+  };
+
   useEffect(() => {
     CheckInputs();
   }, [work, setWork]);
@@ -242,7 +251,6 @@ export default function InfoInput(props) {
     axios
       .get("https://api.litmap.store/api/genre")
       .then((result) => {
-        console.log(result.data.result);
         setGenre(result.data.result);
       })
       .catch((error) => {
@@ -255,7 +263,6 @@ export default function InfoInput(props) {
     axios
       .get("https://api.litmap.store/api/category")
       .then((result) => {
-        console.log(result.data.result);
         setCategory(result.data.result);
       })
       .catch((error) => {
@@ -276,7 +283,7 @@ export default function InfoInput(props) {
             setWork(info);
           }}
         ></TextInput>
-      </Input>{" "}
+      </Input>
       {/* 작가 이름 */}
       <Input id="author">
         <div
@@ -318,7 +325,7 @@ export default function InfoInput(props) {
               </RadioLabel>
               <TextInput
                 placeholder="작가를 입력해주세요"
-                value={data.value}
+                value={work.author[index]}
                 onChange={(e) => {
                   const updatedInputs = inputs.map((item) =>
                     item.id === data.id
@@ -330,7 +337,6 @@ export default function InfoInput(props) {
                     ...work,
                     author: updatedInputs.map((item) => item.value),
                   });
-                  console.log(work);
                 }}
               />
             </div>
@@ -391,20 +397,17 @@ export default function InfoInput(props) {
       <Input id="genre">
         <CustomDropdownButton
           id="장르"
-          title={work.genre ? work.genre : "장르 (필수)"}
+          title={work.genre.length > 0 ? work.genre.join(", ") : "장르 (필수)"}
         >
-          {getGenres.map((genre, i) => {
-            return (
-              <CustomDropItem
-                key={i}
-                onClick={() => {
-                  ChangeDrop("장르", "genre", genre.name);
-                }}
-              >
-                {genre.name}
-              </CustomDropItem>
-            );
-          })}
+          {getGenres.map((data, i) => (
+            <CustomDropItem
+              key={i}
+              onClick={() => handleGenreSelection(data.name)}
+              active={work.genre.includes(data.name)}
+            >
+              {data.name}
+            </CustomDropItem>
+          ))}
         </CustomDropdownButton>
       </Input>
       {/* 출판일 선택 */}

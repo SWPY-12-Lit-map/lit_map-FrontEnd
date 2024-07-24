@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import styled from "styled-components";
 import Image from "react-bootstrap/Image";
 import { MdDelete } from "react-icons/md";
 import basicImg from "./blank-profile-picture-973460_1280.png";
 import { FiPlus } from "react-icons/fi";
+import axios from "axios";
 
 const EditInfo = styled.div`
   display: flex;
@@ -120,21 +121,26 @@ const CastAddButton = styled.button`
 `;
 
 export default function EditCharacter(props) {
-  const count = props.count;
-  const setCount = props.setCount;
-  const characterInfos = props.characterInfos;
-  const setInfos = props.setInfos;
-  const work = props.work;
+  const { count, setCount, characterInfos, setInfos, work } = props;
 
-  const initialState = characterInfos.map(() => ({
-    species: "",
-    role: "",
-    gender: "",
-  }));
+  const [selectedOptions, setSelectedOptions] = useState(
+    characterInfos.map((info) => ({
+      type: info.type || "",
+      role: info.role || "",
+      gender: info.gender || "",
+    }))
+  );
 
-  const [selectedOptions, setSelectedOptions] = useState(initialState);
+  useEffect(() => {
+    setSelectedOptions(
+      characterInfos.map((info) => ({
+        type: info.type || "",
+        role: info.role || "",
+        gender: info.gender || "",
+      }))
+    );
+  }, [characterInfos]);
 
-  /* 이미지 업로드 */
   const UploadImg = ({ index }) => {
     const fileUpload = (e) => {
       const file = e.target.files[0];
@@ -188,7 +194,6 @@ export default function EditCharacter(props) {
     console.log(work);
   };
 
-  // 라디오 변경
   const radioChange = (type, value, index) => {
     const updatedOptions = [...selectedOptions];
     updatedOptions[index] = { ...updatedOptions[index], [type]: value };
@@ -202,6 +207,7 @@ export default function EditCharacter(props) {
   const isChecked = (type, value, index) => {
     return selectedOptions[index] && selectedOptions[index][type] === value;
   };
+
   return (
     <EditInfo>
       {characterInfos.map((info, i) => (
@@ -213,6 +219,15 @@ export default function EditCharacter(props) {
               );
               setInfos(updatedInfos);
               setCount(count - 1);
+
+              axios
+                .delete(`https://api.litmap.store/api/cast/7/0.1/${info.name}`)
+                .then((result) => {
+                  console.log(result);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
             }}
           >
             X
@@ -224,7 +239,7 @@ export default function EditCharacter(props) {
               placeholder="역할의 이름을 입력해주세요"
               value={info.name}
               onChange={(e) => inputChange(e, "name", i)}
-            />{" "}
+            />
             <TextInput
               placeholder="역할의 한줄 소개를 적어주세요"
               value={info.otherInfo}

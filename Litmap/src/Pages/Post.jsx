@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import Sidebar from "../Asset/Sidebar/Sidebar";
 import EditCharacter from "../Asset/EditCharacter";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, version } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
 import { useStore } from "../Asset/store";
@@ -99,6 +99,7 @@ export default function Post(props) {
   const read = props.read;
 
   const { workInfos, addWorkInfos } = useStore();
+  const getWork = { ...workInfos };
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -107,48 +108,44 @@ export default function Post(props) {
   const prevCount = PrevCountRef.current;
 
   useEffect(() => {
-    console.log(workInfos);
     setRead(false);
-    if (workInfos.workId) {
-      setWork(workInfos);
-    } else {
-      if (!mount) {
-        // 컴포넌트가 마운트될 때만 실행
-        const newInfos = Array.from({ length: count }, (_, i) => ({
-          name: "",
-          imageUrl: "",
-          type: "",
-          role: "",
-          gender: "",
-          age: "",
-          mbti: "",
-          contents: "",
-        }));
-        setInfos(newInfos);
-        setMount(true);
-      } else if (prevCount !== count) {
-        const newInfos = Array.from({ length: count }, (_, i) => ({
-          name: "",
-          imageUrl: "",
-          type: "",
-          role: "",
-          gender: "",
-          age: "",
-          mbti: "",
-          contents: "",
-        }));
 
-        if (prevCount < count) {
-          setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
-        } else if (prevCount > count) {
-          setInfos((prevInfos) => prevInfos.slice(0, count));
-        }
+    if (!mount) {
+      // 컴포넌트가 마운트될 때만 실행
+      const newInfos = Array.from({ length: count }, (_, i) => ({
+        name: "",
+        imageUrl: "",
+        type: "",
+        role: "",
+        gender: "",
+        age: "",
+        mbti: "",
+        contents: "",
+      }));
+      setInfos(newInfos);
+      setMount(true);
+    } else if (prevCount !== count) {
+      const newInfos = Array.from({ length: count }, (_, i) => ({
+        name: "",
+        imageUrl: "",
+        type: "",
+        role: "",
+        gender: "",
+        age: "",
+        mbti: "",
+        contents: "",
+      }));
 
-        if (count <= 1) {
-          setCount(1);
-        } else if (count > 30) {
-          setCount(30);
-        }
+      if (prevCount < count) {
+        setInfos((prevInfos) => [...prevInfos, ...newInfos.slice(prevCount)]);
+      } else if (prevCount > count) {
+        setInfos((prevInfos) => prevInfos.slice(0, count));
+      }
+
+      if (count <= 1) {
+        setCount(1);
+      } else if (count > 30) {
+        setCount(30);
       }
     }
   }, [count, mount, prevCount, work]);
@@ -156,6 +153,30 @@ export default function Post(props) {
   useEffect(() => {
     console.log(work);
   }, [work]);
+
+  useEffect(() => {
+    // console.log(getWork);
+    if (workInfos.workId) {
+      setWork({
+        category: workInfos.category,
+        confirmCheck: false,
+        author: workInfos.author,
+        contents: workInfos.contents,
+        imageUrl: workInfos.imageUrl,
+        version: workInfos.versions.versionNum,
+        versionName: workInfos.versions.versionName,
+        title: workInfos.title,
+        publisherName: "민음사",
+        genre: workInfos.genre,
+        memberId: 24,
+        publisherDate: "",
+
+        relationship: workInfos.versions.relationship,
+      });
+      setCount(workInfos.versions.casts.length);
+      setInfos(workInfos.versions.casts);
+    }
+  }, []);
 
   const Mainpart = () => {
     switch (state) {
@@ -252,16 +273,6 @@ export default function Post(props) {
             <>
               <ExtraSave
                 onClick={() => {
-                  const names = work.author;
-                  const name = names.find((name) => name == mainAuthor);
-                  const position = names.indexOf(name);
-                  if (position !== -1) {
-                    [names[0], names[position]] = [names[position], names[0]];
-                  }
-                  const namesString = names.join(",");
-                  console.log(namesString);
-                  setWork({ ...work, author: namesString });
-                  console.log(work);
                   const Extrasave = { ...work, confirmCheck: false };
                   setWork(Extrasave);
                   axios
@@ -307,15 +318,6 @@ export default function Post(props) {
                   if (state === 1) {
                     setState(2);
                     document.querySelector("#nextBtn").innerHTML = "저장";
-                    setExtraSave(true);
-                    const names = work.author;
-                    const name = names.find((name) => name == mainAuthor);
-                    const position = names.indexOf(name);
-                    if (position !== -1) {
-                      [names[0], names[position]] = [names[position], names[0]];
-                    }
-                    const namesString = names.join(",");
-                    console.log(namesString);
                     setWork({ ...work, author: namesString });
                     console.log(work);
                   } else if (state === 2) {

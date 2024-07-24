@@ -247,6 +247,10 @@ const Mindmap = (props) => {
     }
   }, [read, onRestore]);
 
+  useEffect(() => {
+    onSave();
+  }, [nodes, edges, backgroundImage, backColor, selectedEdgeId]);
+
   return (
     <Mapping>
       <ReactFlow

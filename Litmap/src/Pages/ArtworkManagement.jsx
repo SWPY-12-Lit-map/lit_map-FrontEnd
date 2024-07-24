@@ -348,17 +348,11 @@ const ArtworkManagement = () => {
                           "https://api.litmap.store/api/version/rollback/7/0.1"
                         )
                         .then((result) => {
-                          axios
-                            .get("https://api.litmap.store/api/work/7")
-                            .then((result) => {
-                              console.log(result);
-                              addWorkInfos(result.data.result);
-                              if (result.data.result.workId) {
-                                navigate("/category1");
-                              }
-                              //
-                            });
                           console.log(result);
+                          addWorkInfos(result.data.result);
+                          if (result.data.result.workId) {
+                            navigate("/category1");
+                          }
                         })
                         .catch((error) => {
                           console.log(error);
