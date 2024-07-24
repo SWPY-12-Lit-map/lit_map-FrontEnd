@@ -41,6 +41,19 @@ const ResultCount = styled.div`
   }
 `;
 
+const NoResult = styled.div`
+  width: 100%;
+  height: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 100px 0;
+  & > div {
+    font-weight: 600;
+    margin: 20px 0 5px 0;
+  }
+`;
+
 const Category = styled.div``;
 
 const CategoryTitle = styled.h3``;
@@ -95,16 +108,11 @@ const FootNav = styled.div`
   }
 `;
 
-export default function SearchResult() {
+export default function SearchResult({ userInput, setUserInput }) {
   const navigate = useNavigate();
   const { searchResult } = useStore();
   const [displayResults, setDisplayResults] = useState({});
   const [activeIndex, setActiveIndex] = useState(0);
-  const [userInput, setUserInput] = useState(
-    localStorage.getItem("recentSearch")
-      ? JSON.parse(localStorage.getItem("recentSearch"))
-      : []
-  ); // 유저가 검색한 값 가져오기
   const [worksCount, setWorksCount] = useState(0);
 
   useEffect(() => {
@@ -129,13 +137,16 @@ export default function SearchResult() {
     setActiveIndex(index);
   };
 
+  // 최근 검색어 삭제
   const deleteRecent = (name) => {
     const updatedUserInput = userInput.filter((item) => item !== name);
     setUserInput(updatedUserInput);
     localStorage.setItem("recentSearch", JSON.stringify(updatedUserInput));
   };
 
-  useEffect(() => {}, [userInput, setUserInput]);
+  useEffect(() => {
+    console.log(worksCount);
+  }, [userInput, setUserInput]);
 
   return (
     <SearchPage>
@@ -176,8 +187,12 @@ export default function SearchResult() {
       <ResultCount>
         총 <span>{worksCount}</span>건 검색
       </ResultCount>
-      {Object.keys(displayResults).length === 0 ? (
-        <p>검색 결과가 없습니다.</p>
+      {worksCount === 0 ? (
+        <NoResult>
+          <img src="/Document_empty.png"></img>
+          <div>검색결과가 없어요</div>
+          <p>검색어를 다시 한 번 확인해주세요</p>
+        </NoResult>
       ) : (
         Object.keys(displayResults).map((category) => (
           <Category key={category}>

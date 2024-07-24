@@ -83,9 +83,11 @@ function App() {
     getAxios();
   }, [num]);
 
+  // 메가메뉴 설정 여부
   const [login, setLogin] = useState(false);
   const [mega, setMega] = useState(false);
 
+  // 작품 정보
   const date = new Date();
   const [count, setCount] = useState(3); // 인물 수
   const [characterInfos, setInfos] = useState([]); // 인물정보
@@ -125,14 +127,26 @@ function App() {
     setWork(infosChange);
   }, [characterInfos]);
 
+  // 마인드맵 디자인 설정
   const [edgeType, setEdgetype] = useState("직선"); // 직선 / 곡선
   const [lineStyle, setLine] = useState("실선"); // 실선 / 점선
+
+  const [userInput, setUserInput] = useState(
+    localStorage.getItem("recentSearch")
+      ? JSON.parse(localStorage.getItem("recentSearch"))
+      : []
+  ); // 유저가 검색한 값 가져오기
 
   return (
     <>
       <Router>
         <GlobalStyle></GlobalStyle>
-        <Navbar login={login} setLogin={setLogin} />
+        <Navbar
+          login={login}
+          setLogin={setLogin}
+          userInput={userInput}
+          setUserInput={setUserInput}
+        />
         <ScrollTop />
         <Routes>
           <Route
@@ -193,7 +207,12 @@ function App() {
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/find-id" element={<FindIdPage />} />
           <Route path="/reset-password" element={<FindPasswordPage />} />
-          <Route path="/searchresult" element={<SearchResult />}></Route>
+          <Route
+            path="/searchresult"
+            element={
+              <SearchResult userInput={userInput} setUserInput={setUserInput} />
+            }
+          ></Route>
         </Routes>
       </Router>
     </>

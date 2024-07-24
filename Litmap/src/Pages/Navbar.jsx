@@ -7,6 +7,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
 import { useStore } from "../Asset/store";
+import { IoTimeOutline } from "react-icons/io5";
 
 const Nav = styled.div`
   font-size: 20px;
@@ -104,6 +105,7 @@ const DropBtn = styled(DropdownButton)`
 `;
 
 const SearchInfo = styled.div`
+  position: relative;
   border: 1px solid black;
   border-radius: 0 0 30px 30px;
   background-color: white;
@@ -112,6 +114,26 @@ const SearchInfo = styled.div`
   position: absolute;
   top: 60px;
   z-index: 10;
+`;
+
+const RecentSearch = styled.p`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 5px 0;
+  & > svg {
+    margin-right: 5px;
+  }
+  & > button {
+    position: absolute;
+    right: 0;
+    background-color: unset;
+    border: none;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #f7f7f7;
+  }
 `;
 
 const Right = styled.div`
@@ -181,19 +203,15 @@ const LogoutDropdown = styled(Dropdown)`
   }
 `;
 
-function Navbar({ login, setLogin }) {
+function Navbar({ login, setLogin, userInput, setUserInput }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [userInput, setUserInput] = useState(
-    localStorage.getItem("recentSearch")
-      ? JSON.parse(localStorage.getItem("recentSearch"))
-      : []
-  ); // 유저가 검색한 값 가져오기
   useEffect(() => {
     window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
   }, [userInput, setUserInput]); // 유저 검색내용 저장
+
   const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
   const [searchSort, setSort] = useState("작품 제목"); // 검색 카테고리
   const [state, setState] = useState(false); // 검색창 활성화 여부
@@ -220,8 +238,8 @@ function Navbar({ login, setLogin }) {
       .then((result) => {
         console.log(result);
         addSearchResult(result.data.result);
-        {
-          result.data.resultCode == 200 ? navigate("/searchresult") : null;
+        if (result.data.resultCode === 200) {
+          navigate("/searchresult");
         }
       })
       .catch((error) => {
@@ -253,7 +271,6 @@ function Navbar({ login, setLogin }) {
   useEffect(() => {
     function handleFocus(e) {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
-        // input 체크 해제
         setState(false);
       }
     }
@@ -277,22 +294,29 @@ function Navbar({ login, setLogin }) {
     getSearches();
   }, [setUserInput, userInput, userSearch, setUserSearch]);
 
+  // 중복 검색어 처리
+  const updateSearches = (newSearch) => {
+    const updatedSearches = [
+      newSearch,
+      ...userInput.filter((item) => item !== newSearch),
+    ];
+    setUserInput(updatedSearches);
+    localStorage.setItem("recentSearch", JSON.stringify(updatedSearches));
+  };
+
   const searchKey = (e) => {
     if (e.key === "Enter") {
-      console.log(userSearch);
-      setUserInput([...userInput, userSearch]);
+      updateSearches(userSearch);
       setUserSearch("");
-      getSearches();
       search();
-
       setState(false);
     }
   };
 
   const searchBtn = () => {
-    setUserInput([...userInput, userSearch]);
+    updateSearches(userSearch);
     setUserSearch("");
-    getSearches();
+    search();
   };
 
   // 인물 등록페이지면 안보이게
@@ -300,15 +324,20 @@ function Navbar({ login, setLogin }) {
   useEffect(() => {
     if (location.pathname === "/category1") {
       setPostPage(true);
-      console.log(postPage);
     } else {
       setPostPage(false);
-      console.log(postPage);
     }
   }, [location]);
 
   const handleProfileClick = () => {
     navigate("/category2");
+  };
+
+  // 최근 검색어 삭제
+  const deleteRecent = (name) => {
+    const updatedUserInput = userInput.filter((item) => item !== name);
+    setUserInput(updatedUserInput);
+    localStorage.setItem("recentSearch", JSON.stringify(updatedUserInput));
   };
 
   return (
@@ -321,18 +350,17 @@ function Navbar({ login, setLogin }) {
         <SearchCategory>
           <DropBtn id="dropdown-basic-button" title={searchSort}>
             {["작품 제목", "내용", "작가", "회원", "제목 + 내용"].map(
-              (data, i) => {
-                return (
-                  <Dropdown.Item
-                    onClick={(e) => {
-                      setSort(data);
-                      toggleDropdown();
-                    }}
-                  >
-                    {data}
-                  </Dropdown.Item>
-                );
-              }
+              (data, i) => (
+                <Dropdown.Item
+                  key={i}
+                  onClick={() => {
+                    setSort(data);
+                    toggleDropdown();
+                  }}
+                >
+                  {data}
+                </Dropdown.Item>
+              )
             )}
           </DropBtn>
         </SearchCategory>
@@ -354,25 +382,31 @@ function Navbar({ login, setLogin }) {
             borderRadius: state ? "30px 30px 0px 0px" : "30px",
             borderBottom: state ? "none" : "solid 1px black",
           }}
-          onChange={(e) => {
-            setUserSearch(e.target.value);
-          }}
+          onChange={(e) => setUserSearch(e.target.value)}
           onKeyDown={searchKey}
-          onClick={() => {
-            state ? setState(false) : setState(true);
-          }}
+          onClick={() => setState(!state)}
         />
-        {state ? (
+        {state && (
           <SearchInfo
             style={{
               borderTop: state ? "none" : "black",
             }}
           >
+            최근 검색어:
             {recentSearch.map((a, index) => (
-              <p key={index}>{a}</p>
+              <RecentSearch
+                key={index}
+                onClick={() => {
+                  setUserSearch(a);
+                  search();
+                }}
+              >
+                <IoTimeOutline /> {a}
+                <button onClick={() => deleteRecent(a)}>X</button>
+              </RecentSearch>
             ))}
           </SearchInfo>
-        ) : null}
+        )}
       </SearchBarContainer>
 
       <Right>
