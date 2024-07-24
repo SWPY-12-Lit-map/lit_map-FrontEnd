@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
@@ -112,7 +111,6 @@ const SearchInfo = styled.div`
   position: absolute;
   top: 60px;
   z-index: 10;
-  display: none;
 `;
 
 const Right = styled.div`
@@ -211,14 +209,14 @@ function Navbar({ login, setLogin }) {
         setState(false);
       }
     }
-    document.addEventListener("mouseup", handleFocus);
+    document.addEventListener("mousedown", handleFocus);
     return () => {
-      document.removeEventListener("mouseup", handleFocus);
+      document.removeEventListener("mousedown", handleFocus);
     };
   }, [searchRef]);
 
   // localstorage에서 가져오기
-  const [recentSearch, setRecentSearch] = useState();
+  const [recentSearch, setRecentSearch] = useState([]);
 
   const getSearches = () => {
     const getRecentSearch = localStorage.getItem("recentSearch")
@@ -251,7 +249,7 @@ function Navbar({ login, setLogin }) {
   // 인물 등록페이지면 안보이게
   const [postPage, setPostPage] = useState(false);
   useEffect(() => {
-    if (location.pathname == "/category1") {
+    if (location.pathname === "/category1") {
       setPostPage(true);
       console.log(postPage);
     } else {
@@ -260,25 +258,95 @@ function Navbar({ login, setLogin }) {
     }
   }, [location]);
 
+  const searchResult = () => {
+    axios
+      .post("https://api.litmap.store/api/board/search", {
+        searchType: "TITLE",
+        question: "",
+      })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <Nav style={{ display: postPage ? "none" : "flex" }}>
       <NavLogo to="/">
         <LogoImg src="/Logo.png" alt="로고" />
       </NavLogo>
 
-      <SearchBarContainer>
+      <SearchBarContainer ref={searchRef}>
         <SearchCategory>
-          <DropBtn id="dropdown-basic-button" title="통합검색">
-            <Dropdown.Item onClick={toggleDropdown}>작품 제목</Dropdown.Item>
-            <Dropdown.Item onClick={toggleDropdown}>작가 이름</Dropdown.Item>
-            <Dropdown.Item onClick={toggleDropdown}>출판사 이름</Dropdown.Item>
+          <DropBtn
+            id="dropdown-basic-button"
+            title={searchSort ? searchSort : "통합검색"}
+          >
+            <Dropdown.Item
+              onClick={(e) => {
+                setSort(e.target.text);
+                toggleDropdown();
+              }}
+            >
+              작품 제목
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(e) => {
+                setSort(e.target.text);
+                toggleDropdown();
+              }}
+            >
+              작가 이름
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(e) => {
+                setSort(e.target.text);
+                toggleDropdown();
+              }}
+            >
+              출판사 이름
+            </Dropdown.Item>
           </DropBtn>
         </SearchCategory>
-        <SearchBtn onClick={toggleDropdown}>
+        <SearchBtn
+          onClick={() => {
+            searchBtn();
+            toggleDropdown();
+            searchResult();
+          }}
+        >
           <SearchIcon icon={faMagnifyingGlass} />
         </SearchBtn>
-        <SearchBar placeholder="검색어를 입력해주세요" />
-        {dropdownVisible && <SearchInfo></SearchInfo>}
+        <SearchBar
+          id="searchBar"
+          placeholder="검색어를 입력해주세요"
+          className="search"
+          value={userSearch}
+          style={{
+            borderRadius: state ? "30px 30px 0px 0px" : "30px",
+            borderBottom: state ? "none" : "solid 1px black",
+          }}
+          onChange={(e) => {
+            setUserSearch(e.target.value);
+          }}
+          onKeyDown={searchKey}
+          onClick={() => {
+            state ? setState(false) : setState(true);
+          }}
+        />
+        {state ? (
+          <SearchInfo
+            style={{
+              borderTop: state ? "none" : "black",
+            }}
+          >
+            {recentSearch.map((a, index) => (
+              <p key={index}>{a}</p>
+            ))}
+          </SearchInfo>
+        ) : null}
       </SearchBarContainer>
 
       <Right>
