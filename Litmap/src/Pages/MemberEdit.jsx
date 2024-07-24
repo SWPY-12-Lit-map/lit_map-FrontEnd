@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import WithdrawalPage from "./WithdrawalPage"; // 새로 추가한 컴포넌트
+import WithdrawalPage from "./WithdrawalPage";
 
 const Content = styled.div`
     padding: 20px;
@@ -174,7 +174,6 @@ const MemberEdit = ({ onImageChange }) => {
     const [phone, setPhone] = useState("010-0000-0000");
     const [website, setWebsite] = useState("https://www.litmap.com");
     const [address, setAddress] = useState("서울시 강서구 마곡나루");
-    const [detailAddress, setDetailAddress] = useState("상세주소");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -182,7 +181,7 @@ const MemberEdit = ({ onImageChange }) => {
     const [isPhoneEditable, setIsPhoneEditable] = useState(false);
     const [isWebsiteEditable, setIsWebsiteEditable] = useState(false);
     const [isAddressEditable, setIsAddressEditable] = useState(false);
-    const [showWithdrawalPage, setShowWithdrawalPage] = useState(false); // 추가된 상태
+    const [showWithdrawalPage, setShowWithdrawalPage] = useState(false);
 
     const handlePasswordVisibilityToggle = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -306,7 +305,7 @@ const MemberEdit = ({ onImageChange }) => {
                             />
                         </div>
                     </InfoItem>
-                    <SmallText>영문 대소문자, 숫자, 특수문자를 3가지 이상으로 조합해 8자 이상 16자 이하로 입력해주세요.</SmallText>
+                    <SmallText>영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력해주세요.</SmallText>
                     <InfoItem>
                         <div className="title">새 비밀번호 확인</div>
                         <div className="input-container">
@@ -359,18 +358,10 @@ const MemberEdit = ({ onImageChange }) => {
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
                                 />
-                                <input
-                                    type="text"
-                                    value={detailAddress}
-                                    onChange={(e) => setDetailAddress(e.target.value)}
-                                    placeholder="상세 주소"
-                                    style={{ marginTop: "10px" }}
-                                />
                             </>
                         ) : (
                             <>
                                 <div>{address}</div>
-                                <div>{detailAddress}</div>
                             </>
                         )}
                         <SmallButton onClick={() => setIsAddressEditable(!isAddressEditable)}>
