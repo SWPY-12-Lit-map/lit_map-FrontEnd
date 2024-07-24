@@ -5,4 +5,7 @@ export const useStore = create((set) => ({
 
   addWorkInfos: (data) => set({ workInfos: data }),
   removeWorkInfos: () => set({ workInfos: {} }),
+
+  searchResult: {},
+  addSearchResult: (data) => set({ searchResult: data }),
 }));

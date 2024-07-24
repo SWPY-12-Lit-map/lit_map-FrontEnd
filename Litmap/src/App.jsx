@@ -18,6 +18,7 @@ import FindPasswordPage from "./Pages/FindPasswordPage";
 // import SearchResult from "./Pages/SearchResult";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
+import SearchResult from "./Pages/SearchResult";
 
 const GlobalStyle = createGlobalStyle`html {
     height: 100%;
@@ -29,11 +30,7 @@ const GlobalStyle = createGlobalStyle`html {
     #root {
       height: 100%;
     }`;
-const Main = styled.div`
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-`;
+
 function App() {
   // 작품 가져오기
   const [state, setState] = useState(false);
@@ -196,6 +193,7 @@ function App() {
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/find-id" element={<FindIdPage />} />
           <Route path="/reset-password" element={<FindPasswordPage />} />
+          <Route path="/searchresult" element={<SearchResult />}></Route>
         </Routes>
       </Router>
     </>

@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axios from "axios";
+import { useStore } from "../Asset/store";
 
 const Nav = styled.div`
   font-size: 20px;
@@ -194,8 +195,39 @@ function Navbar({ login, setLogin }) {
     window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
   }, [userInput, setUserInput]); // 유저 검색내용 저장
   const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
-  const [searchSort, setSort] = useState(); // 검색 카테고리
+  const [searchSort, setSort] = useState("작품 제목"); // 검색 카테고리
   const [state, setState] = useState(false); // 검색창 활성화 여부
+  const { searchResult, addSearchResult } = useStore();
+
+  const searchTypeMap = {
+    "작품 제목": "TITLE",
+    내용: "CONTENTS",
+    작가: "AUTHOR",
+    출판사: "PUBLISHER",
+    회원: "MEMBER",
+    "제목 + 내용": "TITLE_AND_CONTENTS",
+  };
+
+  const postBody = {
+    searchType: searchTypeMap[searchSort] || "",
+    question: userSearch,
+  };
+
+  // 검색결과
+  const search = () => {
+    axios
+      .post("https://api.litmap.store/api/board/search", postBody)
+      .then((result) => {
+        console.log(result);
+        addSearchResult(result.data.result);
+        {
+          result.data.resultCode == 200 ? navigate("/searchresult") : null;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -251,7 +283,8 @@ function Navbar({ login, setLogin }) {
       setUserInput([...userInput, userSearch]);
       setUserSearch("");
       getSearches();
-      navigate("/searchresult");
+      search();
+
       setState(false);
     }
   };
@@ -274,20 +307,6 @@ function Navbar({ login, setLogin }) {
     }
   }, [location]);
 
-  const searchResult = () => {
-    axios
-      .post("https://api.litmap.store/api/board/search", {
-        searchType: "TITLE",
-        question: "",
-      })
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   const handleProfileClick = () => {
     navigate("/category2");
   };
@@ -300,41 +319,28 @@ function Navbar({ login, setLogin }) {
 
       <SearchBarContainer ref={searchRef}>
         <SearchCategory>
-          <DropBtn
-            id="dropdown-basic-button"
-            title={searchSort ? searchSort : "통합검색"}
-          >
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-                toggleDropdown();
-              }}
-            >
-              작품 제목
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-                toggleDropdown();
-              }}
-            >
-              작가 이름
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={(e) => {
-                setSort(e.target.text);
-                toggleDropdown();
-              }}
-            >
-              출판사 이름
-            </Dropdown.Item>
+          <DropBtn id="dropdown-basic-button" title={searchSort}>
+            {["작품 제목", "내용", "작가", "회원", "제목 + 내용"].map(
+              (data, i) => {
+                return (
+                  <Dropdown.Item
+                    onClick={(e) => {
+                      setSort(data);
+                      toggleDropdown();
+                    }}
+                  >
+                    {data}
+                  </Dropdown.Item>
+                );
+              }
+            )}
           </DropBtn>
         </SearchCategory>
         <SearchBtn
           onClick={() => {
             searchBtn();
             toggleDropdown();
-            searchResult();
+            search();
           }}
         >
           <SearchIcon icon={faMagnifyingGlass} />
