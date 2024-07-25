@@ -16,7 +16,7 @@ const Navbar = styled.div`
 const NavItem = styled.span`
   cursor: pointer;
   text-align: center;
-  width: 14%;
+  width: 20%;
   padding: 5px 10px;
   color: ${(props) => (props.isActive ? "#8B0024" : "black")};
   font-weight: ${(props) => (props.isActive ? "bold" : "normal")};
@@ -117,14 +117,12 @@ export default function SearchResult({ userInput, setUserInput }) {
   const [worksCount, setWorksCount] = useState(0);
 
   useEffect(() => {
-    console.log(searchResult);
+    // 카테고리 필터링
     const filteredResults = {};
-    // 같은 key 값 찾기
     Object.keys(searchResult).forEach((category) => {
       filteredResults[category] = searchResult[category];
     });
     setDisplayResults(filteredResults);
-    console.log(filteredResults);
 
     // 작품 총 개수 구하기
     const counts = Object.values(searchResult).map(
@@ -138,7 +136,6 @@ export default function SearchResult({ userInput, setUserInput }) {
     setActiveIndex(index);
   };
 
-  // 최근 검색어 삭제
   const deleteRecent = (name) => {
     const updatedUserInput = userInput.filter((item) => item !== name);
     setUserInput(updatedUserInput);
@@ -149,24 +146,29 @@ export default function SearchResult({ userInput, setUserInput }) {
     console.log(worksCount);
   }, [userInput, setUserInput]);
 
+  // 카테고리 필터
+  const filteredResults = Object.keys(displayResults)
+    .filter((category, index) => {
+      return activeIndex === 0 || activeIndex - 1 === index;
+    })
+    .reduce((res, key) => ((res[key] = displayResults[key]), res), {});
+
   return (
     <SearchPage>
       <Recent>
         최근 검색어
-        {userInput.map((data, i) => {
-          return (
-            <Inputs key={i}>
-              {data}{" "}
-              <button
-                onClick={() => {
-                  deleteRecent(data);
-                }}
-              >
-                X
-              </button>
-            </Inputs>
-          );
-        })}
+        {userInput.map((data, i) => (
+          <Inputs key={i}>
+            {data}{" "}
+            <button
+              onClick={() => {
+                deleteRecent(data);
+              }}
+            >
+              X
+            </button>
+          </Inputs>
+        ))}
       </Recent>
       <Navbar>
         <NavItem isActive={activeIndex === 0} onClick={() => handleClick(0)}>
@@ -190,19 +192,19 @@ export default function SearchResult({ userInput, setUserInput }) {
       </ResultCount>
       {worksCount === 0 ? (
         <NoResult>
-          <img src="/Document_empty.png"></img>
+          <img src="/Document_empty.png" alt="No Results" />
           <div>검색결과가 없어요</div>
           <p>검색어를 다시 한 번 확인해주세요</p>
         </NoResult>
       ) : (
-        Object.keys(displayResults).map((category) => (
+        Object.keys(filteredResults).map((category) => (
           <Category key={category}>
             <CategoryTitle>
               {category}{" "}
-              <CategoryCount>{displayResults[category].count}</CategoryCount>
+              <CategoryCount>{filteredResults[category].count}</CategoryCount>
             </CategoryTitle>
             <Works>
-              {displayResults[category].works.map((work) => (
+              {filteredResults[category].works.map((work) => (
                 <div
                   key={work.workId}
                   onClick={() => {
@@ -218,7 +220,7 @@ export default function SearchResult({ userInput, setUserInput }) {
             </Works>
           </Category>
         ))
-      )}{" "}
+      )}
       <Foot>
         <FootNav>
           <Link to="/개인정보처리방침" style={{ color: "#454545" }}>
