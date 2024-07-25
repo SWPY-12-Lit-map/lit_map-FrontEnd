@@ -3,15 +3,14 @@ import { useStore } from "../Asset/store";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 
-const SearchPage = styled.div`
-  padding: 0 2%;
-`;
+const SearchPage = styled.div``;
 
 const Navbar = styled.div`
   width: 40%;
   display: flex;
   justify-content: space-around;
   font-size: 20px;
+  padding: 0 2%;
 `;
 
 const NavItem = styled.span`
@@ -30,12 +29,14 @@ const Recent = styled.div`
   color: #7d7d7d;
   font-size: 18px;
   font-weight: 600;
+  padding: 0 2%;
 `;
 
 const ResultCount = styled.div`
   font-size: 20px;
   font-weight: 600;
   margin: 30px 0;
+  padding: 0 2%;
   & > span {
     color: #8b0024;
   }
