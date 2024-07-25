@@ -7,8 +7,8 @@ const { Kakao } = window;
 const ShareBtn = styled.button`
   background-color: #8d2741;
   border: solid 1px #8d2741;
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 `;
 

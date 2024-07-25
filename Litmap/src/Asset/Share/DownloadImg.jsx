@@ -2,24 +2,32 @@ import React, { useEffect } from "react";
 import { useReactFlow, getRectOfNodes, getTransformForBounds } from "reactflow";
 import { toPng } from "html-to-image";
 import backImg from "../backgroundImg.png";
+import { useStore } from "../store";
+import styled from "styled-components";
+
+const Button = styled.button`
+  background-color: unset;
+  border-color: #8d2741;
+  border-radius: 10px;
+  color: #8d2741;
+  width: 50%;
+  padding: 10px;
+`;
 
 export default function DownloadImg(props) {
   const { getNodes } = useReactFlow();
   const imageWidth = 1920;
   const imageHeight = 1080;
-  const imgUrl = props.imgUrl;
-  const setUrl = props.setUrl;
   const workInfo = props.workInfo;
-
-  console.log(workInfo);
-  console.log(imgUrl);
+  const fileType = props.fileType;
+  const { imgUrl, setImgUrl } = useStore();
 
   /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
     const a = document.createElement("a");
     a.setAttribute(
       "download",
-      `${workInfo.title}.${workInfo.versions.versionName}.png`
+      `${workInfo.title} ${workInfo.versions.versionName}.${fileType}`
     );
     a.setAttribute("href", dataUrl);
     a.click();
@@ -81,7 +89,7 @@ export default function DownloadImg(props) {
             // 최종 이미지 URL 생성
             resultCanvas.toBlob((blob) => {
               const dataUrl = URL.createObjectURL(blob);
-              setUrl(dataUrl);
+              setImgUrl(dataUrl);
             });
           };
         })
@@ -98,12 +106,13 @@ export default function DownloadImg(props) {
 
   /* 컴포넌트가 마운트될 때 한 번 호출 */
   useEffect(() => {
+    console.log(workInfo);
     ImgtoPng();
   }, []);
 
   return (
-    <button className="download-btn" onClick={handleDownload}>
-      PNG로 저장
-    </button>
+    <Button className="download-btn" onClick={handleDownload}>
+      다운로드
+    </Button>
   );
 }

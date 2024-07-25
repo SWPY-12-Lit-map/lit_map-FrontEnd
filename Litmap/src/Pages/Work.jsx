@@ -8,6 +8,7 @@ import Mindmap from "../Asset/Mindmap/Mindmap";
 import { ReactFlowProvider } from "reactflow";
 import { useParams } from "react-router-dom";
 import { useStore } from "../Asset/store";
+import { format } from "date-fns";
 
 const Body = styled.div`
   display: flex;
@@ -73,9 +74,6 @@ const Btn1 = styled(Button)`
   justify-content: center;
   align-items: center;
 `;
-const Btn2 = styled(Btn1)`
-  width: 25%;
-`;
 
 const RelatedVideo = styled.div``;
 
@@ -120,6 +118,13 @@ export default function Work({
       });
   };
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return isNaN(date.getTime())
+      ? "날짜 정보 없음"
+      : format(date, "yyyy년 MM월 dd일");
+  };
+
   useEffect(() => {
     setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
     GetWork();
@@ -131,7 +136,7 @@ export default function Work({
       <Category />
       <Body>
         <Workinfo>
-          <Thumbnail src="/poster1.png" alt="썸네일 자리"></Thumbnail>
+          <Thumbnail src={workInfo.imageUrl} alt="썸네일 자리"></Thumbnail>
           <Description>
             <Title>{workInfo.title}</Title>{" "}
             <State>완결여부 결정도 해야됨</State>
@@ -165,10 +170,13 @@ export default function Work({
             {state == false ? (
               <Info>
                 <Author>감독/작가: {workInfo.author}</Author>
-                <Releasedate>개봉/출판일자{workInfo.publisherDate}</Releasedate>
+                <Releasedate>
+                  오픈:
+                  {formatDate(workInfo.publisherDate)}
+                </Releasedate>
                 <Season>시즌: 이것도 넣어야 됨</Season>
-                <Channel>공급사이트: 이것도 넣어야 함</Channel>
-                <Content>간단내용 {workInfo.contents}</Content>
+                <Channel>채널: 이것도 넣어야 함</Channel>
+                <Content>내용: {workInfo.contents}</Content>
               </Info>
             ) : (
               <RelatedVideo>
@@ -202,20 +210,6 @@ export default function Work({
             <img src="/poster4.png" alt="추천 포스터 4" />
           </Recommends>
         </Recommend>
-        {/* <button
-          onClick={() => {
-            axios
-              .get("https://api.litmap.store/api/work/1")
-              .then((result) => {
-                console.log(result);
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          }}
-        >
-          확인
-        </button> */}
       </Body>
     </>
   );

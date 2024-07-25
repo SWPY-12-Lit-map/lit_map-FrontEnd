@@ -4,9 +4,13 @@ import styled from "styled-components";
 const ShareBtn = styled.button`
   background-color: #8d2741;
   border: solid 1px #8d2741;
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
+`;
+
+const NaverIcon = styled(SiNaver)`
+  padding: 5px;
 `;
 
 export default function NaverShare() {
@@ -20,7 +24,7 @@ export default function NaverShare() {
   return (
     <>
       <ShareBtn onClick={share}>
-        <SiNaver color="white" size={"50px"} />
+        <NaverIcon color="white" size={"50px"} />
       </ShareBtn>
     </>
   );

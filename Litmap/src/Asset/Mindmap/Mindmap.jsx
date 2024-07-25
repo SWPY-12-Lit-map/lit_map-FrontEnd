@@ -25,7 +25,8 @@ const Mapping = styled.div`
 `;
 const Btns = styled.div`
   display: flex;
-  margin-top: 30px;
+  margin-top: 10px;
+  justify-content: flex-end;
 `;
 const CustomControls = styled(Controls)`
   position: absolute;
@@ -98,6 +99,7 @@ const Mindmap = (props) => {
     backgroundImg,
     setBackImg,
     relationship,
+    workInfo,
   } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -308,7 +310,7 @@ const Mindmap = (props) => {
         {read ? null : <MiniMap />}
       </ReactFlow>
       <Btns>
-        <ModalBtn /> {/* 공유하기 */}
+        <ModalBtn workInfo={workInfo} /> {/* 공유하기 */}
       </Btns>
     </Mapping>
   );
