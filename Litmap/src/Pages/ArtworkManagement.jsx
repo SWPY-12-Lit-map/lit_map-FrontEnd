@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch,faRotateRight, faChevronRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faRotateRight, faChevronRight, faCaretDown, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ const Content = styled.div`
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
 `;
 
@@ -66,49 +66,6 @@ const Td = styled.td`
   button {
     border: none;
     background-color: white;
-  }
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-`;
-
-const CheckboxInput = styled.input`
-  display: none;
-
-  &:checked + span {
-    background-color: #8B0024;
-    border-color: #8B0024;
-  }
-
-  &:checked + span::after {
-    display: block;
-  }
-`;
-
-const CheckboxCustom = styled.span`
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #9F9F9F;
-  border-radius: 50%;
-  position: relative;
-  background-color: white;
-  margin-right: 10px;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 6px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: translate(-50%, -50%) rotate(45deg);
-    display: none;
   }
 `;
 
@@ -218,8 +175,9 @@ const SearchInput = styled.input`
 
 const Controls = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-bottom: 10px;
+  gap: 10px; /* 간격 조정 */
 `;
 
 const Divider = styled.div`
@@ -229,81 +187,92 @@ const Divider = styled.div`
   margin-bottom: 10px;
 `;
 
-const ArtworkManagement = () => {
+const TreeToggle = styled.span`
+  cursor: pointer;
+  margin-right: 10px;
+`;
+
+const ArtworkManagement = ({ setContentHeight }) => {
   const { addWorkInfos } = useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([
     {
       id: 1,
       name: "오만과 편견",
-      modifyDate: "2024.06.20",
-      firstRegisterDate: "2024.06.20 13:40",
-      status: "임시 저장",
+      category: "소설",
+      author: "제인 오스틴",
+      publisher: "출판사1",
+      versions: [
+        { versionId: 1, date: "2024.06.20", versionName: "v1.0", status: "임시 저장" },
+        { versionId: 2, date: "2024.06.21", versionName: "v1.1", status: "게시 완료" },
+      ],
     },
     {
       id: 2,
       name: "홍길동전",
-      modifyDate: "2024.05.04",
-      firstRegisterDate: "2024.05.01 09:00",
-      status: "게시 완료",
+      category: "고전",
+      author: "허균",
+      publisher: "출판사2",
+      versions: [
+        { versionId: 3, date: "2024.05.04", versionName: "v1.0", status: "게시 완료" },
+      ],
     },
     {
       id: 3,
       name: "사랑의 이해",
-      modifyDate: "2024.05.04",
-      firstRegisterDate: "2024.05.01 09:00",
-      status: "승인 중",
+      category: "소설",
+      author: "미상",
+      publisher: "출판사3",
+      versions: [
+        { versionId: 4, date: "2024.05.04", versionName: "v1.0", status: "승인 중" },
+        { versionId: 11, date: "2024.05.04", versionName: "v1.1", status: "게시 완료" },
+      ],
     },
     {
       id: 4,
-      name: "오만과 편견1",
-      modifyDate: "2024.06.20",
-      firstRegisterDate: "2024.06.20 13:40",
-      status: "임시 저장",
+      name: "해리포터",
+      category: "판타지",
+      author: "J.K. 롤링",
+      publisher: "출판사4",
+      versions: [
+        { versionId: 5, date: "2024.07.01", versionName: "v1.0", status: "임시 저장" },
+        { versionId: 6, date: "2024.07.02", versionName: "v1.1", status: "게시 완료" },
+      ],
     },
     {
       id: 5,
-      name: "홍길동전1",
-      modifyDate: "2024.05.04",
-      firstRegisterDate: "2024.05.01 09:00",
-      status: "게시 완료",
+      name: "반지의 제왕",
+      category: "판타지",
+      author: "J.R.R. 톨킨",
+      publisher: "출판사5",
+      versions: [
+        { versionId: 7, date: "2024.08.01", versionName: "v1.0", status: "게시 완료" },
+      ],
     },
     {
       id: 6,
-      name: "사랑의 이해1",
-      modifyDate: "2024.05.04",
-      firstRegisterDate: "2024.05.01 09:00",
-      status: "승인 중",
-    },
-    {
-      id: 7,
-      name: "사랑의 이해2",
-      modifyDate: "2024.05.04",
-      firstRegisterDate: "2024.05.01 09:00",
-      status: "승인 중",
+      name: "1984",
+      category: "디스토피아",
+      author: "조지 오웰",
+      publisher: "출판사6",
+      versions: [
+        { versionId: 8, date: "2024.09.01", versionName: "v1.0", status: "승인 중" },
+        { versionId: 9, date: "2024.09.02", versionName: "v1.1", status: "게시 완료" },
+        { versionId: 10, date: "2024.09.03", versionName: "v1.2", status: "임시 저장" },
+      ],
     },
   ]);
-  const [checkedItems, setCheckedItems] = useState({});
-  const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [showDropdown, setShowDropdown] = useState(false);
+  const [expandedItems, setExpandedItems] = useState({});
 
-  const handleCheckAll = () => {
-    const newCheckedItems = {};
-    currentItems.forEach((item) => {
-      newCheckedItems[item.id] = !allChecked;
-    });
-    setCheckedItems(newCheckedItems);
-    setAllChecked(!allChecked);
-  };
-
-  const handleCheckItem = (id) => {
-    setCheckedItems({ ...checkedItems, [id]: !checkedItems[id] });
-  };
+  useEffect(() => {
+    setContentHeight(200 + data.length * 100); // Content 높이 설정
+  }, [data, setContentHeight]);
 
   const handleRefresh = () => {
     setRefreshTime(new Date().toLocaleString());
@@ -312,13 +281,26 @@ const ArtworkManagement = () => {
   const handleDelete = (id) => {
     const newData = data.filter((item) => item.id !== id);
     setData(newData);
-    const newCheckedItems = { ...checkedItems };
-    delete newCheckedItems[id];
-    setCheckedItems(newCheckedItems);
+  };
+
+  const handleDeleteVersion = (id, versionId) => {
+    const item = data.find((item) => item.id === id);
+    if (item.versions.length === 1) {
+      handleDelete(id);
+    } else {
+      const newData = data.map((item) => {
+        if (item.id === id) {
+          const newVersions = item.versions.filter((version) => version.versionId !== versionId);
+          return { ...item, versions: newVersions };
+        }
+        return item;
+      });
+      setData(newData);
+    }
   };
 
   const filteredData = data.filter((item) => {
-    if (filterStatus !== "all" && item.status !== filterStatus) {
+    if (filterStatus !== "all" && !item.versions.some(version => version.status === filterStatus)) {
       return false;
     }
     if (searchTerm && !item.name.includes(searchTerm)) {
@@ -335,6 +317,10 @@ const ArtworkManagement = () => {
   for (let i = 1; i <= Math.ceil(filteredData.length / itemsPerPage); i++) {
     pageNumbers.push(i);
   }
+
+  const toggleExpand = (id) => {
+    setExpandedItems({ ...expandedItems, [id]: !expandedItems[id] });
+  };
 
   return (
     <Content>
@@ -361,52 +347,39 @@ const ArtworkManagement = () => {
       </RefreshSection>
 
       <Controls>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <CheckboxContainer onClick={handleCheckAll}>
-            <CheckboxInput
-              type="checkbox"
-              checked={allChecked}
-              readOnly
-            />
-            <CheckboxCustom />
-          </CheckboxContainer>
-          <span>전체보기 (456개)</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <DropdownContainer>
-            <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
-              상태순 <FontAwesomeIcon icon={faCaretDown} />
-            </DropdownButton>
-            <DropdownContent show={showDropdown}>
-              <DropdownItem
-                selected={filterStatus === "임시 저장"}
-                onClick={() => setFilterStatus("임시 저장")}
-              >
-                임시저장
-              </DropdownItem>
-              <DropdownItem
-                selected={filterStatus === "승인 중"}
-                onClick={() => setFilterStatus("승인 중")}
-              >
-                승인중
-              </DropdownItem>
-              <DropdownItem
-                selected={filterStatus === "게시 완료"}
-                onClick={() => setFilterStatus("게시 완료")}
-              >
-                게시완료
-              </DropdownItem>
-            </DropdownContent>
-          </DropdownContainer>
-          <SearchBar>
-            <SearchInput
-              placeholder="검색어 입력"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FontAwesomeIcon icon={faSearch} />
-          </SearchBar>
-        </div>
+        <DropdownContainer>
+          <DropdownButton onClick={() => setShowDropdown(!showDropdown)}>
+            상태순 <FontAwesomeIcon icon={faCaretDown} />
+          </DropdownButton>
+          <DropdownContent show={showDropdown}>
+            <DropdownItem
+              selected={filterStatus === "임시 저장"}
+              onClick={() => setFilterStatus("임시 저장")}
+            >
+              임시저장
+            </DropdownItem>
+            <DropdownItem
+              selected={filterStatus === "승인 중"}
+              onClick={() => setFilterStatus("승인 중")}
+            >
+              승인중
+            </DropdownItem>
+            <DropdownItem
+              selected={filterStatus === "게시 완료"}
+              onClick={() => setFilterStatus("게시 완료")}
+            >
+              게시완료
+            </DropdownItem>
+          </DropdownContent>
+        </DropdownContainer>
+        <SearchBar>
+          <SearchInput
+            placeholder="검색어 입력"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FontAwesomeIcon icon={faSearch} />
+        </SearchBar>
       </Controls>
 
       <Divider />
@@ -414,50 +387,59 @@ const ArtworkManagement = () => {
       <Table>
         <tbody>
           {currentItems.map((item) => (
-            <tr key={item.id}>
-              <Td>
-                <CheckboxContainer onClick={() => handleCheckItem(item.id)}>
-                  <CheckboxInput
-                    type="checkbox"
-                    checked={checkedItems[item.id] || false}
-                    readOnly
-                  />
-                  <CheckboxCustom />
-                </CheckboxContainer>
-              </Td>
-              <Td>{item.modifyDate}</Td>
-              <Td>{item.name}</Td>
-              <Td>
-                <Status status={item.status}>{item.status}</Status>
-              </Td>
-              <Td>
-                <button
-                  onClick={
-                    async () => {
-                      await axios
-                        .put(
-                          "https://api.litmap.store/api/version/rollback/7/0.1"
-                        )
-                        .then((result) => {
-                          console.log(result);
-                          addWorkInfos(result.data.result);
-                          if (result.data.result.workId) {
-                            navigate("/category1");
-                          }
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                        });
-                    }
-                  }
-                >
-                  수정하기
-                </button>
-              </Td>
-              <Td>
-                <button onClick={() => handleDelete(item.id)}>삭제하기</button>
-              </Td>
-            </tr>
+            <React.Fragment key={item.id}>
+              <tr>
+                <Td onClick={() => toggleExpand(item.id)}>
+                  <TreeToggle>
+                    {expandedItems[item.id] ? <FontAwesomeIcon icon={faChevronUp} /> : <FontAwesomeIcon icon={faChevronDown} />}
+                  </TreeToggle>
+                </Td>
+                <Td>{item.name}</Td>
+                <Td>{item.category}</Td>
+                <Td>{item.author}</Td>
+                <Td>{item.publisher}</Td>
+                <Td>
+                  <button onClick={() => handleDelete(item.id)}>삭제하기</button>
+                </Td>
+              </tr>
+              {expandedItems[item.id] && item.versions.map((version) => (
+                <tr key={version.versionId}>
+                  <Td></Td>
+                  <Td>{version.date}</Td>
+                  <Td>{version.versionName}</Td>
+                  <Td>
+                    <Status status={version.status}>{version.status}</Status>
+                  </Td>
+                  <Td>
+                    <button
+                      onClick={
+                        async () => {
+                          await axios
+                            .put(
+                              `https://api.litmap.store/api/version/rollback/${version.versionId}/0.1`
+                            )
+                            .then((result) => {
+                              console.log(result);
+                              addWorkInfos(result.data.result);
+                              if (result.data.result.workId) {
+                                navigate("/category1");
+                              }
+                            })
+                            .catch((error) => {
+                              console.log(error);
+                            });
+                        }
+                      }
+                    >
+                      수정하기
+                    </button>
+                  </Td>
+                  <Td>
+                    <button onClick={() => handleDeleteVersion(item.id, version.versionId)}>삭제하기</button>
+                  </Td>
+                </tr>
+              ))}
+            </React.Fragment>
           ))}
         </tbody>
       </Table>

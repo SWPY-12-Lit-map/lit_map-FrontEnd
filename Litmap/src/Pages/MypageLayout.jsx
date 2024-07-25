@@ -10,7 +10,6 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  height: 100vh;
   background-color: #FBF9F6;
   padding: 40px;
   box-sizing: border-box;
@@ -126,9 +125,10 @@ const MenuSection = styled.div`
 
 const MypageLayout = () => {
   const [profileImage, setProfileImage] = useState("https://via.placeholder.com/60");
+  const [contentHeight, setContentHeight] = useState(1000); // 초기 높이 설정
 
   return (
-    <Container>
+    <Container contentHeight={contentHeight}>
       <Sidebar>
         <Box>
           <ProfileSection>
@@ -185,10 +185,10 @@ const MypageLayout = () => {
       </Sidebar>
       <MainContent>
         <Routes>
-          <Route path="/" element={<ArtworkManagement />} />
+          <Route path="/" element={<ArtworkManagement setContentHeight={setContentHeight} />} />
           <Route path="manage-profile" element={<ProfileManage profileImage={profileImage} setProfileImage={setProfileImage} />} />
           <Route path="edit-member" element={<MemberEdit />} />
-          <Route path="manage-artworks" element={<ArtworkManagement />} />
+          <Route path="manage-artworks" element={<ArtworkManagement setContentHeight={setContentHeight} />} />
           <Route path="adminpage" element={<AdminPage />} />
         </Routes>
       </MainContent>
