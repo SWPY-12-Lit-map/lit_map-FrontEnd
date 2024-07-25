@@ -102,7 +102,7 @@ const MenuSection = styled.div`
     padding: 0;
 
     li {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
 
       a {
         color: #000;
@@ -129,7 +129,7 @@ const MypageLayout = () => {
   const [contentHeight, setContentHeight] = useState(1000); // 초기 높이 설정
 
   return (
-    <Container contentHeight={contentHeight}>
+    <Container $contentHeight={contentHeight}>
       <Sidebar>
         <Box>
           <ProfileSection>

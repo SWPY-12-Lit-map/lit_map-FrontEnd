@@ -177,7 +177,7 @@ const Controls = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px;
-  gap: 10px; /* 간격 조정 */
+  gap: 10px;
 `;
 
 const Divider = styled.div`
@@ -421,7 +421,7 @@ const ArtworkManagement = ({ setContentHeight }) => {
                             .then((result) => {
                               console.log(result);
                               addWorkInfos(result.data.result);
-                              if (result.data.result.workId) {
+                              if (result.data.result?.workId) {
                                 navigate("/category1");
                               }
                             })
