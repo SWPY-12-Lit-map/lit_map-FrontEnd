@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import { useStore } from "../Asset/store";
+
 import { useNavigate } from "react-router-dom";
-import Calendar from "../Asset/Calender";
+
 import SimpleCalender from "../Asset/SimpleCalender";
 
 const Content = styled.div`
@@ -62,6 +62,7 @@ const SearchName = styled.div`
   background-color: #e2e5eb;
   border: 1px solid #ddd;
   border-radius: 10px;
+  cursor: pointer;
   margin-bottom: 20px;
   font-size: 16px;
 
@@ -181,7 +182,6 @@ const Category = styled.div`
   display: flex;
   width: 100%;
   text-align: center;
-  align-items: center;
   border-bottom: 1px solid #c5c5c5;
   padding: 10px 0 5px 0;
   & > span {
@@ -221,19 +221,9 @@ const ChooseBtn = styled.div`
   }
 `;
 
-export default function ArtworkManagement() {
-  const { addWorkInfos } = useStore();
+export default function RegisterAllow() {
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      id: 1,
-      date: "2024.07.01",
-      userName: "가입자",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -304,9 +294,13 @@ export default function ArtworkManagement() {
       });
   };
 
+  useEffect(() => {
+    getAxios();
+  }, []);
+
   return (
     <Content>
-      <Header>가입 승인</Header>
+      <Header>작품 등록 승인</Header>
 
       <RefreshSection>
         조회 시간 : {refreshTime}
@@ -320,11 +314,11 @@ export default function ArtworkManagement() {
       <SearchName>
         <div className="text-container">
           <NameArea>
-            <span>이름</span>
+            <span>제목</span>
             <input type="text" />
           </NameArea>
           <DateArea>
-            <span>가입날짜별</span>
+            <span>등록날짜별</span>
             <SelectDate>
               <SimpleCalender date={startDate} setDate={setStartDate} />
               ~
@@ -342,9 +336,9 @@ export default function ArtworkManagement() {
             <CheckboxCustom />
           </CheckboxContainer>
           <Category>
-            <div>가입 날짜</div>
-            <div>이름</div>
-            <div>선택 분야</div>
+            <div>등록 날짜</div>
+            <div>제목</div>
+            <div>버전</div>
             <div>작품 링크</div>
             <div>상태</div>
           </Category>
@@ -371,13 +365,13 @@ export default function ArtworkManagement() {
             </div>
 
             <Category id="memberInfo">
-              <span>{item.date}</span>
-              <span>{item.userName}</span>
-              <span>{item.area}</span>
+              <span>{item.versionList[0].lastUpdateDate}</span>
+              <span>{item.title}</span>
+              <span>{item.versionList[0].versionName}</span>
               <span>
                 <Status
                   onClick={() => {
-                    navigate(item.workLink);
+                    navigate(`/work/${item.workId}`);
                   }}
                 >
                   작품 보러가기

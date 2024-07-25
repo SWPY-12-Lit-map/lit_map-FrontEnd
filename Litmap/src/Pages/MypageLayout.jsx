@@ -5,12 +5,15 @@ import AdminPage from "./AdminPage";
 import MemberEdit from "./MemberEdit";
 import ProfileManage from "./ProfileManage";
 import ArtworkManagement from "./ArtworkManagement";
+import RegisterAllow from "./RegisterAllow";
+import MemberManage from "./MemberManage";
+import BannerManage from "./BannerManage";
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color: #FBF9F6;
+  background-color: #fbf9f6;
   padding: 40px;
   box-sizing: border-box;
   min-height: 100vh;
@@ -18,7 +21,7 @@ const Container = styled.div`
 
 const Sidebar = styled.div`
   width: 300px;
-  background-color: #FBF9F6;
+  background-color: #fbf9f6;
   padding: 20px;
   box-sizing: border-box;
 `;
@@ -58,7 +61,7 @@ const ProfileSection = styled.div`
   .role {
     font-size: 14px;
     color: #fff;
-    background-color: #8D2741;
+    background-color: #8d2741;
     padding: 5px 10px;
     border-radius: 50px;
     display: inline-block;
@@ -124,8 +127,12 @@ const MenuSection = styled.div`
   }
 `;
 
+const AdminMenu = styled.ul``;
+
 const MypageLayout = () => {
-  const [profileImage, setProfileImage] = useState("https://via.placeholder.com/60");
+  const [profileImage, setProfileImage] = useState(
+    "https://via.placeholder.com/60"
+  );
   const [contentHeight, setContentHeight] = useState(1000); // 초기 높이 설정
 
   return (
@@ -174,23 +181,54 @@ const MypageLayout = () => {
                 </Link>
               </li>
             </ul>
-            <ul>
+            <AdminMenu>
+              <h3>관리자용 메뉴</h3>
               <li>
                 <Link to="adminpage">
-                  관리자용 메뉴
+                  <img src="/Shape.png" />
+                  가입승인
+                </Link>
+                <Link to="adminregister">
+                  {" "}
+                  <img src="/mypage_list.png" alt="작품 리스트" />
+                  작품 등록 승인
+                </Link>
+                <Link to="membermanage">
+                  <img src="/heart-circle-outline.png" />
+                  회원 관리
+                </Link>
+                <Link to="bannermannage">
+                  <img src="/home-outline.png" />홈 화면 관리
                 </Link>
               </li>
-            </ul>
+            </AdminMenu>
           </MenuSection>
         </Box>
       </Sidebar>
       <MainContent>
         <Routes>
-          <Route path="/" element={<ArtworkManagement setContentHeight={setContentHeight} />} />
-          <Route path="manage-profile" element={<ProfileManage profileImage={profileImage} setProfileImage={setProfileImage} />} />
+          <Route
+            path="/"
+            element={<ArtworkManagement setContentHeight={setContentHeight} />}
+          />
+          <Route
+            path="manage-profile"
+            element={
+              <ProfileManage
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+              />
+            }
+          />
           <Route path="edit-member" element={<MemberEdit />} />
-          <Route path="manage-artworks" element={<ArtworkManagement setContentHeight={setContentHeight} />} />
+          <Route
+            path="manage-artworks"
+            element={<ArtworkManagement setContentHeight={setContentHeight} />}
+          />
           <Route path="adminpage" element={<AdminPage />} />
+          <Route path="adminregister" element={<RegisterAllow />} />
+          <Route path="membermanage" element={<MemberManage />} />
+          <Route path="bannermannage" element={<BannerManage />} />
         </Routes>
       </MainContent>
     </Container>

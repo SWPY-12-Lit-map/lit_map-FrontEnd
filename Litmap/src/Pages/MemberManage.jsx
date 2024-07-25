@@ -62,6 +62,7 @@ const SearchName = styled.div`
   background-color: #e2e5eb;
   border: 1px solid #ddd;
   border-radius: 10px;
+  cursor: pointer;
   margin-bottom: 20px;
   font-size: 16px;
 
@@ -181,7 +182,6 @@ const Category = styled.div`
   display: flex;
   width: 100%;
   text-align: center;
-  align-items: center;
   border-bottom: 1px solid #c5c5c5;
   padding: 10px 0 5px 0;
   & > span {
@@ -221,8 +221,7 @@ const ChooseBtn = styled.div`
   }
 `;
 
-export default function ArtworkManagement() {
-  const { addWorkInfos } = useStore();
+export default function MemberManage() {
   const navigate = useNavigate();
   const [data, setData] = useState([
     {
@@ -306,7 +305,7 @@ export default function ArtworkManagement() {
 
   return (
     <Content>
-      <Header>가입 승인</Header>
+      <Header>회원 관리</Header>
 
       <RefreshSection>
         조회 시간 : {refreshTime}

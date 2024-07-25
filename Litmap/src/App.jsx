@@ -61,7 +61,6 @@ function App() {
         setView((prevView) => [...prevView, ...data]);
         setDataState(result.data.result.last);
         const dataId = data[0].workId;
-
         setWorkId([...workId, dataId]);
       })
       .catch((error) => {
