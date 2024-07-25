@@ -81,6 +81,7 @@ export default function Post(props) {
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
   const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
+  const { read, setRead } = useStore();
 
   // nav 조작
   const [hideNav, setHide] = useState(false);
@@ -95,8 +96,6 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
-  const setRead = props.setRead;
-  const read = props.read;
 
   const { workInfos, addWorkInfos } = useStore();
   const getWork = { ...workInfos };

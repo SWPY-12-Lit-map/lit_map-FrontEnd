@@ -3,11 +3,11 @@ import Category from "../Asset/Category";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import YouTube from "react-youtube";
-import { HiOutlinePlayPause } from "react-icons/hi2";
 import ModalBtn from "../Asset/Share/ModalBtn";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import { ReactFlowProvider } from "reactflow";
 import { useParams } from "react-router-dom";
+import { useStore } from "../Asset/store";
 
 const Body = styled.div`
   display: flex;
@@ -63,10 +63,7 @@ const Releasedate = styled(List)``;
 const Season = styled(List)``;
 const Channel = styled(List)``;
 const Content = styled(List)``;
-const Btns = styled.div`
-  display: flex;
-  margin-top: 30px;
-`;
+
 const Btn1 = styled(Button)`
   border-radius: 10px;
   width: 40%;
@@ -103,13 +100,12 @@ export default function Work({
   work,
   edgeType,
   lineStyle,
-  read,
-  setRead,
+  setWork,
 }) {
   const [state, setState] = useState(false);
   const [workInfo, setWorkInfo] = useState({}); // 백엔드에서 받은거를 저장
   const { id } = useParams();
-  console.log(id);
+  const { read, setRead } = useStore();
 
   const GetWork = async () => {
     await axios
@@ -132,62 +128,57 @@ export default function Work({
 
   return (
     <>
-      <ReactFlowProvider>
-        <Category />
-        <Body>
-          <Workinfo>
-            <Thumbnail src="/poster1.png" alt="썸네일 자리"></Thumbnail>
-            <Description>
-              <Title>{workInfo.title}</Title>{" "}
-              <State>완결여부 결정도 해야됨</State>
-              <SelectBar>
-                <Button
-                  onClick={() => {
-                    setState(false);
-                    console.log(work);
-                  }}
-                  style={{
-                    backgroundColor: state == false ? "#8d2741" : "white",
-                    border: state == false ? "#8d2741" : "white",
-                    color: state == false ? "white" : "black",
-                  }}
-                >
-                  기본정보
-                </Button>{" "}
-                <Button
-                  onClick={() => {
-                    setState(true);
-                  }}
-                  style={{
-                    backgroundColor: state == true ? "#8d2741" : "white",
-                    border: state == true ? "#8d2741" : "white",
-                    color: state == true ? "white" : "black",
-                  }}
-                >
-                  연관영상
-                </Button>
-              </SelectBar>
-              {state == false ? (
-                <Info>
-                  <Author>감독/작가: {workInfo.author}</Author>
-                  <Releasedate>
-                    개봉/출판일자{workInfo.publisherDate}
-                  </Releasedate>
-                  <Season>시즌: 이것도 넣어야 됨</Season>
-                  <Channel>공급사이트: 이것도 넣어야 함</Channel>
-                  <Content>간단내용 {workInfo.contents}</Content>
-                  <Btns>
-                    <ModalBtn workInfo={workInfo} /> {/* 공유하기 */}
-                  </Btns>
-                </Info>
-              ) : (
-                <RelatedVideo>
-                  <YouTube videoId="ESPFTY8Y-xM"></YouTube>
-                </RelatedVideo>
-              )}
-            </Description>
-          </Workinfo>
-          <Connection>
+      <Category />
+      <Body>
+        <Workinfo>
+          <Thumbnail src="/poster1.png" alt="썸네일 자리"></Thumbnail>
+          <Description>
+            <Title>{workInfo.title}</Title>{" "}
+            <State>완결여부 결정도 해야됨</State>
+            <SelectBar>
+              <Button
+                onClick={() => {
+                  setState(false);
+                  console.log(work);
+                }}
+                style={{
+                  backgroundColor: state == false ? "#8d2741" : "white",
+                  border: state == false ? "#8d2741" : "white",
+                  color: state == false ? "white" : "black",
+                }}
+              >
+                기본정보
+              </Button>{" "}
+              <Button
+                onClick={() => {
+                  setState(true);
+                }}
+                style={{
+                  backgroundColor: state == true ? "#8d2741" : "white",
+                  border: state == true ? "#8d2741" : "white",
+                  color: state == true ? "white" : "black",
+                }}
+              >
+                연관영상
+              </Button>
+            </SelectBar>
+            {state == false ? (
+              <Info>
+                <Author>감독/작가: {workInfo.author}</Author>
+                <Releasedate>개봉/출판일자{workInfo.publisherDate}</Releasedate>
+                <Season>시즌: 이것도 넣어야 됨</Season>
+                <Channel>공급사이트: 이것도 넣어야 함</Channel>
+                <Content>간단내용 {workInfo.contents}</Content>
+              </Info>
+            ) : (
+              <RelatedVideo>
+                <YouTube videoId="ESPFTY8Y-xM"></YouTube>
+              </RelatedVideo>
+            )}
+          </Description>
+        </Workinfo>
+        <Connection>
+          <ReactFlowProvider>
             <Mindmap
               count={count}
               characterInfos={characterInfos}
@@ -199,18 +190,19 @@ export default function Work({
               setRead={setRead}
               // casts={workInfo.versions.casts}
               // relationship={workInfo.versions.relationship}
-            />
-          </Connection>
-          <Recommend>
-            <h3>함께 볼만한 드라마</h3>
-            <Recommends>
-              <img src="/poster1.png" alt="추천 포스터 1" />
-              <img src="/poster2.png" alt="추천 포스터 2" />
-              <img src="/poster3.png" alt="추천 포스터 3" />
-              <img src="/poster4.png" alt="추천 포스터 4" />
-            </Recommends>
-          </Recommend>
-          {/* <button
+            />{" "}
+          </ReactFlowProvider>
+        </Connection>
+        <Recommend>
+          <h3>함께 볼만한 드라마</h3>
+          <Recommends>
+            <img src="/poster1.png" alt="추천 포스터 1" />
+            <img src="/poster2.png" alt="추천 포스터 2" />
+            <img src="/poster3.png" alt="추천 포스터 3" />
+            <img src="/poster4.png" alt="추천 포스터 4" />
+          </Recommends>
+        </Recommend>
+        {/* <button
           onClick={() => {
             axios
               .get("https://api.litmap.store/api/work/1")
@@ -224,8 +216,7 @@ export default function Work({
         >
           확인
         </button> */}
-        </Body>
-      </ReactFlowProvider>
+      </Body>
     </>
   );
 }

@@ -16,12 +16,17 @@ import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
 import DownloadImg from "../Share/DownloadImg";
+import ModalBtn from "../Share/ModalBtn";
+import { useStore } from "../store";
 
 const Mapping = styled.div`
   width: 100%;
   height: 100%;
 `;
-
+const Btns = styled.div`
+  display: flex;
+  margin-top: 30px;
+`;
 const CustomControls = styled(Controls)`
   position: absolute;
   top: 10%;
@@ -86,7 +91,6 @@ const Mindmap = (props) => {
   const {
     edgeType,
     lineStyle,
-    read,
     characterInfos,
     count,
     work,
@@ -101,6 +105,7 @@ const Mindmap = (props) => {
   const [backColor, setBackColor] = useState();
   const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
   const [local, setLocal] = useState(localStorage.getItem("color"));
+  const { read } = useStore();
 
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
@@ -165,8 +170,8 @@ const Mindmap = (props) => {
         ? localStorage.getItem("color")
         : null;
       const updateRelationship = { ...work, relationship: flow, version: 0.1 };
+      console.log(read);
       setWork(updateRelationship);
-      console.log(work);
     }
   }, [rfInstance, work, backgroundImg, setWork]);
 
@@ -241,12 +246,13 @@ const Mindmap = (props) => {
 
   useEffect(() => {
     if (read == true) {
-      onRestore();
       console.log(read);
+      onRestore();
     }
   }, [read, onRestore]);
 
   useEffect(() => {
+    console.log(read);
     if (!read) {
       if (
         nodes.length > 0 ||
@@ -301,12 +307,9 @@ const Mindmap = (props) => {
         <CustomControls />
         {read ? null : <MiniMap />}
       </ReactFlow>
-      {/* {read ? null : (
-        <>
-          <button onClick={onSave}>Save</button>
-          <button onClick={onRestore}>restore</button>
-        </>
-      )} */}
+      <Btns>
+        <ModalBtn /> {/* 공유하기 */}
+      </Btns>
     </Mapping>
   );
 };

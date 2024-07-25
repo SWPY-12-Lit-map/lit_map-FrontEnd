@@ -8,4 +8,13 @@ export const useStore = create((set) => ({
 
   searchResult: {},
   addSearchResult: (data) => set({ searchResult: data }),
+
+  imgUrl: "",
+  setImgUrl: (data) => set({ imgUrl: data }),
+
+  url: "",
+  setUrl: (data) => set({ url: data }),
+
+  read: false,
+  setRead: (data) => set({ read: data }),
 }));

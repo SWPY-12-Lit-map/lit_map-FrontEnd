@@ -1,7 +1,8 @@
-import { Handle, NodeResizer, Position, useStore } from "reactflow";
+import { Handle, NodeResizer, Position } from "reactflow";
 import basicImg from "../blank-profile-picture-973460_1280.png";
 import { useState } from "react";
 import styled from "styled-components";
+import { useStore } from "../store";
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
 const Button = styled.button`
@@ -27,10 +28,11 @@ export default function CustomNode({ id, data, selected }) {
   const connectionNodeId = useStore(connectionNodeIdSelector);
   const isConnecting = !!connectionNodeId;
   const isTarget = connectionNodeId && connectionNodeId !== id;
+  const { read } = useStore();
 
   return (
     <div className="customNode" style={{ width: "100%", height: "100%" }}>
-      {data.read ? null : (
+      {read ? null : (
         <NodeResizer
           color="blue"
           isVisible={selected}
@@ -47,7 +49,7 @@ export default function CustomNode({ id, data, selected }) {
             className="customHandle"
             position={Position.Right}
             type="source"
-            style={data.read ? { width: "0%", height: "0%" } : null}
+            style={read ? { width: "0%", height: "0%" } : null}
           />
         )}
         <div>
@@ -78,7 +80,7 @@ export default function CustomNode({ id, data, selected }) {
           position={Position.Left}
           type="target"
           isConnectableStart={false}
-          style={data.read ? { width: "0%", height: "0%" } : null}
+          style={read ? { width: "0%", height: "0%" } : null}
         />
       </div>
     </div>
