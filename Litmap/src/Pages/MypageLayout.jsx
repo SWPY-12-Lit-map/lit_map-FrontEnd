@@ -13,6 +13,7 @@ const Container = styled.div`
   background-color: #FBF9F6;
   padding: 40px;
   box-sizing: border-box;
+  min-height: 100vh;
 `;
 
 const Sidebar = styled.div`
