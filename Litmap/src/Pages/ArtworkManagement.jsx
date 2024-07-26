@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faRotateRight, faChevronRight, faCaretDown, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearch,
+  faRotateRight,
+  faChevronRight,
+  faCaretDown,
+  faChevronDown,
+  faChevronUp,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
@@ -111,10 +118,10 @@ const DropdownContainer = styled.div`
 `;
 
 const DropdownButton = styled.button`
-  background-color: #F5F5F5;
-  color: #7D7D7D;
+  background-color: #f5f5f5;
+  color: #7d7d7d;
   padding: 5px 10px;
-  border: 1px solid #7D7D7D;
+  border: 1px solid #7d7d7d;
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -141,7 +148,7 @@ const DropdownItem = styled.div`
   border-radius: 8px;
 
   &:hover {
-    background-color: #8B0024;
+    background-color: #8b0024;
     color: #fff;
   }
 `;
@@ -152,8 +159,8 @@ const SearchBar = styled.div`
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 0 10px;
-  background-color: #F5F5F5;
-  color: #9F9F9F;
+  background-color: #f5f5f5;
+  color: #9f9f9f;
 `;
 
 const SearchInput = styled.input`
@@ -162,8 +169,8 @@ const SearchInput = styled.input`
   outline: none;
   padding: 5px;
   flex-grow: 1;
-  background-color: #F5F5F5;
-  color: #9F9F9F;
+  background-color: #f5f5f5;
+  color: #9f9f9f;
 `;
 
 const Controls = styled.div`
@@ -200,17 +207,22 @@ const ArtworkManagement = ({ setContentHeight }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://api.litmap.store/api/board/myWorkList");
+        const response = await axios.get(
+          "https://api.litmap.store/api/board/myWorkList"
+        );
+        console.log(response.data.result);
         const fetchedData = response.data.result.list.map((item, index) => ({
           id: index + 1,
           name: item.title,
           category: item.category,
+          workId: item.workId,
           author: item.mainAuthor,
           publisher: item.publisher,
           versions: item.versionLists.map((version) => ({
             versionId: version.versionId,
             versionName: version.versionName,
-            date: version.lastUpdateDate.split('T')[0],
+            versionNum: version.versionNum,
+            date: version.lastUpdateDate.split("T")[0],
             status:
               version.confirm === "LOAD"
                 ? "임시 저장"
@@ -220,7 +232,9 @@ const ArtworkManagement = ({ setContentHeight }) => {
           })),
         }));
         setData(fetchedData);
+        console.log(data);
       } catch (error) {
+        console.log(data);
         console.error("데이터를 불러오는데 실패했습니다.", error);
       }
     };
@@ -236,19 +250,43 @@ const ArtworkManagement = ({ setContentHeight }) => {
     setRefreshTime(new Date().toLocaleString());
   };
 
-  const handleDelete = (id) => {
+  /* 작품 삭제 */
+  const handleDelete = (workId) => {
+    console.log(workId);
+    axios
+      .delete(`https://api.litmap.store/api/work/${workId}`)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(versionId);
+        console.log(error);
+      });
     const newData = data.filter((item) => item.id !== id);
     setData(newData);
   };
 
-  const handleDeleteVersion = (id, versionId) => {
+  /* 버전삭제 */
+  const handleDeleteVersion = (versionId, versionNum) => {
+    console.log(versionId);
+    console.log(versionNum);
+    axios
+      .delete(`https://api.litmap.store/api/version/${versionId}/${versionNum}`)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     const item = data.find((item) => item.id === id);
     if (item.versions.length === 1) {
       handleDelete(id);
     } else {
       const newData = data.map((item) => {
         if (item.id === id) {
-          const newVersions = item.versions.filter((version) => version.versionId !== versionId);
+          const newVersions = item.versions.filter(
+            (version) => version.versionId !== versionId
+          );
           return { ...item, versions: newVersions };
         }
         return item;
@@ -258,7 +296,10 @@ const ArtworkManagement = ({ setContentHeight }) => {
   };
 
   const filteredData = data.filter((item) => {
-    if (filterStatus !== "all" && !item.versions.some(version => version.status === filterStatus)) {
+    if (
+      filterStatus !== "all" &&
+      !item.versions.some((version) => version.status === filterStatus)
+    ) {
       return false;
     }
     if (searchTerm && !item.name.includes(searchTerm)) {
@@ -338,12 +379,16 @@ const ArtworkManagement = ({ setContentHeight }) => {
 
       <Table>
         <tbody>
-          {currentItems.map((item) => (
+          {currentItems.map((item, i) => (
             <React.Fragment key={item.id}>
               <tr>
                 <Td onClick={() => toggleExpand(item.id)}>
                   <TreeToggle>
-                    {expandedItems[item.id] ? <FontAwesomeIcon icon={faChevronUp} /> : <FontAwesomeIcon icon={faChevronDown} />}
+                    {expandedItems[item.id] ? (
+                      <FontAwesomeIcon icon={faChevronUp} />
+                    ) : (
+                      <FontAwesomeIcon icon={faChevronDown} />
+                    )}
                   </TreeToggle>
                 </Td>
                 <Td>{item.name}</Td>
@@ -351,21 +396,23 @@ const ArtworkManagement = ({ setContentHeight }) => {
                 <Td>{item.author}</Td>
                 <Td>{item.publisher}</Td>
                 <Td>
-                  <button onClick={() => handleDelete(item.id)}>삭제하기</button>
+                  <button onClick={() => handleDelete(item.workId)}>
+                    삭제하기
+                  </button>
                 </Td>
               </tr>
-              {expandedItems[item.id] && item.versions.map((version) => (
-                <tr key={version.versionId}>
-                  <Td></Td>
-                  <Td>{version.date}</Td>
-                  <Td>{version.versionName}</Td>
-                  <Td>
-                    <Status status={version.status}>{version.status}</Status>
-                  </Td>
-                  <Td>
-                    <button
-                      onClick={
-                        async () => {
+              {expandedItems[item.id] &&
+                item.versions.map((version, i) => (
+                  <tr key={version.versionId}>
+                    <Td></Td>
+                    <Td>{version.date}</Td>
+                    <Td>{version.versionName}</Td>
+                    <Td>
+                      <Status status={version.status}>{version.status}</Status>
+                    </Td>
+                    <Td>
+                      <button
+                        onClick={async () => {
                           await axios
                             .put(
                               `https://api.litmap.store/api/version/rollback/${version.versionId}/0.1`
@@ -380,17 +427,25 @@ const ArtworkManagement = ({ setContentHeight }) => {
                             .catch((error) => {
                               console.log(error);
                             });
+                        }}
+                      >
+                        수정하기
+                      </button>
+                    </Td>
+                    <Td>
+                      <button
+                        onClick={() =>
+                          handleDeleteVersion(
+                            item.workId,
+                            item.versions[i].versionNum
+                          )
                         }
-                      }
-                    >
-                      수정하기
-                    </button>
-                  </Td>
-                  <Td>
-                    <button onClick={() => handleDeleteVersion(item.id, version.versionId)}>삭제하기</button>
-                  </Td>
-                </tr>
-              ))}
+                      >
+                        삭제하기
+                      </button>
+                    </Td>
+                  </tr>
+                ))}
             </React.Fragment>
           ))}
         </tbody>
