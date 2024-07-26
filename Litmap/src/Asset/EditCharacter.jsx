@@ -6,6 +6,7 @@ import { MdDelete } from "react-icons/md";
 import basicImg from "./blank-profile-picture-973460_1280.png";
 import { FiPlus } from "react-icons/fi";
 import axios from "axios";
+import { IoImageOutline } from "react-icons/io5";
 
 const EditInfo = styled.div`
   display: flex;
@@ -38,7 +39,7 @@ const DeleteBtn = styled.button`
 
 const CustomImg = styled(Image)`
   width: 100%;
-  height: 100%;
+  height: 30%;
   object-fit: contain;
   background-color: #e9e9e9;
 `;
@@ -49,6 +50,7 @@ const Btnstyle = styled.div`
   border: none;
   width: 45%;
   padding: 5px 10px;
+
   :hover {
     cursor: pointer;
   }
@@ -59,7 +61,6 @@ const Btnstyle = styled.div`
     cursor: pointer;
   }
   input[type="file"] {
-    display: none;
   }
 `;
 
@@ -120,6 +121,20 @@ const CastAddButton = styled.button`
   cursor: pointer;
 `;
 
+const ImgUpload = styled.label`
+  background-color: #e9e9e9;
+  text-align: center;
+  & > svg {
+    width: 100%;
+    background-color: #e9e9e9;
+    height: 80%;
+    padding: 5% 10% 0 10%;
+    color: #c5c5c5;
+  }
+  & > p {
+    color: #9f9f9f;
+  }
+`;
 export default function EditCharacter(props) {
   const { count, setCount, characterInfos, setInfos, work } = props;
 
@@ -153,12 +168,17 @@ export default function EditCharacter(props) {
 
     return (
       <>
-        <label
-          htmlFor={`imgUpload${index}`}
-          style={{ height: "30%", margin: "0 auto", width: "90%" }}
-        >
-          <CustomImg src={characterInfos[index].imageUrl || basicImg} rounded />
-        </label>
+        {characterInfos[index].imageUrl ? (
+          <CustomImg src={characterInfos[index].imageUrl} />
+        ) : (
+          <ImgUpload
+            htmlFor={`imgUpload${index}`}
+            style={{ height: "30%", margin: "0 auto", width: "90%" }}
+          >
+            <IoImageOutline />
+            <p>이미지 업로드</p>
+          </ImgUpload>
+        )}
 
         {characterInfos[index].imageUrl ? (
           <Btnstyle>
@@ -180,6 +200,9 @@ export default function EditCharacter(props) {
             type="file"
             accept="image/*"
             onChange={fileUpload}
+            style={{
+              display: "none",
+            }}
           />
         )}
       </>

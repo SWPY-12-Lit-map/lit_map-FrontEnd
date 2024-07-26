@@ -39,7 +39,7 @@ const Radio = styled.input`
 `;
 const RadioLabel = styled.label`
   position: absolute;
-  right: 20px;
+  right: 0px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -114,8 +114,35 @@ const TextInput = styled.input`
   }
 `;
 
+const TextAreaInput = styled.textarea`
+  border: 1px solid #7d7d7d;
+  background-color: unset;
+  border-radius: 10px;
+  height: 100px;
+  resize: none;
+`;
+
 const InputArea = styled.div`
   display: flex;
+  align-items: center;
+  position: relative;
+  color: #7d7d7d;
+
+  & > button:first-of-type {
+    position: absolute;
+    left: 70px;
+    background-color: unset;
+    border: none;
+    color: #7d7d7d;
+  }
+
+  & > button:last-of-type {
+    position: absolute;
+    right: 70px;
+    background-color: unset;
+    border: none;
+    color: #7d7d7d;
+  }
 `;
 
 const HumanInput = styled(TextInput)`
@@ -264,6 +291,7 @@ export default function InfoInput(props) {
       .get("https://api.litmap.store/api/category")
       .then((result) => {
         setCategory(result.data.result);
+        console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -310,7 +338,12 @@ export default function InfoInput(props) {
           {inputs.map((data, index) => (
             <div
               key={data.id}
-              style={{ display: "flex", alignItems: "center" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                position: "relative",
+                marginBottom: "10px",
+              }}
             >
               <RadioLabel checked={isChecked(index)}>
                 <Radio
@@ -347,19 +380,6 @@ export default function InfoInput(props) {
           <CiCirclePlus /> 작가 추가하기
         </AuthorAddBtn>
       </Input>
-      {/* 시스템 버전 */}
-      {/* <Input id="version">
-        <span>
-          {" "}
-          <RedStar>*</RedStar>버전:{" "}
-        </span>
-        <input
-          type="text"
-          style={{ background: "light gray" }}
-          value={work.version}
-          disabled
-        ></input>
-      </Input> */}
       {/* 사용자 임의 버전등록 */}
       <Input id="versionName">
         <span>버전명: </span>
@@ -377,7 +397,7 @@ export default function InfoInput(props) {
         <div>카테고리</div>
         <CustomDropdownButton
           id="카테고리"
-          title={work.category ? work.category : "카테고리 (필수)"}
+          title={work.category == "" ? work.category : "카테고리 (필수)"}
         >
           {getCategory.map((category, i) => {
             return (
@@ -385,6 +405,7 @@ export default function InfoInput(props) {
                 key={i}
                 onClick={() => {
                   ChangeDrop("카테고리", "category", category.name);
+                  console.log(work.category);
                 }}
               >
                 {category.name}
@@ -439,7 +460,7 @@ export default function InfoInput(props) {
       <Input id="contents">
         {" "}
         설명:{" "}
-        <TextInput
+        <TextAreaInput
           id="text"
           placeholder="작품 설명을 입력해주세요"
           value={work.contents}
@@ -447,7 +468,7 @@ export default function InfoInput(props) {
             const info = { ...work, contents: e.target.value };
             setWork(info);
           }}
-        ></TextInput>
+        ></TextAreaInput>
       </Input>
       {/* 등장인물 수 */}
       <Input id="count">

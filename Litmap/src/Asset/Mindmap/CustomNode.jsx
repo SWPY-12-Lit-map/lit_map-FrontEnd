@@ -5,12 +5,11 @@ import styled from "styled-components";
 import { useStore } from "../store";
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
-const Button = styled.button`
-  position: absolute;
-  left: 25px;
-`;
 const InfoTab = styled.div`
   position: absolute;
+  background-color: white;
+  width: 100%;
+  top: 30%;
 `;
 
 const NodeName = styled.div`
@@ -23,6 +22,20 @@ const NodeName = styled.div`
   background-color: white;
 `;
 
+const NodeStyle = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  .customHandle {
+    width: 10px;
+    height: 10px;
+    background: #555;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    left: 40%;
+  }
+`;
+
 export default function CustomNode({ id, data, selected }) {
   const [show, setShow] = useState(false);
   const connectionNodeId = useStore(connectionNodeIdSelector);
@@ -31,8 +44,8 @@ export default function CustomNode({ id, data, selected }) {
   const { read } = useStore();
 
   return (
-    <div className="customNode" style={{ width: "100%", height: "100%" }}>
-      {read ? null : (
+    <NodeStyle className="customNode">
+      {!read && (
         <NodeResizer
           color="blue"
           isVisible={selected}
@@ -40,49 +53,44 @@ export default function CustomNode({ id, data, selected }) {
           minHeight={100}
         />
       )}
-      <div
-        className="customNodeBody"
-        style={{ width: "100%", height: "100%", overflow: "unset" }}
-      >
+      <div className="customNodeBody" style={{ width: "100%", height: "100%" }}>
         {!isConnecting && (
           <Handle
             className="customHandle"
             position={Position.Right}
             type="source"
-            style={read ? { width: "0%", height: "0%" } : null}
+            style={{ top: "50%", transform: "translateY(-50%)" }}
           />
         )}
         <div>
-          {/* <Button
+          <img src={data.imageUrl || basicImg} width={100} alt="Profile" />
+          <NodeName
             onClick={() => {
               setShow(!show);
             }}
           >
-            다운
-          </Button> */}
-          <img src={data.imageUrl || basicImg} width={100} alt="Profile"></img>
-          <NodeName>{data.name}</NodeName>
-          {/* {show && (
-            <InfoTab>
-              <p>이름: {data.name}</p>
-              <p>종족: {data.type}</p>
-              <p>주조연: {data.role}</p>
-              <p>성별: {data.gender}</p>
-              <p>나이: {data.age}</p>
-              <p>mbti: {data.mbti}</p>
-              <p>기타내용: {data.contents}</p>
-            </InfoTab>
-          )} */}
+            {data.name}
+          </NodeName>
         </div>
-
         <Handle
           className="customHandle"
           position={Position.Left}
           type="target"
           isConnectableStart={false}
-          style={read ? { width: "0%", height: "0%" } : null}
+          style={{ top: "50%", transform: "translateY(-50%)" }}
         />
-      </div>
-    </div>
+      </div>{" "}
+      {show && (
+        <InfoTab>
+          <p>이름: {data.name}</p>
+          <p>종족: {data.type}</p>
+          <p>주조연: {data.role}</p>
+          <p>성별: {data.gender}</p>
+          <p>나이: {data.age}</p>
+          <p>mbti: {data.mbti}</p>
+          <p>기타내용: {data.contents}</p>
+        </InfoTab>
+      )}
+    </NodeStyle>
   );
 }

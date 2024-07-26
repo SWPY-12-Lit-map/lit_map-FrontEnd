@@ -48,7 +48,7 @@ function FloatingEdge({
   );
 
   const [edgePath, labelX, labelY] = (
-    data.edgeType == "직선" ? getStraightPath : getBezierPath
+    data.edgeType === "직선" ? getStraightPath : getBezierPath
   )({
     sourceX: sx,
     sourceY: sy,
@@ -66,8 +66,6 @@ function FloatingEdge({
     if (onTextChange) {
       onTextChange(id, newText);
     }
-    console.log(data.edgeType);
-    console.log(data.read);
   };
 
   const ChangeinputStyle =
@@ -91,20 +89,23 @@ function FloatingEdge({
           ...style,
           stroke: selected ? "grey" : style.stroke,
           strokeWidth: selected ? 4 : style.strokeWidth,
-          strokeDasharray: data.lineStyle == "실선" ? "" : "4",
+          strokeDasharray: data.lineStyle === "실선" ? "" : "4",
         }}
       />
       <EdgeLabelRenderer>
         <div
           style={{
             position: "absolute",
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            transform: `translate(-50%, -50%) translate(${
+              labelX + 4
+            }px,${labelY}px)`, // Slight adjustment
             fontSize: 12,
             pointerEvents: "all",
+            backgroundColor: "white", // Optional: to make it more visible
+            padding: "2px", // Optional: padding for better appearance
           }}
           className="nodrag nopan"
         >
-          {" "}
           <input
             type="text"
             value={text}
@@ -112,11 +113,11 @@ function FloatingEdge({
             style={{
               border: data.read ? "none" : null,
               textAlign: "center",
-              // ...ChangeinputStyle,
+              ...ChangeinputStyle,
             }}
-            readOnly={data.read ? true : false}
+            readOnly={data.read}
           />
-          {data.read ? null : (
+          {!data.read && (
             <button className="edgebutton" onClick={onEdgeClick}>
               ×
             </button>

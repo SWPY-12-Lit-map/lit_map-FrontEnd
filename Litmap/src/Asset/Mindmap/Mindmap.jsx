@@ -265,7 +265,7 @@ const Mindmap = (props) => {
         onSave();
       }
     }
-  }, [nodes, edges, backgroundImage, backColor, read, onSave]);
+  }, [nodes, edges, backgroundImage, backColor]);
 
   return (
     <Mapping>

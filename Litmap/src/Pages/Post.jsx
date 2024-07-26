@@ -149,10 +149,7 @@ export default function Post(props) {
     }
   }, [count, mount, prevCount, work]);
 
-  useEffect(() => {
-    console.log(work);
-  }, [work]);
-
+  // 임시저장 시
   useEffect(() => {
     // console.log(getWork);
     if (workInfos.workId) {
@@ -169,7 +166,7 @@ export default function Post(props) {
         genre: workInfos.genre,
         memberId: 24,
         publisherDate: "",
-
+        workId: workInfos.workId,
         relationship: workInfos.versions.relationship,
       });
       setCount(workInfos.versions.casts.length);
