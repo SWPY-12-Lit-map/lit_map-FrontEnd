@@ -91,20 +91,13 @@ const Pagination = styled.div`
   }
 `;
 
-const RefreshSection = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 10px;
-`;
-
 const Status = styled.div`
   background-color: ${({ status }) =>
     status === "임시 저장"
       ? "#FFE1DC"
-      : status === "게시 완료"
-      ? "#EFF5FF"
-      : "#FFF5E6"};
+      : status === "승인 중"
+      ? "#FFF5E6"
+      : "#EFF5FF"};
   border: none;
   color: #121212;
   padding: 5px 10px;
@@ -195,73 +188,7 @@ const TreeToggle = styled.span`
 const ArtworkManagement = ({ setContentHeight }) => {
   const { addWorkInfos } = useStore();
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      id: 1,
-      name: "오만과 편견",
-      category: "소설",
-      author: "제인 오스틴",
-      publisher: "출판사1",
-      versions: [
-        { versionId: 1, date: "2024.06.20", versionName: "v1.0", status: "임시 저장" },
-        { versionId: 2, date: "2024.06.21", versionName: "v1.1", status: "게시 완료" },
-      ],
-    },
-    {
-      id: 2,
-      name: "홍길동전",
-      category: "고전",
-      author: "허균",
-      publisher: "출판사2",
-      versions: [
-        { versionId: 3, date: "2024.05.04", versionName: "v1.0", status: "게시 완료" },
-      ],
-    },
-    {
-      id: 3,
-      name: "사랑의 이해",
-      category: "소설",
-      author: "미상",
-      publisher: "출판사3",
-      versions: [
-        { versionId: 4, date: "2024.05.04", versionName: "v1.0", status: "승인 중" },
-        { versionId: 11, date: "2024.05.04", versionName: "v1.1", status: "게시 완료" },
-      ],
-    },
-    {
-      id: 4,
-      name: "해리포터",
-      category: "판타지",
-      author: "J.K. 롤링",
-      publisher: "출판사4",
-      versions: [
-        { versionId: 5, date: "2024.07.01", versionName: "v1.0", status: "임시 저장" },
-        { versionId: 6, date: "2024.07.02", versionName: "v1.1", status: "게시 완료" },
-      ],
-    },
-    {
-      id: 5,
-      name: "반지의 제왕",
-      category: "판타지",
-      author: "J.R.R. 톨킨",
-      publisher: "출판사5",
-      versions: [
-        { versionId: 7, date: "2024.08.01", versionName: "v1.0", status: "게시 완료" },
-      ],
-    },
-    {
-      id: 6,
-      name: "1984",
-      category: "디스토피아",
-      author: "조지 오웰",
-      publisher: "출판사6",
-      versions: [
-        { versionId: 8, date: "2024.09.01", versionName: "v1.0", status: "승인 중" },
-        { versionId: 9, date: "2024.09.02", versionName: "v1.1", status: "게시 완료" },
-        { versionId: 10, date: "2024.09.03", versionName: "v1.2", status: "임시 저장" },
-      ],
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -269,6 +196,37 @@ const ArtworkManagement = ({ setContentHeight }) => {
   const itemsPerPage = 5;
   const [showDropdown, setShowDropdown] = useState(false);
   const [expandedItems, setExpandedItems] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("https://api.litmap.store/api/board/myWorkList");
+        const fetchedData = response.data.result.list.map((item, index) => ({
+          id: index + 1,
+          name: item.title,
+          category: item.category,
+          author: item.mainAuthor,
+          publisher: item.publisher,
+          versions: item.versionLists.map((version) => ({
+            versionId: version.versionId,
+            versionName: version.versionName,
+            date: version.lastUpdateDate.split('T')[0],
+            status:
+              version.confirm === "LOAD"
+                ? "임시 저장"
+                : version.confirm === "CONFIRM"
+                ? "승인 중"
+                : "게시 완료",
+          })),
+        }));
+        setData(fetchedData);
+      } catch (error) {
+        console.error("데이터를 불러오는데 실패했습니다.", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     setContentHeight(200 + data.length * 100); // Content 높이 설정
@@ -319,7 +277,10 @@ const ArtworkManagement = ({ setContentHeight }) => {
   }
 
   const toggleExpand = (id) => {
-    setExpandedItems({ ...expandedItems, [id]: !expandedItems[id] });
+    setExpandedItems((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
   };
 
   return (
@@ -336,15 +297,6 @@ const ArtworkManagement = ({ setContentHeight }) => {
         </div>
         <FontAwesomeIcon icon={faChevronRight} size="2x" />
       </BigButton>
-
-      <RefreshSection>
-        조회 시간 : {refreshTime}
-        <FontAwesomeIcon
-          icon={faRotateRight}
-          onClick={handleRefresh}
-          style={{ cursor: "pointer", marginLeft: "10px", color: "#1890ff" }}
-        />
-      </RefreshSection>
 
       <Controls>
         <DropdownContainer>

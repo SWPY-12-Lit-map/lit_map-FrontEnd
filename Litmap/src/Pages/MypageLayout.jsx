@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
+import axios from "axios";
 import AdminPage from "./AdminPage";
 import MemberEdit from "./MemberEdit";
 import ProfileManage from "./ProfileManage";
@@ -130,28 +131,72 @@ const MenuSection = styled.div`
 const AdminMenu = styled.ul``;
 
 const MypageLayout = () => {
-  const [profileImage, setProfileImage] = useState(
-    "https://via.placeholder.com/60"
-  );
-  const [contentHeight, setContentHeight] = useState(1000); // 초기 높이 설정
+  const [profileImage, setProfileImage] = useState(null);
+  const [contentHeight, setContentHeight] = useState(1000);
+  const [nickname, setNickname] = useState("닉네임");
+  const [role, setRole] = useState("대표");
+  const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      // 사용자 프로필 정보 가져오기 (실제 API 경로로 변경 필요)
+      const response = await axios.get("/api/user/profile");
+      setNickname(response.data.nickname);
+      setRole(response.data.role);
+      setProfileImage(response.data.profileImage);
+    };
+
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get("https://api.litmap.store/api/board/workCount");
+        setStats({
+          작성중인글: response.data.result["작성중인 글"],
+          작성한글: response.data.result["작성한 글"],
+        });
+      } catch (error) {
+        console.error("Failed to fetch stats", error);
+      }
+    };
+
+    fetchUserProfile();
+    fetchStats();
+  }, []);
+
+  const getDefaultProfileImage = (role) => {
+    switch (role) {
+      case "대표":
+        return "/representative.png";
+      case "직원":
+        return "/staff.png";
+      case "1인작가":
+        return "/writer.png";
+      case "협력사":
+        return "/cooperation.png";
+      default:
+        return "https://via.placeholder.com/60";
+    }
+  };
 
   return (
     <Container $contentHeight={contentHeight}>
       <Sidebar>
         <Box>
           <ProfileSection>
-            <img src={profileImage} alt="프로필 이미지" />
-            <div className="name">문학동네님</div>
-            <div className="role">대표</div>
+            <img
+              src={profileImage || getDefaultProfileImage(role)}
+              alt="프로필 이미지"
+            />
+            <div className="name">{nickname}님</div>
+            <div className="role">{role}</div>
           </ProfileSection>
           <StatsSection>
             <div className="stat">
               <div className="title">작성한 글</div>
-              <div className="count">213개</div>
+              <div className="count">{stats.작성한글}개</div>
             </div>
             <div className="stat">
               <div className="title">작성중인 글</div>
-              <div className="count">387개</div>
+              <div className="count">{stats.작성중인글}개</div>
             </div>
           </StatsSection>
         </Box>
@@ -185,20 +230,20 @@ const MypageLayout = () => {
               <h3>관리자용 메뉴</h3>
               <li>
                 <Link to="adminpage">
-                  <img src="/Shape.png" />
+                  <img src="/Shape.png" alt="가입승인 이미지" />
                   가입승인
                 </Link>
                 <Link to="adminregister">
-                  {" "}
                   <img src="/mypage_list.png" alt="작품 리스트" />
                   작품 등록 승인
                 </Link>
                 <Link to="membermanage">
-                  <img src="/heart-circle-outline.png" />
+                  <img src="/heart-circle-outline.png" alt="회원 관리 이미지" />
                   회원 관리
                 </Link>
                 <Link to="bannermannage">
-                  <img src="/home-outline.png" />홈 화면 관리
+                  <img src="/home-outline.png" alt="홈 화면 관리 이미지" />
+                  홈 화면 관리
                 </Link>
               </li>
             </AdminMenu>
