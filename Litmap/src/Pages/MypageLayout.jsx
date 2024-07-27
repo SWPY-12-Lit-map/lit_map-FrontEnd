@@ -152,17 +152,7 @@ const MypageLayout = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          console.error("No access token found");
-          return;
-        }
-        console.log("Fetching profile with token:", token);
-
         const response = await axios.get("https://api.litmap.store/api/members/profile", {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
           withCredentials: true,
         });
 
@@ -180,7 +170,9 @@ const MypageLayout = () => {
 
     const fetchStats = async () => {
       try {
-        const response = await axios.get("https://api.litmap.store/api/board/workCount");
+        const response = await axios.get("https://api.litmap.store/api/board/workCount", {
+          withCredentials: true,
+        });
         setStats({
           작성중인글: response.data.result["작성중인 글"],
           작성한글: response.data.result["작성한 글"],
@@ -292,10 +284,8 @@ const MypageLayout = () => {
             path="manage-profile"
             element={
               <ProfileManage
-                profileImage={profile.userImage}
-                setProfileImage={(newImage) =>
-                  setProfile((prev) => ({ ...prev, userImage: newImage }))
-                }
+                profile={profile}
+                setProfile={setProfile}
               />
             }
           />
