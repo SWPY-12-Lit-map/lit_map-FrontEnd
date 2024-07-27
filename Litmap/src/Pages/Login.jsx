@@ -166,6 +166,10 @@ const Login = ({ setLogin }) => {
       })
       .then((result) => {
         console.log(result);
+        setLogin(true);
+        const id = result.data.result.id;
+        document.cookie = `sessionId=${id}; path=/`;
+        navigate("/");
       })
       .catch((error) => {
         console.log(error);
