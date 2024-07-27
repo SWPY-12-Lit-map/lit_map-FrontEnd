@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import axios from "axios";
 
 const PageContainer = styled.div`
   display: flex;
@@ -156,40 +157,59 @@ const Login = ({ setLogin }) => {
       alert("이메일과 비밀번호를 모두 입력해주세요.");
       return;
     }
-  
-    try {
-      const response = await fetch(
-        `https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(
-          email
-        )}&password=${encodeURIComponent(password)}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            accept: "*/*",
-          },
-          credentials: 'include', // 쿠키 포함
-          body: "",
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "로그인에 실패했습니다.");
-      }
-  
-      const data = await response.json();
-  
-      // 로그인 성공 시 세션 ID를 쿠키에 저장
-      document.cookie = `sessionId=${data.sessionId}; path=/`;
-  
-      console.log(`로그인 성공: ${email}`);
-      setLogin(true);
-      navigate("/");
-    } catch (error) {
-      alert(error.message || "로그인 도중 문제가 발생했습니다. 나중에 다시 시도해주세요.");
-    }
-  };  
+    console.log(email);
+    console.log(password);
+    await axios
+      .post(`https://api.litmap.store/api/members/login`, {
+        litmapEmail: email,
+        password: password,
+      })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // try {
+    //   const response = await fetch(
+    //     `https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(
+    //       email
+    //     )}&password=${encodeURIComponent(password)}`,
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         accept: "*/*",
+    //       },
+    //       credentials: "include", // 쿠키 포함
+    //       body: {
+    //         litmapEmail: email,
+    //         password: password,
+    //       },
+    //     }
+    //   );
+
+    //   if (!response.ok) {
+    //     const errorData = await response.json();
+    //     throw new Error(errorData.error || "로그인에 실패했습니다.");
+    //   }
+
+    //   const data = await response.json();
+    //   console.log(data);
+    //   // 로그인 성공 시 세션 ID를 쿠키에 저장
+    //   document.cookie = `sessionId=${data.sessionId}; path=/`;
+
+    //   console.log(`로그인 성공: ${email}`);
+    //   setLogin(true);
+    //   navigate("/");
+    // } catch (error) {
+    //   alert(
+    //     error.message ||
+    //       "로그인 도중 문제가 발생했습니다. 나중에 다시 시도해주세요."
+    //   );
+    // }
+  };
 
   return (
     <PageContainer>
