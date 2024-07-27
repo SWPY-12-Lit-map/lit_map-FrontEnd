@@ -131,19 +131,51 @@ const MenuSection = styled.div`
 const AdminMenu = styled.ul``;
 
 const MypageLayout = () => {
-  const [profileImage, setProfileImage] = useState(null);
+  const [profile, setProfile] = useState({
+    id: null,
+    litmapEmail: "",
+    workEmail: "",
+    name: "",
+    nickname: "닉네임",
+    myMessage: "",
+    userImage: "",
+    urlLink: "",
+    memberRoleStatus: "대표",
+    roleStatus: "",
+    publisher: null,
+    works: [],
+    authorities: [],
+  });
   const [contentHeight, setContentHeight] = useState(1000);
-  const [nickname, setNickname] = useState("닉네임");
-  const [role, setRole] = useState("대표");
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      // 사용자 프로필 정보 가져오기 (실제 API 경로로 변경 필요)
-      const response = await axios.get("/api/user/profile");
-      setNickname(response.data.nickname);
-      setRole(response.data.role);
-      setProfileImage(response.data.profileImage);
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          console.error("No access token found");
+          return;
+        }
+        console.log("Fetching profile with token:", token);
+
+        const response = await axios.get("https://api.litmap.store/api/members/profile", {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+
+        setProfile(response.data);
+      } catch (error) {
+        if (error.response) {
+          // 서버에서 응답이 있었던 경우
+          console.error("Failed to fetch user profile:", error.response.status, error.response.data);
+        } else {
+          // 서버에서 응답이 없던 경우
+          console.error("Failed to fetch user profile:", error.message);
+        }
+      }
     };
 
     const fetchStats = async () => {
@@ -183,11 +215,11 @@ const MypageLayout = () => {
         <Box>
           <ProfileSection>
             <img
-              src={profileImage || getDefaultProfileImage(role)}
+              src={profile.userImage || getDefaultProfileImage(profile.memberRoleStatus)}
               alt="프로필 이미지"
             />
-            <div className="name">{nickname}님</div>
-            <div className="role">{role}</div>
+            <div className="name">{profile.nickname}님</div>
+            <div className="role">{profile.memberRoleStatus}</div>
           </ProfileSection>
           <StatsSection>
             <div className="stat">
@@ -234,7 +266,7 @@ const MypageLayout = () => {
                   가입승인
                 </Link>
                 <Link to="adminregister">
-                  <img src="/mypage_list.png" alt="작품 리스트" />
+                  <img src="/mypage_list.png" alt="작품 등록 승인" />
                   작품 등록 승인
                 </Link>
                 <Link to="membermanage">
@@ -260,8 +292,10 @@ const MypageLayout = () => {
             path="manage-profile"
             element={
               <ProfileManage
-                profileImage={profileImage}
-                setProfileImage={setProfileImage}
+                profileImage={profile.userImage}
+                setProfileImage={(newImage) =>
+                  setProfile((prev) => ({ ...prev, userImage: newImage }))
+                }
               />
             }
           />

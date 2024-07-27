@@ -209,8 +209,25 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   const location = useLocation();
 
   useEffect(() => {
-    window.localStorage.setItem("recentSearch", JSON.stringify(userInput));
-  }, [userInput, setUserInput]); // 유저 검색내용 저장
+    // 로그인 상태 확인
+    const checkLoginStatus = () => {
+      const sessionId = getCookie("sessionId");
+      if (sessionId) {
+        setLogin(true);
+      } else {
+        setLogin(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // 쿠키 값 가져오기
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  };
 
   const [userSearch, setUserSearch] = useState(""); // 유저 검색내용 초기값을 빈 문자열로 설정
   const [searchSort, setSort] = useState("작품 제목"); // 검색 카테고리
@@ -254,7 +271,8 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   const handleLogout = async () => {
     try {
       const response = await axios.get(
-        "https://api.litmap.store/api/members/logout"
+        "https://api.litmap.store/api/members/logout",
+        { withCredentials: true }
       );
       if (response.status === 200) {
         setLogin(false);
