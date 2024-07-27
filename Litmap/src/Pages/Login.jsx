@@ -157,8 +157,6 @@ const Login = ({ setLogin }) => {
       alert("이메일과 비밀번호를 모두 입력해주세요.");
       return;
     }
-    console.log(email);
-    console.log(password);
     await axios
       .post(`https://api.litmap.store/api/members/login`, {
         litmapEmail: email,

@@ -212,10 +212,11 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
     // 로그인 상태 확인
     const checkLoginStatus = () => {
       const sessionId = getCookie("sessionId");
-      if (sessionId) {
-        setLogin(true);
-      } else {
+      console.log(sessionId);
+      if (!sessionId) {
         setLogin(false);
+      } else {
+        setLogin(true);
       }
     };
 
@@ -269,18 +270,18 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   };
 
   const handleLogout = async () => {
-    try {
-      const response = await axios.get(
-        "https://api.litmap.store/api/members/logout",
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+    await axios
+      .get("https://api.litmap.store/api/members/logout")
+      .then((response) => {
+        const sessionId = getCookie("sessionId");
         setLogin(false);
+        document.cookie = `sessionId=${sessionId} ; path=/; max-age=0`;
+        console.log("삭제됨");
         navigate("/");
-      }
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   // 특정 영역 외 클릭 시 발생하는 이벤트
