@@ -329,9 +329,9 @@ const Mindmap = (props) => {
         />
         <CustomControls>
           <PreviewButton onClick={fitView}>미리보기</PreviewButton>
-          <DeleteEdgesButton onClick={deleteAllEdges}>
+          {/* <DeleteEdgesButton onClick={deleteAllEdges}>
             선 삭제
-          </DeleteEdgesButton>
+          </DeleteEdgesButton> */}
         </CustomControls>
         {read ? null : <CustomMiniMap />}
       </ReactFlow>
