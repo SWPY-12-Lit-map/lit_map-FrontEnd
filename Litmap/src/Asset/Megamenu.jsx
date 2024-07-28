@@ -2,16 +2,18 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { MdArrowDropDown } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
 
 const MegamenuWrapper = styled.div`
   display: flex;
-  background-color: black;
-  color: white;
+  background-color: #fbf9f6;
   box-sizing: border-box;
   padding: 20px;
   border: 1px solid #ccc;
-  width: 100%;
+  width: 90%;
   position: absolute;
+  top: 0%;
   z-index: 10000;
 `;
 
@@ -23,9 +25,11 @@ const Column = styled.div`
 
 const ColumnTitle = styled.h3`
   font-size: 16px;
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid #dadada;
   padding-bottom: 10px;
-  color: white;
+  color: #7d7d7d;
+  font-weight: bold;
+  cursor: pointer;
 `;
 
 const SubCategory = styled.div`
@@ -35,13 +39,19 @@ const SubCategory = styled.div`
 const SubCategoryTitle = styled.div`
   font-size: 14px;
   margin-bottom: 10px;
+  cursor: pointer;
+  color: #7d7d7d;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const NavigationItem = styled.li`
   font-size: 12px;
   margin: 5px 0;
   cursor: pointer;
-  color: white;
+  color: #7d7d7d;
 
   &:hover {
     text-decoration: underline;
@@ -63,29 +73,34 @@ const Tooltip = styled.div`
 
 const CloseBtn = styled.button`
   position: absolute;
-  right: 35px;
+  top: 0;
+  right: 2%;
   background: none;
-  color: white;
+  color: black;
   border: none;
+  font-size: 30px;
 `;
 
 function Megamenu(props) {
   const setMega = props.setMega;
   const mega = props.mega;
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [genres, setGenres] = useState([]);
   const [category, setCategory] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeGenre, setActiveGenre] = useState(null);
 
   const navigate = useNavigate();
 
-  function getAxios(category, genre) {
+  function getAxios(categoryId, genreId) {
     axios
-      .get(`https://api.litmap.store/api/board/theme/${category}/${genre}`)
+      .get(`https://api.litmap.store/api/board/theme/${categoryId}/${genreId}`)
       .then((result) => {
         console.log(...result.data.result);
-        setData({
-          [`${category}-${genre}`]: result.data.result,
-        });
+        setData((prevData) => ({
+          ...prevData,
+          [`${categoryId}-${genreId}`]: result.data.result,
+        }));
         console.log(data);
       })
       .catch((error) => {
@@ -99,8 +114,7 @@ function Megamenu(props) {
       .get("https://api.litmap.store/api/genre")
       .then((result) => {
         console.log(...result.data.result);
-        const works = [...data];
-        setGenres([...works, ...result.data.result]);
+        setGenres(result.data.result);
       })
       .catch((error) => {
         console.log(error);
@@ -110,8 +124,7 @@ function Megamenu(props) {
       .get("https://api.litmap.store/api/category")
       .then((result) => {
         console.log(...result.data.result);
-        const works = [...data];
-        setCategory([...works, ...result.data.result]);
+        setCategory(result.data.result);
       })
       .catch((error) => {
         console.log(error);
@@ -125,20 +138,36 @@ function Megamenu(props) {
           mega == true ? setMega(false) : null;
         }}
       >
-        X
+        <IoClose />
       </CloseBtn>
 
       {category.map((category) => (
-        <Column key={category.name}>
-          <ColumnTitle>{category.name}</ColumnTitle>
-          {genres.map((genre) => (
-            <SubCategory key={genre.name}>
+        <Column key={category.id}>
+          <ColumnTitle
+            style={{
+              color: activeCategory === category.id ? "#8B0024" : "#7d7d7d",
+            }}
+            onClick={() => {}}
+          >
+            {category.name}
+          </ColumnTitle>
+          {genres.map((genre, i) => (
+            <SubCategory key={i}>
               <SubCategoryTitle
+                style={{
+                  color:
+                    activeGenre === genre.id && activeCategory === category.id
+                      ? "#8B0024"
+                      : "#7d7d7d",
+                }}
                 onClick={() => {
+                  setActiveCategory(category.id);
+                  setActiveGenre(genre.id);
                   getAxios(category.id, genre.id);
                 }}
               >
                 {genre.name}
+                <MdArrowDropDown />
               </SubCategoryTitle>
               {data[`${category.id}-${genre.id}`] &&
                 data[`${category.id}-${genre.id}`].length > 0 &&

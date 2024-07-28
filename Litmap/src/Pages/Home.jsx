@@ -9,6 +9,8 @@ import axios from "axios";
 const Container = styled.div`
   font-size: 20px;
   margin-bottom: 100px;
+  width: 100%;
+  position: relative;
 `;
 
 const Banner = styled(Carousel)`
@@ -102,10 +104,9 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
 
   return (
     <>
-      {mega && <Megamenu mega={mega} setMega={setMega} />}
       <Container>
         {/* 카테고리 */}
-        <Category setMega={setMega} />
+        <Category setMega={setMega} mega={mega} />
         {/* 배너 캐러셀 */}
         <Banner activeIndex={index} onSelect={handleSelect}>
           {slides.map((img, index) => (
@@ -139,39 +140,40 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
             조회순
           </CategoryBtn>
         </SortOptions>
-
-        <Posts>
-          {!state
-            ? update.map((post, index) => (
-                <Post
-                  key={index}
-                  onClick={() => {
-                    navigate(`/work/${post.workId}`);
-                  }}
-                >
-                  <img
-                    src={post.image}
-                    alt={post.title}
+        <div>
+          <Posts>
+            {!state
+              ? update.map((post, index) => (
+                  <Post
+                    key={index}
                     onClick={() => {
-                      navigate("/work");
+                      navigate(`/work/${post.workId}`);
                     }}
-                  />
-                  <div>{post.title}</div>
-                </Post>
-              ))
-            : view.map((post, index) => (
-                <Post key={index}>
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    onClick={() => {
-                      navigate("/work");
-                    }}
-                  />
-                  <div>{post.title}</div>
-                </Post>
-              ))}
-        </Posts>
+                  >
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      onClick={() => {
+                        navigate("/work");
+                      }}
+                    />
+                    <div>{post.title}</div>
+                  </Post>
+                ))
+              : view.map((post, index) => (
+                  <Post key={index}>
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      onClick={() => {
+                        navigate("/work");
+                      }}
+                    />
+                    <div>{post.title}</div>
+                  </Post>
+                ))}
+          </Posts>
+        </div>
       </Container>
 
       <Foot>

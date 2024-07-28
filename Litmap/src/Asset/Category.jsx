@@ -4,14 +4,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Link } from "react-router-dom";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import Megamenu from "./Megamenu";
 
 const CategoryMenu = styled.ul`
+  width: 80%;
   display: flex;
   align-items: center;
   list-style: none;
   padding: 20px 50px;
   gap: 15px;
-  margin-bottom: 20px;
+  margin: 20px auto;
   position: relative;
   font-size: 20px;
 `;
@@ -31,8 +33,8 @@ const BarsIcon = styled(FontAwesomeIcon)`
   font-size: 20px;
 `;
 
-function Category(props) {
-  const setMega = props.setMega;
+function Category({ setMega, mega }) {
+  // const setMega = props.setMega;
 
   return (
     <CategoryMenu>
@@ -52,11 +54,12 @@ function Category(props) {
         <StyledLink to="/category2">드라마_임시마이페이지</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category3">영화</StyledLink>
+        <StyledLink>영화</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category4">웹툰</StyledLink>
+        <StyledLink>웹툰</StyledLink>
       </CategoryMenuItem>
+      {mega && <Megamenu mega={mega} setMega={setMega} />}
     </CategoryMenu>
   );
 }

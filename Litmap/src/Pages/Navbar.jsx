@@ -10,6 +10,7 @@ import { useStore } from "../Asset/store";
 import { IoTimeOutline } from "react-icons/io5";
 
 const Nav = styled.div`
+  width: 100%;
   font-size: 20px;
   display: flex;
   justify-content: space-between;
