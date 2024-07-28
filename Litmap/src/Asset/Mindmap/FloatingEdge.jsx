@@ -113,7 +113,7 @@ function FloatingEdge({
             style={{
               border: data.read ? "none" : null,
               textAlign: "center",
-              ...ChangeinputStyle,
+              // ...ChangeinputStyle,
             }}
             readOnly={data.read}
           />

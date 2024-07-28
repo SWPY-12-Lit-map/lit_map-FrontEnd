@@ -59,7 +59,7 @@ export default function CustomNode({ id, data, selected }) {
             className="customHandle"
             position={Position.Right}
             type="source"
-            style={{ top: "50%", transform: "translateY(-50%)" }}
+            style={read ? null : { top: "50%", transform: "translateY(-50%)" }}
           />
         )}
         <div>
@@ -77,7 +77,7 @@ export default function CustomNode({ id, data, selected }) {
           position={Position.Left}
           type="target"
           isConnectableStart={false}
-          style={{ top: "50%", transform: "translateY(-50%)" }}
+          style={read ? null : { top: "50%", transform: "translateY(-50%)" }}
         />
       </div>{" "}
       {show && (
