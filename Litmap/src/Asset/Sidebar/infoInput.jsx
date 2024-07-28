@@ -249,10 +249,11 @@ export default function InfoInput(props) {
   // 빈값 확인
   const CheckInputs = () => {
     const works = Object.values(work);
-    const found = works.find((a) => a === "");
-    if (found === undefined) {
-      setNext(true);
-    }
+    const found = works.find((a) => a == "");
+    setNext(true);
+    // if (found === undefined) {
+    //   setNext(true);
+    // }
   };
 
   // 장르 복수 선택
@@ -291,7 +292,6 @@ export default function InfoInput(props) {
       .get("https://api.litmap.store/api/category")
       .then((result) => {
         setCategory(result.data.result);
-        console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -397,7 +397,7 @@ export default function InfoInput(props) {
         <div>카테고리</div>
         <CustomDropdownButton
           id="카테고리"
-          title={work.category == "" ? work.category : "카테고리 (필수)"}
+          title={work.category ? work.category : "카테고리 (필수)"}
         >
           {getCategory.map((category, i) => {
             return (
@@ -450,7 +450,7 @@ export default function InfoInput(props) {
           type="checkbox"
           defaultChecked={work.imageUrl ? true : false}
           onClick={() => {
-            const info = { ...work, imageUrl: "대체 이미지" };
+            const info = { ...work, imageUrl: "" };
             setWork(info);
           }}
         ></input>{" "}

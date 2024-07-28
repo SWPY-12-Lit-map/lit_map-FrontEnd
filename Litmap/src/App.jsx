@@ -61,6 +61,7 @@ function App() {
         const data = result.data.result.content;
         setView((prevView) => [...prevView, ...data]);
         setDataState(result.data.result.last);
+        console.log(result);
         const dataId = data[0].workId;
         setWorkId([...workId, dataId]);
       })

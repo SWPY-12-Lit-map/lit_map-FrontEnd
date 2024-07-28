@@ -242,9 +242,8 @@ export default function EditCharacter(props) {
               );
               setInfos(updatedInfos);
               setCount(count - 1);
-
               axios
-                .delete(`https://api.litmap.store/api/cast/7/0.1/${info.name}`)
+                .delete(`https://api.litmap.store/api/cast/${info.castId}`)
                 .then((result) => {
                   console.log(result);
                 })

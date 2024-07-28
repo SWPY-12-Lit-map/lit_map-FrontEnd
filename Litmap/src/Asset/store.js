@@ -17,4 +17,14 @@ export const useStore = create((set) => ({
 
   read: false,
   setRead: (data) => set({ read: data }),
+  // 노드 가져오기
+  // store.js
+
+  edges: [],
+  setEdges: (edges) => set({ edges }),
+  removeEdge: (edgeId) =>
+    set((state) => ({
+      edges: state.edges.filter((edge) => edge.id !== edgeId),
+    })),
+  // 다른 상태 및 설정들...
 }));
