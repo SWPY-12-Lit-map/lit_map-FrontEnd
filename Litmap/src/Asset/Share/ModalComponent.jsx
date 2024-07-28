@@ -153,16 +153,20 @@ function ModalComponent({ workInfo, isDownloadOnly, ...props }) {
   }
 
   const handleFacebookShare = () => {
+    const title = workInfo.title;
+    const shareUrl = url;
     window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}title=${title}`,
       "_blank",
       "width=600,height=400"
     );
   };
 
   const handleTwitterShare = () => {
+    const text = `${workInfo.title}의 인물 관계도를 확인해보세요!`;
+    const shareUrl = url;
     window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(imgUrl)}`,
+      `https://twitter.com/intent/tweet?text=${shareUrl}${text}`,
       "_blank",
       "width=600,height=400"
     );
