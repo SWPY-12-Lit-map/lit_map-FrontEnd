@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { MdArrowDropDown } from "react-icons/md";
+import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 
 const MegamenuWrapper = styled.div`
@@ -29,7 +29,6 @@ const ColumnTitle = styled.h3`
   padding-bottom: 10px;
   color: #7d7d7d;
   font-weight: bold;
-  cursor: pointer;
 `;
 
 const SubCategory = styled.div`
@@ -89,6 +88,7 @@ function Megamenu(props) {
   const [category, setCategory] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeGenre, setActiveGenre] = useState(null);
+  const [openSubCategory, setOpenSubCategory] = useState({});
 
   const navigate = useNavigate();
 
@@ -96,12 +96,10 @@ function Megamenu(props) {
     axios
       .get(`https://api.litmap.store/api/board/theme/${categoryId}/${genreId}`)
       .then((result) => {
-        console.log(...result.data.result);
         setData((prevData) => ({
           ...prevData,
           [`${categoryId}-${genreId}`]: result.data.result,
         }));
-        console.log(data);
       })
       .catch((error) => {
         console.log(error);
@@ -113,7 +111,6 @@ function Megamenu(props) {
     axios
       .get("https://api.litmap.store/api/genre")
       .then((result) => {
-        console.log(...result.data.result);
         setGenres(result.data.result);
       })
       .catch((error) => {
@@ -123,7 +120,6 @@ function Megamenu(props) {
     axios
       .get("https://api.litmap.store/api/category")
       .then((result) => {
-        console.log(...result.data.result);
         setCategory(result.data.result);
       })
       .catch((error) => {
@@ -131,11 +127,31 @@ function Megamenu(props) {
       });
   }, []);
 
+  const handleSubCategoryClick = (categoryId, genreId) => {
+    const key = `${categoryId}-${genreId}`;
+    if (openSubCategory[key]) {
+      setOpenSubCategory((prev) => ({
+        ...prev,
+        [key]: false,
+      }));
+      setActiveCategory(null);
+      setActiveGenre(null);
+    } else {
+      setOpenSubCategory((prev) => ({
+        ...prev,
+        [key]: true,
+      }));
+      setActiveCategory(categoryId);
+      setActiveGenre(genreId);
+      getAxios(categoryId, genreId);
+    }
+  };
+
   return (
     <MegamenuWrapper>
       <CloseBtn
         onClick={() => {
-          mega == true ? setMega(false) : null;
+          mega === true ? setMega(false) : null;
         }}
       >
         <IoClose />
@@ -150,41 +166,41 @@ function Megamenu(props) {
           >
             {category.name}
           </ColumnTitle>
-          {genres.map((genre, i) => (
-            <SubCategory key={i}>
-              <SubCategoryTitle
-                style={{
-                  color:
-                    activeGenre === genre.id && activeCategory === category.id
-                      ? "#8B0024"
-                      : "#7d7d7d",
-                }}
-                onClick={() => {
-                  setActiveCategory(null);
-                  setActiveGenre(null);
-                  setActiveCategory(category.id);
-                  setActiveGenre(genre.id);
-                  getAxios(category.id, genre.id);
-                }}
-              >
-                {genre.name}
-                <MdArrowDropDown />
-              </SubCategoryTitle>
-              {data[`${category.id}-${genre.id}`] &&
-                data[`${category.id}-${genre.id}`].length > 0 &&
-                data[`${category.id}-${genre.id}`].map((item) => (
-                  <NavigationItem
-                    key={item.workId}
-                    id={item.workId}
-                    onClick={() => {
-                      navigate(`/work/${item.workId}`);
-                    }}
-                  >
-                    {item.workTitle}
-                  </NavigationItem>
-                ))}
-            </SubCategory>
-          ))}
+          {genres.map((genre, i) => {
+            const key = `${category.id}-${genre.id}`;
+            const isOpen = openSubCategory[key];
+            return (
+              <SubCategory key={i}>
+                <SubCategoryTitle
+                  style={{
+                    color:
+                      activeGenre === genre.id && activeCategory === category.id
+                        ? "#8B0024"
+                        : "#7d7d7d",
+                  }}
+                  onClick={() => handleSubCategoryClick(category.id, genre.id)}
+                >
+                  {genre.name}
+                  {isOpen ? <MdArrowDropUp /> : <MdArrowDropDown />}
+                </SubCategoryTitle>
+                {isOpen && data[key] && data[key].length > 0 && (
+                  <div>
+                    {data[key].map((item) => (
+                      <NavigationItem
+                        key={item.workId}
+                        id={item.workId}
+                        onClick={() => {
+                          navigate(`/work/${item.workId}`);
+                        }}
+                      >
+                        {item.workTitle}
+                      </NavigationItem>
+                    ))}
+                  </div>
+                )}
+              </SubCategory>
+            );
+          })}
         </Column>
       ))}
     </MegamenuWrapper>

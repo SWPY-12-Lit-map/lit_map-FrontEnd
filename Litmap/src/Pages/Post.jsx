@@ -324,14 +324,18 @@ export default function Post(props) {
                     const Extrasave = { ...work, confirmCheck: true };
                     setWork(Extrasave);
                     console.log(work);
-                    // axios
-                    //   .post("https://api.litmap.store/api/work", work)
-                    //   .then((result) => {
-                    //     console.log(result);
-                    //   })
-                    //   .then((error) => {
-                    //     console.log(error);
-                    //   });
+                    {
+                      work.confirmCheck
+                        ? axios
+                            .post("https://api.litmap.store/api/work", work)
+                            .then((result) => {
+                              console.log(result);
+                            })
+                            .then((error) => {
+                              console.log(error);
+                            })
+                        : console.log("loading");
+                    }
                   }
                 }}
               >
