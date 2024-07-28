@@ -147,7 +147,6 @@ function Megamenu(props) {
             style={{
               color: activeCategory === category.id ? "#8B0024" : "#7d7d7d",
             }}
-            onClick={() => {}}
           >
             {category.name}
           </ColumnTitle>
@@ -161,6 +160,8 @@ function Megamenu(props) {
                       : "#7d7d7d",
                 }}
                 onClick={() => {
+                  setActiveCategory(null);
+                  setActiveGenre(null);
                   setActiveCategory(category.id);
                   setActiveGenre(genre.id);
                   getAxios(category.id, genre.id);

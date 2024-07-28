@@ -70,10 +70,13 @@ const Posts = styled.div`
 
 const Post = styled.div`
   width: 80%;
+  cursor: pointer;
   img {
     width: 100%;
   }
 `;
+
+const Bookmark = styled.div``;
 
 const Foot = styled.div`
   background-color: #fbf9f6;
@@ -150,11 +153,12 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
                       navigate(`/work/${post.workId}`);
                     }}
                   >
+                    <Bookmark></Bookmark>
                     <img
-                      src={post.image}
+                      src={post.imageUrl}
                       alt={post.title}
                       onClick={() => {
-                        navigate("/work");
+                        navigate(`/work/${post.workId}`);
                       }}
                     />
                     <div>{post.title}</div>
@@ -163,10 +167,10 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
               : view.map((post, index) => (
                   <Post key={index}>
                     <img
-                      src={post.image}
+                      src={post.imageUrl}
                       alt={post.title}
                       onClick={() => {
-                        navigate("/work");
+                        navigate(`/work/${post.workId}`);
                       }}
                     />
                     <div>{post.title}</div>
