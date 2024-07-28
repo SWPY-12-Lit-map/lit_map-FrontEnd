@@ -106,7 +106,6 @@ const Mindmap = (props) => {
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [backColor, setBackColor] = useState();
   const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
-  const [local, setLocal] = useState(localStorage.getItem("color"));
   const { read } = useStore();
 
   const [rfInstance, setRfInstance] = useState(null);
@@ -117,7 +116,11 @@ const Mindmap = (props) => {
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
       type: "custom",
-      position: { x: (i + 5) * 100, y: (i + 5) * 100 },
+      position: {
+        x: (i % 5) * 100,
+        y: Math.floor(i / 5) * 100,
+      },
+
       data: {
         ...characterInfos[i],
       },
@@ -309,9 +312,11 @@ const Mindmap = (props) => {
         <CustomControls />
         {read ? null : <MiniMap />}
       </ReactFlow>
-      <Btns>
-        <ModalBtn workInfo={workInfo} /> {/* 공유하기 */}
-      </Btns>
+      {!read ? null : (
+        <Btns>
+          <ModalBtn workInfo={workInfo} />
+        </Btns>
+      )}
     </Mapping>
   );
 };
