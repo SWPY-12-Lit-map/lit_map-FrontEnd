@@ -34,19 +34,19 @@ export default function MyVerticallyCenteredModal(props) {
         </Button>
         <Button
           onClick={() => {
-            navigate("/category1/postdone");
-
             const setSaveState = { ...work, confirmCheck: true };
             setWork(setSaveState);
-            console.log(work);
-            axios
-              .post("https://api.litmap.store/api/work", work)
-              .then((result) => {
-                console.log(result);
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+            if (work.confirmCheck) {
+              axios
+                .post("https://api.litmap.store/api/work", work)
+                .then((result) => {
+                  console.log(result);
+                  navigate("/category1/postdone");
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
           }}
         >
           확인

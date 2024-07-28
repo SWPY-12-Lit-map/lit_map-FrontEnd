@@ -8,6 +8,7 @@ import ReactFlow, {
   Controls,
   useReactFlow,
   Background,
+  ControlButton,
 } from "reactflow";
 import CustomNode from "./CustomNode";
 import FloatingEdge from "./FloatingEdge";
@@ -58,12 +59,27 @@ const CustomControls = styled(Controls)`
     border-radius: 0 0 10px 10px;
   }
   & > .react-flow__controls-fitview {
-    margin-top: 10px;
-    border-radius: 10px;
+    display: none;
   }
   & > .react-flow__controls-interactive {
     display: none;
   }
+`;
+
+const PreviewButton = styled(ControlButton)`
+  position: absolute;
+  top: 510%;
+  right: 400%;
+`;
+
+const DeleteEdgesButton = styled(ControlButton)`
+  position: absolute;
+  top: 50%;
+  right: 400%;
+`;
+
+const CustomMiniMap = styled(MiniMap)`
+  margin-bottom: 7%;
 `;
 
 const initialNodes = [];
@@ -109,7 +125,7 @@ const Mindmap = (props) => {
   const { read } = useStore();
 
   const [rfInstance, setRfInstance] = useState(null);
-  const { setViewport } = useReactFlow();
+  const { fitView, setViewport } = useReactFlow();
 
   // 노드 생성
   const createNodes = useCallback(() => {
@@ -165,18 +181,15 @@ const Mindmap = (props) => {
       const flow = rfInstance.toObject();
       flow.version = Number(work.defaultVersion);
       flow.work_id = work.title;
-      flow.viewport = {
-        x: rfInstance.getViewport().x,
-        y: rfInstance.getViewport().y,
-        zoom: rfInstance.getViewport().zoom,
-      };
+      flow.viewport = rfInstance.getViewport(); // FitView 설정
       flow.backgroundImage = backgroundImg;
       flow.backgroundColor = localStorage.getItem("color")
         ? localStorage.getItem("color")
         : null;
       const updateRelationship = { ...work, relationship: flow, version: 0.1 };
-      console.log(read);
+
       setWork(updateRelationship);
+      console.log(work);
     }
   }, [rfInstance, work, backgroundImg, setWork]);
 
@@ -203,7 +216,7 @@ const Mindmap = (props) => {
     };
     restoreFlow();
   }, [
-    work.relationship,
+    relationship,
     read,
     setNodes,
     setViewport,
@@ -250,11 +263,12 @@ const Mindmap = (props) => {
   }, [count, createNodes, backgroundImg]);
 
   useEffect(() => {
-    if (read == true) {
+    if (read === true) {
       console.log(read);
       onRestore();
+      fitView(); // fitView 호출
     }
-  }, [read, onRestore]);
+  }, [read, onRestore, fitView]);
 
   useEffect(() => {
     console.log(read);
@@ -269,6 +283,10 @@ const Mindmap = (props) => {
       }
     }
   }, [nodes, edges, backgroundImage, backColor]);
+
+  const deleteAllEdges = () => {
+    setEdges([]);
+  };
 
   return (
     <Mapping>
@@ -309,8 +327,13 @@ const Mindmap = (props) => {
           }}
           variant="none"
         />
-        <CustomControls />
-        {read ? null : <MiniMap />}
+        <CustomControls>
+          <PreviewButton onClick={fitView}>미리보기</PreviewButton>
+          <DeleteEdgesButton onClick={deleteAllEdges}>
+            선 삭제
+          </DeleteEdgesButton>
+        </CustomControls>
+        {read ? null : <CustomMiniMap />}
       </ReactFlow>
       {!read ? null : (
         <Btns>

@@ -97,9 +97,6 @@ export default function Post(props) {
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
 
-  const { workInfos, addWorkInfos } = useStore();
-  const getWork = { ...workInfos };
-
   useEffect(() => {
     PrevCountRef.current = count;
   }, [count]); // count가 변경될 때만 실행
@@ -149,9 +146,11 @@ export default function Post(props) {
     }
   }, [count, mount, prevCount, work]);
 
-  // 임시저장 시
+  const { workInfos, addWorkInfos } = useStore();
+  const getWork = { ...workInfos };
+  // 임시저장 불러올 때
   useEffect(() => {
-    // console.log(getWork);
+    // 임시저장 불러오기
     if (workInfos.workId) {
       setWork({
         category: workInfos.category,
@@ -165,12 +164,13 @@ export default function Post(props) {
         publisherName: "민음사",
         genre: workInfos.genre,
         memberId: 24,
-        publisherDate: "",
+        publisherDate: workInfos.publisherDate,
         workId: workInfos.workId,
         relationship: workInfos.versions.relationship,
+        casts: workInfos.versions.casts,
       });
-      setCount(workInfos.versions.casts.length);
       setInfos(workInfos.versions.casts);
+      setCount(workInfos.versions.casts.length);
     }
   }, []);
 
@@ -271,6 +271,7 @@ export default function Post(props) {
                 onClick={() => {
                   const Extrasave = { ...work, confirmCheck: false };
                   setWork(Extrasave);
+                  console.log(work);
                   axios
                     .post("https://api.litmap.store/api/work", work)
                     .then((result) => {
@@ -296,6 +297,7 @@ export default function Post(props) {
                 onClick={() => {
                   const Extrasave = { ...work, confirmCheck: false };
                   setWork(Extrasave);
+                  console.log(work);
                   axios
                     .post("https://api.litmap.store/api/work", work)
                     .then((result) => {
@@ -314,11 +316,22 @@ export default function Post(props) {
                   if (state === 1) {
                     setState(2);
                     document.querySelector("#nextBtn").innerHTML = "저장";
-                    setWork({ ...work, author: namesString });
+
                     console.log(work);
                   } else if (state === 2) {
                     // 저장 로직 추가
                     setModalShow(true);
+                    const Extrasave = { ...work, confirmCheck: true };
+                    setWork(Extrasave);
+                    console.log(work);
+                    // axios
+                    //   .post("https://api.litmap.store/api/work", work)
+                    //   .then((result) => {
+                    //     console.log(result);
+                    //   })
+                    //   .then((error) => {
+                    //     console.log(error);
+                    //   });
                   }
                 }}
               >
