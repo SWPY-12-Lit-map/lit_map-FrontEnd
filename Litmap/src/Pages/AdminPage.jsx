@@ -228,7 +228,79 @@ export default function ArtworkManagement() {
     {
       id: 1,
       date: "2024.07.01",
-      userName: "가입자",
+      userName: "1",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 2,
+      date: "2024.07.01",
+      userName: "2",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 3,
+      date: "2024.07.01",
+      userName: "3",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 4,
+      date: "2024.07.01",
+      userName: "4",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 5,
+      date: "2024.07.01",
+      userName: "5",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 6,
+      date: "2024.07.01",
+      userName: "6",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 7,
+      date: "2024.07.01",
+      userName: "7",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 8,
+      date: "2024.07.01",
+      userName: "8",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 9,
+      date: "2024.07.01",
+      userName: "9",
+      area: "1인 작가",
+      workLink: "www.naver.com",
+      state: false,
+    },
+    {
+      id: 10,
+      date: "2024.07.01",
+      userName: "10",
       area: "1인 작가",
       workLink: "www.naver.com",
       state: false,
@@ -280,24 +352,12 @@ export default function ArtworkManagement() {
     pageNumbers.push(i);
   }
 
-  const getAxios = () => {
+  /* 가입 승인 */
+  const AllowAccess = (memberId) => {
     axios
-      .get("https://api.litmap.store/api/board/confirm")
+      .get(`https://api.litmap.store/api/members/${memberId}/approve`)
       .then((result) => {
         console.log(result);
-        setData([...result.data.result]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const DenyAccess = (memberId) => {
-    axios
-      .get(`https://api.litmap.store/api/members/${memberId}/approve-withdrawl`)
-      .then((result) => {
-        console.log(result);
-        setData([...result.data.result]);
       })
       .catch((error) => {
         console.log(error);
@@ -377,7 +437,7 @@ export default function ArtworkManagement() {
               <span>
                 <Status
                   onClick={() => {
-                    navigate(item.workLink);
+                    navigate();
                   }}
                 >
                   작품 보러가기
@@ -392,6 +452,9 @@ export default function ArtworkManagement() {
                 <button
                   style={{
                     backgroundColor: "#EFF5FF",
+                  }}
+                  onClick={() => {
+                    AllowAccess(item.id);
                   }}
                 >
                   승인

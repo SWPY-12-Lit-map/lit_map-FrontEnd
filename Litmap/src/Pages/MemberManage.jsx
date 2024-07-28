@@ -3,9 +3,7 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
-import Calendar from "../Asset/Calender";
 import SimpleCalender from "../Asset/SimpleCalender";
 
 const Content = styled.div`
@@ -214,10 +212,17 @@ const ChooseBtn = styled.div`
   display: flex;
   justify-content: flex-end;
   & > button {
-    padding: 5px;
     background-color: unset;
+    padding: 5px;
     border-radius: 10px;
     margin: 0 5px;
+    border-color: #8b0024;
+    color: #8b0024;
+    :active,
+    :focus,
+    :target {
+      border-color: #8b0024;
+    }
   }
 `;
 
@@ -279,24 +284,14 @@ export default function MemberManage() {
     pageNumbers.push(i);
   }
 
-  const getAxios = () => {
-    axios
-      .get("https://api.litmap.store/api/board/confirm")
-      .then((result) => {
-        console.log(result);
-        setData([...result.data.result]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
+  // 회원 탈퇴 승인
   const DenyAccess = (memberId) => {
     axios
-      .get(`https://api.litmap.store/api/members/${memberId}/approve-withdrawl`)
+      .post(
+        `https://api.litmap.store/api/members/${memberId}/approve-withdrawl`
+      )
       .then((result) => {
         console.log(result);
-        setData([...result.data.result]);
       })
       .catch((error) => {
         console.log(error);
@@ -344,8 +339,8 @@ export default function MemberManage() {
             <div>가입 날짜</div>
             <div>이름</div>
             <div>선택 분야</div>
-            <div>작품 링크</div>
-            <div>상태</div>
+            <div>회사명</div>
+            <div>회원구분</div>
           </Category>
         </div>
 
@@ -374,34 +369,16 @@ export default function MemberManage() {
               <span>{item.userName}</span>
               <span>{item.area}</span>
               <span>
-                <Status
-                  onClick={() => {
-                    navigate(item.workLink);
-                  }}
-                >
-                  작품 보러가기
-                </Status>
+                <Status>작품 보러가기</Status>
               </span>
               <span
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <button
-                  style={{
-                    backgroundColor: "#EFF5FF",
-                  }}
-                >
-                  승인
-                </button>
-                <button
-                  style={{
-                    backgroundColor: "#FFE1DC",
-                  }}
-                >
-                  거절
-                </button>
+                직함
               </span>
             </Category>
           </div>
@@ -411,20 +388,11 @@ export default function MemberManage() {
         {" "}
         <ChooseBtn>
           <button
-            style={{
-              color: "#007BFF",
-              borderColor: "#007BFF",
+            onClick={() => {
+              DenyAccess("회원id");
             }}
           >
-            일괄 승인
-          </button>
-          <button
-            style={{
-              color: "#8B0024 ",
-              borderColor: "#8B0024",
-            }}
-          >
-            일괄 거절
+            탈퇴처리
           </button>
         </ChooseBtn>
         <Pagination>

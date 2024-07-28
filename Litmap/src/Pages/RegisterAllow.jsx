@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, version } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +7,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import SimpleCalender from "../Asset/SimpleCalender";
+import { format } from "date-fns";
 
 const Content = styled.div`
   padding: 20px;
@@ -179,11 +180,13 @@ const Status = styled.div`
 `;
 
 const Category = styled.div`
+  position: relative;
   display: flex;
   width: 100%;
   text-align: center;
   border-bottom: 1px solid #c5c5c5;
   padding: 10px 0 5px 0;
+  align-items: center;
   & > span {
     width: 20%;
     & > button {
@@ -220,10 +223,50 @@ const ChooseBtn = styled.div`
     margin: 0 5px;
   }
 `;
+const DenyBar = styled.div`
+  position: absolute;
+  background-color: white;
+  top: 50px;
+  right: 10px;
+  border: solid 1px gray;
+  border-radius: 5px;
+  z-index: 10;
+  padding: 0 10px 10px 10px;
+  & > button {
+    position: relative;
+    right: -48%;
+    background-color: unset;
+    border: none;
+    font-size: 20px;
+  }
+  & > div {
+    border-top: 1px solid lightgray;
+    background-color: white;
+    /* margin-top: 20px; */
+    padding-top: 10px;
+    & > input {
+      border-radius: 5px;
+    }
+    & > button {
+      border: none;
+      border-radius: 10px;
+      background-color: #8b0024;
+      color: white;
+      padding: 5px 7px;
+    }
+  }
+`;
 
 export default function RegisterAllow() {
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([
+    {
+      id: 1,
+      title: "테스트용",
+      workId: 1,
+      versionList: [{ versionName: 0.1, lastUpdateDate: "2020-01-01" }],
+    },
+  ]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -233,6 +276,8 @@ export default function RegisterAllow() {
   const itemsPerPage = 5;
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [deny, setDeny] = useState(false);
+  const [denyReason, setReason] = useState("");
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
@@ -270,6 +315,7 @@ export default function RegisterAllow() {
     pageNumbers.push(i);
   }
 
+  // 승인 안된 작품 가져오기
   const getAxios = () => {
     axios
       .get("https://api.litmap.store/api/board/confirm")
@@ -282,12 +328,13 @@ export default function RegisterAllow() {
       });
   };
 
-  const DenyAccess = (memberId) => {
+  // 작품 승인하기
+  const confirm = (versionId) => {
+    console.log(versionId);
     axios
-      .get(`https://api.litmap.store/api/members/${memberId}/approve-withdrawl`)
+      .put(`https://api.litmap.store/api/version/${versionId}/confirm`)
       .then((result) => {
         console.log(result);
-        setData([...result.data.result]);
       })
       .catch((error) => {
         console.log(error);
@@ -344,7 +391,7 @@ export default function RegisterAllow() {
           </Category>
         </div>
 
-        {currentItems.map((item) => (
+        {currentItems.map((item, i) => (
           <div
             key={item.id}
             style={{
@@ -365,9 +412,11 @@ export default function RegisterAllow() {
             </div>
 
             <Category id="memberInfo">
-              <span>{item.versionList[0].lastUpdateDate}</span>
+              <span>
+                {format(item.versionList[i].lastUpdateDate, "yyyy년 MM월 dd일")}
+              </span>
               <span>{item.title}</span>
-              <span>{item.versionList[0].versionName}</span>
+              <span>{item.versionList[i].versionName}</span>
               <span>
                 <Status
                   onClick={() => {
@@ -387,6 +436,9 @@ export default function RegisterAllow() {
                   style={{
                     backgroundColor: "#EFF5FF",
                   }}
+                  onClick={() => {
+                    confirm(item.workId);
+                  }}
                 >
                   승인
                 </button>
@@ -394,9 +446,51 @@ export default function RegisterAllow() {
                   style={{
                     backgroundColor: "#FFE1DC",
                   }}
+                  onClick={() => {
+                    setDeny(true);
+                  }}
                 >
                   거절
                 </button>
+                {deny ? (
+                  <DenyBar>
+                    <button
+                      onClick={() => {
+                        setDeny(false);
+                      }}
+                    >
+                      X
+                    </button>
+                    <div>
+                      <span>반려사유를 입력하세요: </span>{" "}
+                      <input
+                        onChange={(e) => {
+                          setReason(e.target.value);
+                          console.log(e.target.value);
+                        }}
+                        type="text"
+                      />{" "}
+                      <button
+                        onClick={() => {
+                          axios
+                            .post(
+                              "https://api.litmap.store/api/version/confirm/decline",
+                              { versionId: item.workId, summary: denyReason }
+                            )
+                            .then((result) => {
+                              console.log(result);
+                              // setDeny(false);
+                            })
+                            .catch((error) => {
+                              console.log(error);
+                            });
+                        }}
+                      >
+                        전송
+                      </button>
+                    </div>
+                  </DenyBar>
+                ) : null}
               </span>
             </Category>
           </div>
