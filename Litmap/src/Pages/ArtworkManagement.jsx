@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const Content = styled.div`
   padding: 20px;
@@ -21,6 +22,7 @@ const Content = styled.div`
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
+  height: 100%;
 `;
 
 const Header = styled.div`
@@ -192,8 +194,15 @@ const TreeToggle = styled.span`
   margin-right: 10px;
 `;
 
+const LoadingBar = styled.div`
+  z-index: 100;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+`;
+
 const ArtworkManagement = ({ setContentHeight }) => {
-  const { addWorkInfos } = useStore();
+  const { workInfos, addWorkInfos } = useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -203,44 +212,45 @@ const ArtworkManagement = ({ setContentHeight }) => {
   const itemsPerPage = 5;
   const [showDropdown, setShowDropdown] = useState(false);
   const [expandedItems, setExpandedItems] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.litmap.store/api/board/myWorkList"
-        );
-        console.log(response.data.result);
-        const fetchedData = response.data.result.list.map((item, index) => ({
-          id: index + 1,
-          name: item.title,
-          category: item.category,
-          workId: item.workId,
-          author: item.mainAuthor,
-          publisher: item.publisher,
-          versions: item.versionLists.map((version) => ({
-            versionId: version.versionId,
-            versionName: version.versionName,
-            versionNum: version.versionNum,
-            date: version.lastUpdateDate.split("T")[0],
-            status:
-              version.confirm === "LOAD"
-                ? "임시 저장"
-                : version.confirm === "CONFIRM"
-                ? "승인 중"
-                : "게시 완료",
-          })),
-        }));
-        setData(fetchedData);
-        console.log(data);
-      } catch (error) {
-        console.log(data);
-        console.error("데이터를 불러오는데 실패했습니다.", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         "https://api.litmap.store/api/board/myWorkList"
+  //       );
+  //       console.log(response.data.result);
+  //       const fetchedData = response.data.result.list.map((item, index) => ({
+  //         id: index + 1,
+  //         name: item.title,
+  //         category: item.category,
+  //         workId: item.workId,
+  //         author: item.mainAuthor,
+  //         publisher: item.publisher,
+  //         versions: item.versionLists.map((version) => ({
+  //           versionId: version.versionId,
+  //           versionName: version.versionName,
+  //           versionNum: version.versionNum,
+  //           date: version.lastUpdateDate.split("T")[0],
+  //           status:
+  //             version.confirm === "LOAD"
+  //               ? "임시 저장"
+  //               : version.confirm === "CONFIRM"
+  //               ? "승인 중"
+  //               : "게시 완료",
+  //         })),
+  //       }));
+  //       setData(fetchedData);
+  //       console.log(data);
+  //     } catch (error) {
+  //       console.log(data);
+  //       console.error("데이터를 불러오는데 실패했습니다.", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     setContentHeight(200 + data.length * 100); // Content 높이 설정
@@ -328,6 +338,32 @@ const ArtworkManagement = ({ setContentHeight }) => {
     <Content>
       <Header>작품 및 리스트</Header>
 
+      {loading ? (
+        <LoadingBar>
+          <ClipLoader color="rgba(139, 0, 36, 1)"></ClipLoader>
+        </LoadingBar>
+      ) : null}
+      <button
+        onClick={async () => {
+          await axios
+            .put("https://api.litmap.store/api/version/rollback/17/0.1")
+            .then((result) => {
+              setLoading(true);
+              console.log(result);
+              addWorkInfos(result.data.result);
+              console.log(workInfos);
+              if (result.data.result?.workId) {
+                setLoading(false);
+                navigate("/category1");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }}
+      >
+        수정하기
+      </button>
       <BigButton onClick={() => (window.location.href = "/category1")}>
         <img src="/registration.png" alt="등록 아이콘" />
         <div className="text-container">

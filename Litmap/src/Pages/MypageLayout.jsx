@@ -149,30 +149,47 @@ const MypageLayout = () => {
   const [contentHeight, setContentHeight] = useState(1000);
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get("https://api.litmap.store/api/members/profile", {
-          withCredentials: true,
-        });
+  const cookie = document.cookie;
+  // console.log(cookie);
 
-        setProfile(response.data);
-      } catch (error) {
-        if (error.response) {
-          // 서버에서 응답이 있었던 경우
-          console.error("Failed to fetch user profile:", error.response.status, error.response.data);
-        } else {
-          // 서버에서 응답이 없던 경우
-          console.error("Failed to fetch user profile:", error.message);
-        }
-      }
+  useEffect(() => {
+    // console.log(cookie);
+    const fetchUserProfile = async () => {
+      await axios
+        .get("https://api.litmap.store/api/members/mypage", {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      // try {
+      //   const response = await axios.get("https://api.litmap.store/api/members/profile", {
+      //     withCredentials: true,
+      //   });
+
+      //   setProfile(response.data);
+      // } catch (error) {
+      //   if (error.response) {
+      //     // 서버에서 응답이 있었던 경우
+      //     console.error("Failed to fetch user profile:", error.response.status, error.response.data);
+      //   } else {
+      //     // 서버에서 응답이 없던 경우
+      //     console.error("Failed to fetch user profile:", error.message);
+      //   }
+      // }
     };
 
     const fetchStats = async () => {
       try {
-        const response = await axios.get("https://api.litmap.store/api/board/workCount", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "https://api.litmap.store/api/board/workCount",
+          {
+            withCredentials: true,
+          }
+        );
         setStats({
           작성중인글: response.data.result["작성중인 글"],
           작성한글: response.data.result["작성한 글"],
@@ -207,7 +224,10 @@ const MypageLayout = () => {
         <Box>
           <ProfileSection>
             <img
-              src={profile.userImage || getDefaultProfileImage(profile.memberRoleStatus)}
+              src={
+                profile.userImage ||
+                getDefaultProfileImage(profile.memberRoleStatus)
+              }
               alt="프로필 이미지"
             />
             <div className="name">{profile.nickname}님</div>
@@ -266,8 +286,8 @@ const MypageLayout = () => {
                   회원 관리
                 </Link>
                 <Link to="bannermannage">
-                  <img src="/home-outline.png" alt="홈 화면 관리 이미지" />
-                  홈 화면 관리
+                  <img src="/home-outline.png" alt="홈 화면 관리 이미지" />홈
+                  화면 관리
                 </Link>
               </li>
             </AdminMenu>
@@ -283,10 +303,7 @@ const MypageLayout = () => {
           <Route
             path="manage-profile"
             element={
-              <ProfileManage
-                profile={profile}
-                setProfile={setProfile}
-              />
+              <ProfileManage profile={profile} setProfile={setProfile} />
             }
           />
           <Route path="edit-member" element={<MemberEdit />} />
