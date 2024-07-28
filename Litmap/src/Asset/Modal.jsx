@@ -40,7 +40,7 @@ export default function MyVerticallyCenteredModal(props) {
             setWork(setSaveState);
             console.log(work);
             axios
-              .post("http://43.200.133.58:8080/api/work", work)
+              .post("https://api.litmap.store/api/work", work)
               .then((result) => {
                 console.log(result);
               })
