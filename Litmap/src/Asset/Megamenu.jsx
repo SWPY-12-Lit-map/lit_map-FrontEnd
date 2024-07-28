@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
@@ -88,7 +88,6 @@ function Megamenu(props) {
   const [category, setCategory] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeGenre, setActiveGenre] = useState(null);
-  const [openSubCategory, setOpenSubCategory] = useState({});
 
   const navigate = useNavigate();
 
@@ -129,18 +128,10 @@ function Megamenu(props) {
 
   const handleSubCategoryClick = (categoryId, genreId) => {
     const key = `${categoryId}-${genreId}`;
-    if (openSubCategory[key]) {
-      setOpenSubCategory((prev) => ({
-        ...prev,
-        [key]: false,
-      }));
+    if (activeCategory === categoryId && activeGenre === genreId) {
       setActiveCategory(null);
       setActiveGenre(null);
     } else {
-      setOpenSubCategory((prev) => ({
-        ...prev,
-        [key]: true,
-      }));
       setActiveCategory(categoryId);
       setActiveGenre(genreId);
       getAxios(categoryId, genreId);
@@ -168,7 +159,8 @@ function Megamenu(props) {
           </ColumnTitle>
           {genres.map((genre, i) => {
             const key = `${category.id}-${genre.id}`;
-            const isOpen = openSubCategory[key];
+            const isOpen =
+              activeCategory === category.id && activeGenre === genre.id;
             return (
               <SubCategory key={i}>
                 <SubCategoryTitle
