@@ -212,9 +212,9 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   useEffect(() => {
     // 로그인 상태 확인
     const checkLoginStatus = () => {
-      const sessionId = getCookie("sessionId");
-      console.log(sessionId);
-      if (!sessionId) {
+      const litmapEmail = getCookie("litmapEmail");
+      console.log(litmapEmail);
+      if (!litmapEmail) {
         setLogin(false);
       } else {
         setLogin(true);
@@ -222,7 +222,7 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
     };
 
     checkLoginStatus();
-  }, []);
+  }, [setLogin]);
 
   // 쿠키 값 가져오기
   const getCookie = (name) => {
@@ -274,10 +274,14 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
     await axios
       .get("https://api.litmap.store/api/members/logout")
       .then((response) => {
-        const sessionId = getCookie("sessionId");
         setLogin(false);
-        document.cookie = `sessionId=${sessionId} ; path=/; max-age=0`;
-        console.log("삭제됨");
+        // 모든 쿠키 삭제
+        document.cookie.split(";").forEach((cookie) => {
+          document.cookie = cookie
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/");
+        });
+        console.log("쿠키 삭제됨");
         navigate("/");
       })
       .catch((error) => {

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 const PageContainer = styled.div`
   display: flex;
@@ -152,63 +152,49 @@ const Login = ({ setLogin }) => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+      const [name, value] = cookie.split("=");
+      acc[name] = value;
+      return acc;
+    }, {});
+    if (cookies["litmapEmail"]) {
+      setLogin(true);
+      navigate("/");
+    }
+  }, [setLogin, navigate]);
+
   const handleLogin = async () => {
     if (!email || !password) {
       alert("이메일과 비밀번호를 모두 입력해주세요.");
       return;
     }
-    await axios
-      .post(`https://api.litmap.store/api/members/login`, {
+    try {
+      const result = await axiosInstance.post("/members/login", {
         litmapEmail: email,
         password: password,
-      })
-      .then((result) => {
-        console.log(result);
-        setLogin(true);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
       });
+      console.log(result);
+      setLogin(true);
 
-    // try {
-    //   const response = await fetch(
-    //     `https://api.litmap.store/api/members/login?litmapEmail=${encodeURIComponent(
-    //       email
-    //     )}&password=${encodeURIComponent(password)}`,
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         accept: "*/*",
-    //       },
-    //       credentials: "include", // 쿠키 포함
-    //       body: {
-    //         litmapEmail: email,
-    //         password: password,
-    //       },
-    //     }
-    //   );
+      // 로그인 성공 후 쿠키 설정 (7일 동안 유효)
+      setCookie("litmapEmail", email, 7);
 
-    //   if (!response.ok) {
-    //     const errorData = await response.json();
-    //     throw new Error(errorData.error || "로그인에 실패했습니다.");
-    //   }
+      // 쿠키 설정 확인
+      console.log("Cookies:", document.cookie);
 
-    //   const data = await response.json();
-    //   console.log(data);
-    //   // 로그인 성공 시 세션 ID를 쿠키에 저장
-    //   document.cookie = `sessionId=${data.sessionId}; path=/`;
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      alert("로그인 실패: " + error.message);
+    }
+  };
 
-    //   console.log(`로그인 성공: ${email}`);
-    //   setLogin(true);
-    //   navigate("/");
-    // } catch (error) {
-    //   alert(
-    //     error.message ||
-    //       "로그인 도중 문제가 발생했습니다. 나중에 다시 시도해주세요."
-    //   );
-    // }
+  const setCookie = (name, value, days) => {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
   };
 
   return (
