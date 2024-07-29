@@ -248,14 +248,18 @@ export default function InfoInput(props) {
 
   // 빈값 확인
   const CheckInputs = () => {
-    const works = Object.values(work);
-    const found = works.find((a) => a == "");
-    setNext(true);
-    // if (found === undefined) {
-    //   setNext(true);
-    // }
-  };
+    const works = Object.entries(work)
+      .filter(([key]) => key !== "imageUrl")
+      .map(([_, value]) => value);
 
+    const found = works.find((a) => a === "" || a === null || a === undefined);
+
+    if (found === undefined) {
+      setNext(true);
+    } else {
+      setNext(false); // 빈 값이 있는 경우 false로 설정
+    }
+  };
   // 장르 복수 선택
   const handleGenreSelection = (data) => {
     let updatedGenres = [...work.genre];

@@ -77,6 +77,7 @@ export default function Post(props) {
 
   const [mainAuthor, setMainauth] = useState("");
   const [next, setNext] = useState(false); // 다음 버튼 활성 여부
+  const [isSaveEnabled, setIsSaveEnabled] = useState(false); // 임시 저장 버튼 활성 여부
   const [extraSave, setExtraSave] = useState(false); // 임시서장 = false / 저장 = true
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
@@ -96,6 +97,8 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
+  const { workInfos, addWorkInfos } = useStore();
+  const getWork = { ...workInfos };
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -103,12 +106,33 @@ export default function Post(props) {
 
   const prevCount = PrevCountRef.current;
 
+  // 컴포넌트가 마운트될 때 실행되는 useEffect
   useEffect(() => {
-    setRead(false);
-
-    if (!mount) {
-      // 컴포넌트가 마운트될 때만 실행
-      const newInfos = Array.from({ length: count }, (_, i) => ({
+    if (workInfos.workId) {
+      setRead(false);
+      // 임시저장 불러오기
+      setWork({
+        category: workInfos.category,
+        confirmCheck: false,
+        author: workInfos.author,
+        contents: workInfos.contents,
+        imageUrl: workInfos.imageUrl,
+        version: workInfos.versions.versionNum,
+        versionName: workInfos.versions.versionName,
+        title: workInfos.title,
+        publisherName: "민음사",
+        genre: workInfos.genre,
+        memberId: 24,
+        publisherDate: workInfos.publisherDate,
+        workId: workInfos.workId,
+        relationship: workInfos.versions.relationship,
+        casts: workInfos.versions.casts,
+      });
+      setInfos(workInfos.versions.casts);
+      setCount(workInfos.versions.casts.length);
+    } else {
+      // 초기 상태 설정
+      const newInfos = Array.from({ length: count }, () => ({
         name: "",
         imageUrl: "",
         type: "",
@@ -120,8 +144,12 @@ export default function Post(props) {
       }));
       setInfos(newInfos);
       setMount(true);
-    } else if (prevCount !== count) {
-      const newInfos = Array.from({ length: count }, (_, i) => ({
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mount && prevCount !== count) {
+      const newInfos = Array.from({ length: count }, () => ({
         name: "",
         imageUrl: "",
         type: "",
@@ -144,35 +172,19 @@ export default function Post(props) {
         setCount(30);
       }
     }
-  }, [count, mount, prevCount, work]);
+  }, [count, mount, prevCount]);
 
-  const { workInfos, addWorkInfos } = useStore();
-  const getWork = { ...workInfos };
-  // 임시저장 불러올 때
+  // work, characterInfos를 감지버튼 활성화 여부 업데이트
   useEffect(() => {
-    // 임시저장 불러오기
-    if (workInfos.workId) {
-      setWork({
-        category: workInfos.category,
-        confirmCheck: false,
-        author: workInfos.author,
-        contents: workInfos.contents,
-        imageUrl: workInfos.imageUrl,
-        version: workInfos.versions.versionNum,
-        versionName: workInfos.versions.versionName,
-        title: workInfos.title,
-        publisherName: "민음사",
-        genre: workInfos.genre,
-        memberId: 24,
-        publisherDate: workInfos.publisherDate,
-        workId: workInfos.workId,
-        relationship: workInfos.versions.relationship,
-        casts: workInfos.versions.casts,
-      });
-      setInfos(workInfos.versions.casts);
-      setCount(workInfos.versions.casts.length);
-    }
-  }, []);
+    const isWorkValid =
+      work.title && work.casts.every((cast) => cast.name && cast.type);
+    setIsSaveEnabled(isWorkValid);
+  }, [work, characterInfos]);
+
+  // 다음 버튼의 활성화 여부
+  // useEffect(() => {
+  //   setNext(isSaveEnabled && state === 2);
+  // }, [isSaveEnabled, state]);
 
   const Mainpart = () => {
     switch (state) {
@@ -265,84 +277,63 @@ export default function Post(props) {
               이전
             </Prevbtn>
           ) : null}
-          {!next ? (
-            <>
-              <ExtraSave
-                onClick={() => {
-                  const Extrasave = { ...work, confirmCheck: false };
+          <div>
+            <ExtraSave
+              disabled={!isSaveEnabled}
+              onClick={() => {
+                const Extrasave = { ...work, confirmCheck: false };
+                setWork(Extrasave);
+                console.log(work);
+                axios
+                  .post("https://api.litmap.store/api/work", work)
+                  .then((result) => {
+                    console.log(result);
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }}
+              style={
+                !isSaveEnabled
+                  ? { borderColor: "#9F9F9F", color: "#9F9F9F" }
+                  : {}
+              }
+            >
+              임시저장
+            </ExtraSave>
+            <Nextbtn
+              id="nextBtn"
+              disabled={!next}
+              onClick={() => {
+                if (state === 1) {
+                  setState(2);
+                  document.querySelector("#nextBtn").innerHTML = "저장";
+                  console.log(work);
+                } else if (state === 2) {
+                  // 저장 로직 추가
+                  setModalShow(true);
+                  const Extrasave = { ...work, confirmCheck: true };
                   setWork(Extrasave);
                   console.log(work);
-                  axios
-                    .post("https://api.litmap.store/api/work", work)
-                    .then((result) => {
-                      console.log(result);
-                    })
-                    .then((error) => {
-                      console.log(error);
-                    });
-                }}
-              >
-                임시저장
-              </ExtraSave>
-              <Nextbtn
-                disabled
-                style={{ borderColor: "#9F9F9F", color: "#9F9F9F" }}
-              >
-                다음
-              </Nextbtn>
-            </>
-          ) : (
-            <div>
-              <ExtraSave
-                onClick={() => {
-                  const Extrasave = { ...work, confirmCheck: false };
-                  setWork(Extrasave);
-                  console.log(work);
-                  axios
-                    .post("https://api.litmap.store/api/work", work)
-                    .then((result) => {
-                      console.log(result);
-                    })
-                    .then((error) => {
-                      console.log(error);
-                    });
-                }}
-              >
-                임시저장
-              </ExtraSave>
-              <Nextbtn
-                id="nextBtn"
-                onClick={() => {
-                  if (state === 1) {
-                    setState(2);
-                    document.querySelector("#nextBtn").innerHTML = "저장";
-
-                    console.log(work);
-                  } else if (state === 2) {
-                    // 저장 로직 추가
-                    setModalShow(true);
-                    const Extrasave = { ...work, confirmCheck: true };
-                    setWork(Extrasave);
-                    console.log(work);
-                    {
-                      work.confirmCheck
-                        ? axios
-                            .post("https://api.litmap.store/api/work", work)
-                            .then((result) => {
-                              console.log(result);
-                            })
-                            .then((error) => {
-                              console.log(error);
-                            })
-                        : console.log("loading");
-                    }
+                  {
+                    work.confirmCheck
+                      ? axios
+                          .post("https://api.litmap.store/api/work", work)
+                          .then((result) => {
+                            console.log(result);
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                          })
+                      : console.log("loading");
                   }
-                }}
-              >
-                다음
-              </Nextbtn>
-            </div>
-          )}
+                }
+              }}
+              style={!next ? { borderColor: "#9F9F9F", color: "#9F9F9F" } : {}}
+            >
+              다음
+            </Nextbtn>
+          </div>
         </Foot>
       </Edit>
     </Posting>
