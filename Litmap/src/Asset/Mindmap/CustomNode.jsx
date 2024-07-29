@@ -5,23 +5,6 @@ import styled from "styled-components";
 import { useStore } from "../store";
 
 const connectionNodeIdSelector = (state) => state.connectionNodeId;
-const InfoTab = styled.div`
-  position: absolute;
-  background-color: white;
-  width: 100%;
-  top: 30%;
-`;
-
-const NodeName = styled.div`
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 50px;
-  border-radius: 5px;
-  padding: 0 0 0 5px;
-  background-color: white;
-`;
-
 const NodeStyle = styled.div`
   width: 100%;
   height: 100%;
@@ -34,6 +17,29 @@ const NodeStyle = styled.div`
     border: 1px solid #fff;
     left: 40%;
   }
+`;
+const InfoTab = styled.div`
+  position: absolute;
+  background-color: white;
+  border-radius: 5px;
+  width: 100%;
+  top: 30%;
+`;
+
+const NodeName = styled.div`
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 100%;
+  border-radius: 5px;
+  padding: 0 0 0 5px;
+  background-color: white;
+`;
+
+const NodeImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 export default function CustomNode({ id, data, selected }) {
@@ -62,8 +68,13 @@ export default function CustomNode({ id, data, selected }) {
             style={read ? null : { top: "50%", transform: "translateY(-50%)" }}
           />
         )}
-        <div>
-          <img src={data.imageUrl || basicImg} width={100} alt="Profile" />
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <NodeImg src={data.imageUrl || basicImg} alt="Profile" />
           <NodeName
             onClick={() => {
               setShow(!show);

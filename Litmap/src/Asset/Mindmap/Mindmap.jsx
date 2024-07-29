@@ -23,6 +23,11 @@ import { useStore } from "../store";
 const Mapping = styled.div`
   width: 100%;
   height: 100%;
+
+  z-index: 99;
+  & > div > div > div > div > div > .react-flow__node {
+    width: 150px;
+  }
 `;
 const Btns = styled.div`
   display: flex;
