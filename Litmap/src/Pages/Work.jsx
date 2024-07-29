@@ -57,7 +57,11 @@ const Button = styled.button`
   color: black;
   margin-right: 30px;
 `;
-const Info = styled.div``;
+const Info = styled.div`
+  & > * {
+    margin-bottom: 10px;
+  }
+`;
 const List = styled.div``;
 const Author = styled(List)``;
 const Releasedate = styled(List)``;
@@ -139,12 +143,12 @@ export default function Work({
           <Thumbnail src={workInfo.imageUrl} alt="썸네일 자리"></Thumbnail>
           <Description>
             <Title>{workInfo.title}</Title>{" "}
-            <State>완결여부 결정도 해야됨</State>
+            {/* <State>완결여부 결정도 해야됨</State> */}
             <SelectBar>
               <Button
                 onClick={() => {
                   setState(false);
-                  console.log(work);
+                  console.log(workInfo.genre.join(", "));
                 }}
                 style={{
                   backgroundColor: state == false ? "#8d2741" : "white",
@@ -169,13 +173,17 @@ export default function Work({
             </SelectBar>
             {state == false ? (
               <Info>
-                <Author>감독/작가: {workInfo.author}</Author>
+                <Author>
+                  감독/작가:{" "}
+                  {workInfo.author ? workInfo.author.join(", ") : null}
+                </Author>
                 <Releasedate>
-                  오픈:
-                  {formatDate(workInfo.publisherDate)}
+                  오픈: {formatDate(workInfo.publisherDate)}
                 </Releasedate>
-                <Season>시즌: 이것도 넣어야 됨</Season>
-                <Channel>채널: 이것도 넣어야 함</Channel>
+                <Season>
+                  장르: {workInfo.genre ? workInfo.genre.join(", ") : null}
+                </Season>
+                <Channel>카테고리: {workInfo.category}</Channel>
                 <Content>내용: {workInfo.contents}</Content>
               </Info>
             ) : (

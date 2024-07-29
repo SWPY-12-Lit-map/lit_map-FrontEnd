@@ -82,6 +82,12 @@ const CustomMiniMap = styled(MiniMap)`
   margin-bottom: 7%;
 `;
 
+const Logo = styled.img`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+`;
+
 const initialNodes = [];
 const initialEdges = [];
 const connectionLineStyle = {
@@ -334,6 +340,7 @@ const Mindmap = (props) => {
           </DeleteEdgesButton> */}
         </CustomControls>
         {read ? null : <CustomMiniMap />}
+        {/* <Logo src="/Logo.png"></Logo> */}
       </ReactFlow>
       {!read ? null : (
         <Btns>

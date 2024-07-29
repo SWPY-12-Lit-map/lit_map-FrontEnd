@@ -69,6 +69,7 @@ const Posts = styled.div`
 `;
 
 const Post = styled.div`
+  position: relative;
   width: 80%;
   cursor: pointer;
   img {
@@ -76,7 +77,14 @@ const Post = styled.div`
   }
 `;
 
-const Bookmark = styled.div``;
+const Bookmark = styled.div`
+  position: absolute;
+  top: 20px;
+  background-color: #8b0024;
+  color: white;
+  padding: 1px 13px;
+  border-radius: 0px 10px 10px 0;
+`;
 
 const Foot = styled.div`
   background-color: #fbf9f6;
@@ -153,7 +161,7 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
                       navigate(`/work/${post.workId}`);
                     }}
                   >
-                    <Bookmark></Bookmark>
+                    <Bookmark>{index + 1}</Bookmark>
                     <img
                       src={post.imageUrl}
                       alt={post.title}
@@ -166,6 +174,8 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
                 ))
               : view.map((post, index) => (
                   <Post key={index}>
+                    {" "}
+                    <Bookmark>{index + 1}</Bookmark>
                     <img
                       src={post.imageUrl}
                       alt={post.title}

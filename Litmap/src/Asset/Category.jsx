@@ -45,7 +45,7 @@ function Category({ setMega, mega }) {
         }}
       />
       <CategoryMenuItem>
-        <StyledLink to="/">홈</StyledLink>
+        <StyledLink>홈</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
         <StyledLink to="/category1">도서_임시작품등록페이지</StyledLink>

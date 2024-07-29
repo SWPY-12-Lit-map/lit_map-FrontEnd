@@ -214,6 +214,19 @@ function App() {
               <SearchResult userInput={userInput} setUserInput={setUserInput} />
             }
           ></Route>
+          <Route
+            path="/*"
+            element={
+              <Home
+                mega={mega}
+                setMega={setMega}
+                update={update}
+                state={state}
+                setState={setState}
+                view={view}
+              />
+            }
+          />
         </Routes>
       </Router>
     </>

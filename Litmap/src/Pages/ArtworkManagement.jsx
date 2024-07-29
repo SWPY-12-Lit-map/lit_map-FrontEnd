@@ -343,27 +343,27 @@ const ArtworkManagement = ({ setContentHeight }) => {
           <ClipLoader color="rgba(139, 0, 36, 1)"></ClipLoader>
         </LoadingBar>
       ) : null}
-      <button
-        onClick={async () => {
-          await axios
-            .put("https://api.litmap.store/api/version/rollback/17/0.1")
-            .then((result) => {
-              setLoading(true);
-              console.log(result);
-              addWorkInfos(result.data.result);
-              console.log(workInfos);
-              if (result.data.result?.workId) {
-                setLoading(false);
-                navigate("/category1");
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      >
-        수정하기
-      </button>
+      {/* <button
+          onClick={async () => {
+            await axios
+              .put("https://api.litmap.store/api/version/rollback/17/0.1")
+              .then((result) => {
+                setLoading(true);
+                console.log(result);
+                addWorkInfos(result.data.result);
+                console.log(workInfos);
+                if (result.data.result?.workId) {
+                  setLoading(false);
+                  navigate("/category1");
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }}
+        >
+          수정하기
+        </button> */}
       <BigButton onClick={() => (window.location.href = "/category1")}>
         <img src="/registration.png" alt="등록 아이콘" />
         <div className="text-container">

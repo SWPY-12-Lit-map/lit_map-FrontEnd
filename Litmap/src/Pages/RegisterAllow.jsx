@@ -413,10 +413,18 @@ export default function RegisterAllow() {
 
             <Category id="memberInfo">
               <span>
-                {format(item.versionList[i].lastUpdateDate, "yyyy년 MM월 dd일")}
+                {item?.versionList[0]?.lastUpdateDate &&
+                  format(
+                    item.versionList[0].lastUpdateDate,
+                    "yyyy년 MM월 dd일"
+                  )}
               </span>
               <span>{item.title}</span>
-              <span>{item.versionList[i].versionName}</span>
+              <span>
+                {" "}
+                {item?.versionList[0]?.versionName &&
+                  item.versionList[0].versionName}
+              </span>
               <span>
                 <Status
                   onClick={() => {

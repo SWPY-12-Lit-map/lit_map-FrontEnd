@@ -178,6 +178,7 @@ const Status = styled.div`
 
 const Category = styled.div`
   display: flex;
+  align-items: center;
   width: 100%;
   text-align: center;
   border-bottom: 1px solid #c5c5c5;
@@ -368,9 +369,7 @@ export default function MemberManage() {
               <span>{item.date}</span>
               <span>{item.userName}</span>
               <span>{item.area}</span>
-              <span>
-                <Status>작품 보러가기</Status>
-              </span>
+              <span>회사이름</span>
               <span
                 style={{
                   display: "flex",
