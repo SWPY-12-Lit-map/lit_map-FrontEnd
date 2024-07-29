@@ -19,7 +19,7 @@ const EditInfo = styled.div`
 
   & > div {
     width: 350px;
-    height: 500px;
+    height: 550px;
     margin: 0 10px;
     flex-shrink: 0;
     flex-grow: 0;
