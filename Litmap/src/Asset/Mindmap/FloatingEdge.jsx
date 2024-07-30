@@ -6,7 +6,6 @@ import {
   EdgeLabelRenderer,
   getBezierPath,
 } from "reactflow";
-
 import { getEdgeParams } from "./util";
 
 function getAngle(sx, sy, tx, ty) {
@@ -20,7 +19,7 @@ function FloatingEdge({
   markerEnd,
   style,
   data = {},
-  onTextChange,
+  // onTextChange,
   selected,
 }) {
   const sourceNode = useStore(
@@ -33,7 +32,7 @@ function FloatingEdge({
   const [text, setText] = useState(data.text || "");
 
   useEffect(() => {
-    if (data.text !== text) {
+    if (data.text != text) {
       setText(data.text || "");
     }
   }, [data.text]);
@@ -58,25 +57,20 @@ function FloatingEdge({
     targetPosition: targetPos,
   });
 
-  const angle = getAngle(sx, sy, tx, ty);
+  // const angle = getAngle(sx, sy, tx, ty);
 
   const handleTextChange = (event) => {
     const newText = event.target.value;
     setText(newText);
-    if (onTextChange) {
-      onTextChange(id, newText);
+    if (data.onTextChange) {
+      data.onTextChange(id, newText); // onTextChange 호출
     }
   };
 
-  const ChangeinputStyle =
-    (-125 <= angle && angle <= -45) || (45 < angle && angle < 125)
-      ? { writingMode: "vertical-lr", textOrientation: "upright" }
-      : null;
-
   const onEdgeClick = () => {
+    const { setEdges } = useReactFlow();
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
   };
-  const { setEdges } = useReactFlow();
 
   return (
     <>
@@ -98,11 +92,11 @@ function FloatingEdge({
             position: "absolute",
             transform: `translate(-50%, -50%) translate(${
               labelX + 4
-            }px,${labelY}px)`, // Slight adjustment
+            }px,${labelY}px)`,
             fontSize: 12,
             pointerEvents: "all",
-            backgroundColor: "white", // Optional: to make it more visible
-            padding: "2px", // Optional: padding for better appearance
+            backgroundColor: "white",
+            padding: "2px",
           }}
           className="nodrag nopan"
         >
@@ -113,7 +107,6 @@ function FloatingEdge({
             style={{
               border: data.read ? "none" : null,
               textAlign: "center",
-              // ...ChangeinputStyle,
             }}
             readOnly={data.read}
           />

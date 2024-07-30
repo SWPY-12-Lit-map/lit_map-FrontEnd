@@ -26,5 +26,10 @@ export const useStore = create((set) => ({
     set((state) => ({
       edges: state.edges.filter((edge) => edge.id !== edgeId),
     })),
-  // 다른 상태 및 설정들...
+
+  backgroundColor: "",
+  setBackgroundColor: (data) => set({ backgroundColor: data }),
+
+  backgroundImg: "",
+  setBackgroundImg: (data) => set({ backgroundImg: data }),
 }));

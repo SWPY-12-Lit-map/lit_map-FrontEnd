@@ -125,15 +125,15 @@ const Mindmap = (props) => {
     setWork,
     backgroundImg,
     setBackImg,
-    relationship,
     workInfo,
+    relationship,
   } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [backColor, setBackColor] = useState();
   const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
-  const { read } = useStore();
+  const { workInfos, read, backgroundColor } = useStore();
 
   const [rfInstance, setRfInstance] = useState(null);
   const { fitView, setViewport } = useReactFlow();
@@ -164,6 +164,7 @@ const Mindmap = (props) => {
 
   const onTextChange = useCallback(
     (id, text) => {
+      console.log("Updating edge with id", id, "to text", text);
       setEdges((eds) =>
         eds.map((edge) =>
           edge.id === id ? { ...edge, data: { ...edge.data, text } } : edge
@@ -186,72 +187,66 @@ const Mindmap = (props) => {
     setSelectedEdgeId(edge.id);
   }, []);
 
-  /* 마인드맵 저장 */
+  // 마인드맵 저장 복구
+  const onRestore = useCallback(
+    (data) => {
+      const restoreFlow = async () => {
+        const flow = data;
+        if (flow) {
+          const readNodes = flow.nodes;
+          readNodes.forEach((element) => {
+            element.data.read = true;
+          });
+
+          const restoredEdges = flow.edges.map((edge) => ({
+            ...edge,
+            data: {
+              ...edge.data,
+              text: edge.data.text || "", // 라벨 데이터 복원
+            },
+          }));
+          setNodes(flow.nodes || []);
+          setEdges(restoredEdges || []);
+          setTimeout(() => setViewport(0.1), 0);
+          if (flow.backgroundColor) {
+            setBackColor(flow.backgroundColor);
+          } else if (flow.backgroundImage) {
+            setBackgroundImg(flow.backgroundImage);
+          }
+        }
+      };
+      restoreFlow();
+    },
+    [setNodes, setEdges, setBackImg, setBackColor, setViewport]
+  );
+
+  // 마인드맵 저장
   const onSave = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
       flow.version = Number(work.defaultVersion);
       flow.work_id = work.title;
       flow.viewport = rfInstance.getViewport(); // FitView 설정
-      flow.backgroundImage = backgroundImg;
-      flow.backgroundColor = localStorage.getItem("color")
-        ? localStorage.getItem("color")
-        : null;
+      flow.backgroundImage = backgroundImage;
+      flow.backgroundColor = backColor;
+      flow.nodes = nodes;
+      flow.edges = edges.map((edge) => ({
+        ...edge,
+        data: {
+          ...edge.data,
+          text: edge.data.text, // 엣지의 텍스트 포함
+        },
+      }));
       const updateRelationship = { ...work, relationship: flow, version: 0.1 };
 
       setWork(updateRelationship);
-      console.log(work);
     }
-  }, [rfInstance, work, backgroundImg, setWork]);
-
-  /* 마인드맵 저장 복구 */
-  const onRestore = useCallback(() => {
-    const restoreFlow = async () => {
-      const flow = relationship;
-      const readNodes = flow.nodes;
-      readNodes.forEach((element) => {
-        element.data.read = read;
-      });
-      if (flow) {
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setTimeout(() => setViewport(0.1), 0);
-        if (flow.backgroundColor) {
-          setBackColor(flow.backgroundColor);
-          console.log(backColor);
-        } else if (flow.backgroundImage) {
-          setBackgroundImg(flow.backgroundImage);
-        } else {
-        }
-      }
-    };
-    restoreFlow();
-  }, [
-    relationship,
-    read,
-    setNodes,
-    setViewport,
-    setEdges,
-    setBackImg,
-    setBackColor,
-  ]);
+  }, [rfInstance, backgroundImage, backColor, nodes, edges, work, setWork]);
 
   // 이미지나 컬러가 업데이트 될 때 재렌더링
   useEffect(() => {
     setBackgroundImg(backgroundImg);
   }, [setBackImg, backgroundImg]);
-
-  useEffect(() => {
-    const checkLocalStorage = () => {
-      const color = localStorage.getItem("color");
-      if (color !== backColor) {
-        setBackColor(color);
-      }
-    };
-
-    const intervalId = setInterval(checkLocalStorage, 100);
-    return () => clearInterval(intervalId);
-  }, [backColor]);
 
   /* 선 지우기 */
   useEffect(() => {
@@ -271,18 +266,18 @@ const Mindmap = (props) => {
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
     createNodes();
-  }, [count, createNodes, backgroundImg]);
+  }, [count, createNodes]);
 
   useEffect(() => {
     if (read === true) {
-      console.log(read);
-      onRestore();
+      onRestore(relationship);
       fitView(); // fitView 호출
+    } else {
+      onRestore(work.relationship);
     }
   }, [read, onRestore, fitView]);
 
   useEffect(() => {
-    console.log(read);
     if (!read) {
       if (
         nodes.length > 0 ||
@@ -310,7 +305,7 @@ const Mindmap = (props) => {
             onTextChange,
             edgeType,
             lineStyle,
-            read,
+            read: edge.data.read,
           },
           selected: edge.id === selectedEdgeId,
         }))}
@@ -333,7 +328,7 @@ const Mindmap = (props) => {
           style={{
             backgroundImage: backgroundImage ? `url(${backgroundImage})` : null,
             backgroundSize: backgroundImage ? "cover" : null,
-            background: backColor ? backColor : null,
+            background: backgroundColor ? backgroundColor : null,
             //   "linear-gradient(135deg, rgba(35,185,168,1) 0%, rgba(2,0,36,1) 80%)",
           }}
           variant="none"

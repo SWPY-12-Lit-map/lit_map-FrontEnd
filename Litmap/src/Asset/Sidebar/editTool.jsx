@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
@@ -7,6 +7,9 @@ import { useColor, ColorPicker } from "react-color-palette";
 import "react-color-palette/css";
 import { IoFolderOpenOutline } from "react-icons/io5";
 import { BsPaperclip } from "react-icons/bs";
+import { useStore } from "../store";
+import { ChromePicker } from "react-color";
+import axios from "axios";
 
 const SelectBackground = styled.div`
   margin-top: 10%;
@@ -108,15 +111,44 @@ export default function EditTool(props) {
     setBackground,
     backgroundType,
     backgroundImg,
+    setWork,
+    work,
   } = props;
 
-  const fileTypes = ["JPG", "PNG", "JPEG"];
+  const { backgroundColor, setBackgroundColor } = useStore();
 
+  const fileTypes = ["JPG", "PNG", "JPEG"];
+  const [imageFile, setFile] = useState("");
   // 이미지 업로드
   function DragDrop() {
     const handleChange = (file) => {
-      setBackImg(URL.createObjectURL(file));
-      console.log(backgroundImg);
+      setFile(file);
+      console.log(file.name);
+      const formData = new FormData();
+      formData.append("image", file); // 여기를 imageFile 대신 file로 수정
+      formData.append("path", "relationshipBackground");
+      axios
+        .post("https://api.litmap.store/api/files", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response.data.result);
+          const ImgUrl = {
+            ...work,
+            relationship: {
+              ...work.relationship,
+              backgroundImage: response.data.result,
+            },
+          };
+          setWork(ImgUrl);
+          console.log(work);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      console.log(work);
     };
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
@@ -139,25 +171,20 @@ export default function EditTool(props) {
 
   // 색깔 고르기
   const ColorPick = () => {
-    const [color, setColor] = useColor("#FBF9F6");
-
-    const onChangeComplete = (color) => {
-      localStorage.setItem("color", color.hex);
+    const handleChangeComplete = (color) => {
+      setBackgroundColor(color.hex);
+      setWork({
+        ...work,
+        relationship: {
+          ...work.relationship,
+          backgroundColor: color.hex,
+        },
+      });
     };
-
     return (
-      <ColorPicker
-        hideInput={["rgb", "hsv"]}
-        color={color}
-        onChange={setColor}
-        onChangeComplete={onChangeComplete}
-      />
+      <ChromePicker color={backgroundColor} onChange={handleChangeComplete} />
     );
   };
-
-  useEffect(() => {
-    localStorage.setItem("color", []);
-  }, []);
 
   return (
     <div>

@@ -115,6 +115,8 @@ export default function Sidebar(props) {
             setBackground={props.setBackground}
             setBackImg={props.setBackImg}
             backgroundImg={props.backgroundImg}
+            setWork={setWork}
+            work={work}
           />
         )}
       </SideMain>

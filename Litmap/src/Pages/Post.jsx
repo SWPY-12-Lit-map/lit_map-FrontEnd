@@ -97,7 +97,8 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
-  const { workInfos, addWorkInfos } = useStore();
+  const { workInfos, addWorkInfos, setBackgroundColor, setBackgroundImg } =
+    useStore();
   const getWork = { ...workInfos };
 
   useEffect(() => {
@@ -130,6 +131,18 @@ export default function Post(props) {
       });
       setInfos(workInfos.versions.casts);
       setCount(workInfos.versions.casts.length);
+      setBackgroundColor(
+        workInfos.versions.relationship.backgroundColor != null
+          ? workInfos.versions.relationship.backgroundColor
+          : "#ffffff"
+      );
+      setBackgroundImg(
+        workInfos.versions.relationship.backgroundColor != null
+          ? workInfos.versions.relationship.backgroundColor
+          : "#ffffff"
+      );
+
+      console.log(workInfos);
     } else {
       // 초기 상태 설정
       const newInfos = Array.from({ length: count }, () => ({
