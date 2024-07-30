@@ -116,6 +116,7 @@ export default function Work({
         const Get = result.data.result;
         setWorkInfo(Get);
         console.log(workInfo);
+        console.log(result);
       })
       .catch((error) => {
         console.log(error);
@@ -133,7 +134,8 @@ export default function Work({
     setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
     GetWork();
     // 데이터를 가져오는 함수 호출
-  }, [setWorkInfo, setWorkInfo, read]);
+    console.log(workInfo);
+  }, [read]);
 
   return (
     <>
@@ -204,8 +206,7 @@ export default function Work({
               workInfo={workInfo}
               read={read}
               setRead={setRead}
-              // casts={workInfo.versions.casts}
-              // relationship={workInfo.versions.relationship}
+              relationship={workInfo.versions?.relationship}
             />{" "}
           </ReactFlowProvider>
         </Connection>
