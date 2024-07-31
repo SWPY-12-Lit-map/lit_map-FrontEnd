@@ -219,7 +219,8 @@ const ArtworkManagement = ({ setContentHeight }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://api.litmap.store/api/board/myWorkList"
+          "https://api.litmap.store/api/board/myWorkList",
+          { withCredentials: true }
         );
         console.log(response);
         const fetchedData = response.data.result.list.map((item, index) => ({
