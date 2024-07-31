@@ -202,7 +202,8 @@ const LoadingBar = styled.div`
 `;
 
 const ArtworkManagement = ({ setContentHeight }) => {
-  const { workInfos, addWorkInfos, setCondition, condition } = useStore();
+  const { workInfos, addWorkInfos, setCondition, condition, userId } =
+    useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -222,7 +223,7 @@ const ArtworkManagement = ({ setContentHeight }) => {
         );
         console.log(response);
         const fetchedData = response.data.result.list.map((item, index) => ({
-          id: index + 1,
+          id: userId,
           name: item.title,
           category: item.category,
           workId: item.workId,
