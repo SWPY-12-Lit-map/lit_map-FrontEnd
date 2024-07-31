@@ -15,10 +15,10 @@ import Work from "./Pages/Work";
 import ScrollTop from "./Asset/ScrollTop";
 import FindIdPage from "./Pages/FindIdPage";
 import FindPasswordPage from "./Pages/FindPasswordPage";
-// import SearchResult from "./Pages/SearchResult";
 import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
 import SearchResult from "./Pages/SearchResult";
+import WithdrawalPage from "./Pages/WithdrawalPage";
 
 const GlobalStyle = createGlobalStyle`html {
     height: 100%;
@@ -28,7 +28,6 @@ const GlobalStyle = createGlobalStyle`html {
       width: 100%;
     }
     #root {
-    
       height: 100%;
     }`;
 
@@ -200,11 +199,14 @@ function App() {
               />
             }
           ></Route>
+          
           <Route path="/category2/*" element={<MypageLayout />}>
             <Route path="manage-profile" element={<ProfileManage />} />
             <Route path="edit-member" element={<MemberEdit />} />
+            <Route path="edit-member/withdrawal" element={<WithdrawalPage />} />
             <Route path="manage-artworks" element={<ArtworkManagement />} />
           </Route>
+
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/find-id" element={<FindIdPage />} />
           <Route path="/reset-password" element={<FindPasswordPage />} />

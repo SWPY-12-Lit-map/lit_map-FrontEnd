@@ -192,7 +192,7 @@ const MypageLayout = () => {
     switch (role) {
       case "ACTIVE_MEMBER":
         return "작가";
-      case "PENDING_MEMBER":
+      case "ㅈ":
         return "승인중";
       case "ADMIN":
         return "관리자";
