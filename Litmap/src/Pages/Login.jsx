@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axiosInstance from "./axiosInstance";
+import { useStore } from "../Asset/store";
 
 const PageContainer = styled.div`
   display: flex;
@@ -151,6 +152,7 @@ const Login = ({ setLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { userId, setUserId } = useStore();
 
   useEffect(() => {
     const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
@@ -175,6 +177,7 @@ const Login = ({ setLogin }) => {
         password: password,
       });
       console.log(result);
+      setUserId(result.data.result.id);
       setLogin(true);
 
       // 로그인 성공 후 쿠키 설정 (7일 동안 유효)

@@ -82,7 +82,7 @@ export default function Post(props) {
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
   const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
-  const { read, setRead } = useStore();
+  const { read, setRead, userId } = useStore();
 
   // nav 조작
   const [hideNav, setHide] = useState(false);
@@ -117,7 +117,6 @@ export default function Post(props) {
     console.log(condition);
     if (!condition) {
       // 임시저장 불러오기
-
       setWork({
         category: workInfos.category,
         confirmCheck: false,
@@ -129,7 +128,7 @@ export default function Post(props) {
         title: workInfos.title,
         publisherName: "민음사",
         genre: workInfos.genre,
-        memberId: 24,
+        memberId: userId,
         publisherDate: workInfos.publisherDate,
         workId: workInfos.workId,
         relationship: workInfos.versions.relationship,
@@ -156,7 +155,7 @@ export default function Post(props) {
         genre: [], // 장르
         author: [], // 작가
         imageUrl: "", // 썸넬 이미지
-        memberId: 24, // 작성자 id
+        memberId: userId, // 작성자 id
         title: "", // 제목
         contents: "", // 설명
         publisherDate: date, // 출판일자

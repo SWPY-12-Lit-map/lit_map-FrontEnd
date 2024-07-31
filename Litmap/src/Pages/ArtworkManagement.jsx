@@ -214,43 +214,43 @@ const ArtworkManagement = ({ setContentHeight }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         "https://api.litmap.store/api/board/myWorkList"
-  //       );
-  //       console.log(response.data.result);
-  //       const fetchedData = response.data.result.list.map((item, index) => ({
-  //         id: index + 1,
-  //         name: item.title,
-  //         category: item.category,
-  //         workId: item.workId,
-  //         author: item.mainAuthor,
-  //         publisher: item.publisher,
-  //         versions: item.versionLists.map((version) => ({
-  //           versionId: version.versionId,
-  //           versionName: version.versionName,
-  //           versionNum: version.versionNum,
-  //           date: version.lastUpdateDate.split("T")[0],
-  //           status:
-  //             version.confirm === "LOAD"
-  //               ? "임시 저장"
-  //               : version.confirm === "CONFIRM"
-  //               ? "승인 중"
-  //               : "게시 완료",
-  //         })),
-  //       }));
-  //       setData(fetchedData);
-  //       console.log(data);
-  //     } catch (error) {
-  //       console.log(data);
-  //       console.error("데이터를 불러오는데 실패했습니다.", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.litmap.store/api/board/myWorkList"
+        );
+        console.log(response);
+        const fetchedData = response.data.result.list.map((item, index) => ({
+          id: index + 1,
+          name: item.title,
+          category: item.category,
+          workId: item.workId,
+          author: item.mainAuthor,
+          publisher: item.publisher,
+          versions: item.versionLists.map((version) => ({
+            versionId: version.versionId,
+            versionName: version.versionName,
+            versionNum: version.versionNum,
+            date: version.lastUpdateDate.split("T")[0],
+            status:
+              version.confirm === "LOAD"
+                ? "임시 저장"
+                : version.confirm === "CONFIRM"
+                ? "승인 중"
+                : "게시 완료",
+          })),
+        }));
+        setData(fetchedData);
+        console.log(data);
+      } catch (error) {
+        console.log(data);
+        console.error("데이터를 불러오는데 실패했습니다.", error);
+      }
+    };
 
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     setContentHeight(200 + data.length * 100); // Content 높이 설정

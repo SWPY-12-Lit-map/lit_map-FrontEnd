@@ -35,4 +35,7 @@ export const useStore = create((set) => ({
 
   backgroundImg: "",
   setBackgroundImg: (data) => set({ backgroundImg: data }),
+
+  userId: "",
+  setUserId: (data) => set({ userId: data }),
 }));
