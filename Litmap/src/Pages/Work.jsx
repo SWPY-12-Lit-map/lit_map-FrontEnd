@@ -105,9 +105,10 @@ export default function Work({
   setWork,
 }) {
   const [state, setState] = useState(false);
+  const date = new Date();
   const [workInfo, setWorkInfo] = useState({}); // 백엔드에서 받은거를 저장
   const { id } = useParams();
-  const { read, setRead } = useStore();
+  const { read, setRead, setBackgroundColor } = useStore();
 
   const GetWork = async () => {
     await axios
@@ -117,6 +118,7 @@ export default function Work({
         setWorkInfo(Get);
         console.log(workInfo);
         console.log(result);
+        setBackgroundColor(Get.versions.relationship.backgroundColor);
       })
       .catch((error) => {
         console.log(error);
@@ -131,6 +133,34 @@ export default function Work({
   };
 
   useEffect(() => {
+    setWork({
+      confirmCheck: false,
+      category: "",
+      genre: [],
+      author: [],
+      imageUrl: "",
+      memberId: 24,
+      title: "",
+      contents: "",
+      publisherDate: date,
+      version: 0.1,
+      versionName: "",
+      publisherName: "민음사",
+      casts: [
+        {
+          name: "",
+          imageUrl: "",
+          type: "",
+          role: "",
+          gender: "",
+          age: "",
+          mbti: "",
+          contents: "",
+        },
+      ],
+      relationship: {},
+    });
+    setBackgroundColor("");
     setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
     GetWork();
     // 데이터를 가져오는 함수 호출

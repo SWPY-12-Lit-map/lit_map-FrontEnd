@@ -74,7 +74,7 @@ export default function Post(props) {
 
   const PrevCountRef = useRef(); // 이전 인물 수
   const [mount, setMount] = useState(false); // 페이지 로드
-
+  const date = new Date();
   const [mainAuthor, setMainauth] = useState("");
   const [next, setNext] = useState(false); // 다음 버튼 활성 여부
   const [isSaveEnabled, setIsSaveEnabled] = useState(false); // 임시 저장 버튼 활성 여부
@@ -97,9 +97,13 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
-  const { workInfos, addWorkInfos, setBackgroundColor, setBackgroundImg } =
-    useStore();
-  const getWork = { ...workInfos };
+  const {
+    workInfos,
+    addWorkInfos,
+    setBackgroundColor,
+    setBackgroundImg,
+    condition,
+  } = useStore();
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -109,9 +113,11 @@ export default function Post(props) {
 
   // 컴포넌트가 마운트될 때 실행되는 useEffect
   useEffect(() => {
-    if (workInfos.workId) {
-      setRead(false);
+    setRead(false);
+    console.log(condition);
+    if (!condition) {
       // 임시저장 불러오기
+
       setWork({
         category: workInfos.category,
         confirmCheck: false,
@@ -144,6 +150,20 @@ export default function Post(props) {
 
       console.log(workInfos);
     } else {
+      setWork({
+        confirmCheck: false,
+        category: "", // 책이나 영화 뭐 이런거
+        genre: [], // 장르
+        author: [], // 작가
+        imageUrl: "", // 썸넬 이미지
+        memberId: 24, // 작성자 id
+        title: "", // 제목
+        contents: "", // 설명
+        publisherDate: date, // 출판일자
+        version: 0.1, // 시스템 버전
+        versionName: "", // 작성자 임의 버전
+        publisherName: "민음사",
+      });
       // 초기 상태 설정
       const newInfos = Array.from({ length: count }, () => ({
         name: "",
@@ -193,11 +213,6 @@ export default function Post(props) {
       work.title && work.casts.every((cast) => cast.name && cast.type);
     setIsSaveEnabled(isWorkValid);
   }, [work, characterInfos]);
-
-  // 다음 버튼의 활성화 여부
-  // useEffect(() => {
-  //   setNext(isSaveEnabled && state === 2);
-  // }, [isSaveEnabled, state]);
 
   const Mainpart = () => {
     switch (state) {

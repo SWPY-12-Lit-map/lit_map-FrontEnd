@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import Megamenu from "./Megamenu";
+import { useStore } from "./store";
 
 const CategoryMenu = styled.ul`
   width: 80%;
@@ -34,7 +35,7 @@ const BarsIcon = styled(FontAwesomeIcon)`
 `;
 
 function Category({ setMega, mega }) {
-  // const setMega = props.setMega;
+  const { setCondition, condition } = useStore();
 
   return (
     <CategoryMenu>
@@ -48,7 +49,15 @@ function Category({ setMega, mega }) {
         <StyledLink>홈</StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
-        <StyledLink to="/category1">도서_임시작품등록페이지</StyledLink>
+        <StyledLink
+          to="/category1"
+          onClick={() => {
+            setCondition(true);
+            console.log(condition);
+          }}
+        >
+          도서_임시작품등록페이지
+        </StyledLink>
       </CategoryMenuItem>
       <CategoryMenuItem>
         <StyledLink to="/category2">드라마_임시마이페이지</StyledLink>

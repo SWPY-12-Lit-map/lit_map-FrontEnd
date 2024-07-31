@@ -23,7 +23,6 @@ import { useStore } from "../store";
 const Mapping = styled.div`
   width: 100%;
   height: 100%;
-
   z-index: 99;
   & > div > div > div > div > div > .react-flow__node {
     width: 150px;
@@ -56,7 +55,6 @@ const CustomControls = styled(Controls)`
       max-height: 20px;
     }
   }
-
   & > .react-flow__controls-zoomin {
     border-radius: 10px 10px 0 0;
   }
@@ -137,6 +135,7 @@ const Mindmap = (props) => {
 
   const [rfInstance, setRfInstance] = useState(null);
   const { fitView, setViewport } = useReactFlow();
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
 
   // 노드 생성
   const createNodes = useCallback(() => {
@@ -265,17 +264,25 @@ const Mindmap = (props) => {
 
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
+    console.log(read);
     createNodes();
   }, [count, createNodes]);
 
   useEffect(() => {
-    if (read === true) {
-      onRestore(relationship);
-      fitView(); // fitView 호출
-    } else {
-      onRestore(work.relationship);
-    }
-  }, [read, onRestore, fitView]);
+    const loadRelationship = () => {
+      try {
+        if (read) {
+          onRestore(relationship);
+          fitView(); // fitView 호출
+        } else {
+          onRestore(work.relationship);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadRelationship();
+  }, [relationship, read, onRestore, fitView]);
 
   useEffect(() => {
     if (!read) {
@@ -288,11 +295,15 @@ const Mindmap = (props) => {
         onSave();
       }
     }
-  }, [nodes, edges, backgroundImage, backColor]);
+  }, [nodes, edges, backgroundImage, backColor, read, onSave]);
 
   const deleteAllEdges = () => {
     setEdges([]);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>; // 로딩 중
+  }
 
   return (
     <Mapping>

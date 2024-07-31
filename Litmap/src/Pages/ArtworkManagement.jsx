@@ -202,7 +202,7 @@ const LoadingBar = styled.div`
 `;
 
 const ArtworkManagement = ({ setContentHeight }) => {
-  const { workInfos, addWorkInfos } = useStore();
+  const { workInfos, addWorkInfos, setCondition, condition } = useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -344,26 +344,25 @@ const ArtworkManagement = ({ setContentHeight }) => {
         </LoadingBar>
       ) : null}
       {/* <button
-          onClick={async () => {
-            await axios
-              .put("https://api.litmap.store/api/version/rollback/17/0.1")
-              .then((result) => {
-                setLoading(true);
-                console.log(result);
-                addWorkInfos(result.data.result);
-                console.log(workInfos);
-                if (result.data.result?.workId) {
-                  setLoading(false);
-                  navigate("/category1");
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          }}
-        >
-          수정하기
-        </button> */}
+        onClick={async () => {
+          await axios
+            .put("https://api.litmap.store/api/version/rollback/17/0.1")
+            .then((result) => {
+              setLoading(true);
+              addWorkInfos(result.data.result);
+              setCondition(false);
+              if (result.data.result?.workId) {
+                setLoading(false);
+                navigate("/category1");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }}
+      >
+        수정하기
+      </button> */}
       <BigButton onClick={() => (window.location.href = "/category1")}>
         <img src="/registration.png" alt="등록 아이콘" />
         <div className="text-container">

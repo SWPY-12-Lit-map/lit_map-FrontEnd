@@ -192,6 +192,7 @@ function App() {
                 count={count}
                 characterInfos={characterInfos}
                 work={work}
+                setWork={setWork}
                 edgeType={edgeType}
                 lineStyle={lineStyle}
                 read={read}
@@ -199,7 +200,7 @@ function App() {
               />
             }
           ></Route>
-          
+
           <Route path="/category2/*" element={<MypageLayout />}>
             <Route path="manage-profile" element={<ProfileManage />} />
             <Route path="edit-member" element={<MemberEdit />} />

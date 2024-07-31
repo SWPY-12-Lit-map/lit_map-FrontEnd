@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
 export const useStore = create((set) => ({
+  condition: true, // 작품등록 = true, 작품수정 = false
+  setCondition: (data) => set({ condition: data }),
+
   workInfos: {},
 
   addWorkInfos: (data) => set({ workInfos: data }),
@@ -27,7 +30,7 @@ export const useStore = create((set) => ({
       edges: state.edges.filter((edge) => edge.id !== edgeId),
     })),
 
-  backgroundColor: "",
+  backgroundColor: "#fff",
   setBackgroundColor: (data) => set({ backgroundColor: data }),
 
   backgroundImg: "",

@@ -20,13 +20,13 @@ const logoStyle = {
   bottom: "10px",
   width: "100px",
   height: "auto",
-  zIndex: 1000, // Ensure the logo appears above other content
+  zIndex: 1000,
 };
 
 export default function DownloadImg(props) {
   const { fitView } = useReactFlow();
   const fileType = props.fileType;
-  const { imgUrl, setImgUrl } = useStore();
+  const { imgUrl, setImgUrl, backgroundColor } = useStore();
 
   /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
@@ -40,40 +40,31 @@ export default function DownloadImg(props) {
   function ImgtoPng() {
     const viewport = document.querySelector(".react-flow__viewport");
 
-    // Create a temporary container to hold the viewport and logo
     const container = document.createElement("div");
     container.style.position = "relative";
     container.style.width = viewport.offsetWidth + "px";
     container.style.height = viewport.offsetHeight + "px";
 
-    // Clone the viewport and append to the container
     const clonedViewport = viewport.cloneNode(true);
 
-    // Get background styles from the viewport
     const viewportStyles = getComputedStyle(viewport);
     clonedViewport.style.backgroundImage = viewportStyles.backgroundImage;
     clonedViewport.style.backgroundColor = viewportStyles.backgroundColor;
 
     container.appendChild(clonedViewport);
-
-    // Create and append the logo
     const logo = document.createElement("img");
     logo.src = "/Logo.png";
     Object.assign(logo.style, logoStyle);
     container.appendChild(logo);
-
-    // Append the container to the body
     document.body.appendChild(container);
 
-    // Convert the container (with logo and background) to PNG
     toPng(container, {
       cacheBust: true,
-      backgroundColor: null, // Use the background from the viewport
+      backgroundColor: backgroundColor == "" ? "white" : backgroundColor,
     })
       .then((dataUrl) => {
         setImgUrl(dataUrl);
         downloadImage(dataUrl);
-        // Clean up: remove the temporary container
         document.body.removeChild(container);
       })
       .catch((error) => {
