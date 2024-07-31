@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
-  faRotateRight,
   faChevronRight,
   faCaretDown,
   faChevronDown,
@@ -219,11 +218,11 @@ const ArtworkManagement = ({ setContentHeight }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://api.litmap.store/api/board/myWorkList"
+          "https://api.litmap.store/api/board/myWorkList", { withCredentials: true }
         );
         console.log(response);
-        const fetchedData = response.data.result.list.map((item, index) => ({
-          id: userId,
+        const fetchedData = response.data.result.list.map((item) => ({
+          id: item.workId,
           name: item.title,
           category: item.category,
           workId: item.workId,
@@ -265,45 +264,40 @@ const ArtworkManagement = ({ setContentHeight }) => {
   const handleDelete = (workId) => {
     console.log(workId);
     axios
-      .delete(`https://api.litmap.store/api/work/${workId}`)
+      .delete(`https://api.litmap.store/api/work/${workId}`, { withCredentials: true })
       .then((result) => {
         console.log(result);
+        const newData = data.filter((item) => item.workId !== workId);
+        setData(newData);
       })
       .catch((error) => {
-        console.log(versionId);
         console.log(error);
       });
-    const newData = data.filter((item) => item.id !== id);
-    setData(newData);
   };
 
   /* 버전삭제 */
-  const handleDeleteVersion = (versionId, versionNum) => {
+  const handleDeleteVersion = (versionId, versionNum, workId) => {
     console.log(versionId);
     console.log(versionNum);
     axios
-      .delete(`https://api.litmap.store/api/version/${versionId}/${versionNum}`)
+      .delete(`https://api.litmap.store/api/version/${versionId}/${versionNum}`, { withCredentials: true })
       .then((result) => {
         console.log(result);
+        let newData = data.map((item) => {
+          if (item.workId === workId) {
+            const newVersions = item.versions.filter(
+              (version) => version.versionId !== versionId
+            );
+            return { ...item, versions: newVersions };
+          }
+          return item;
+        });
+        newData = newData.filter((item) => item.versions.length > 0); // 버전이 없는 작품 삭제
+        setData(newData);
       })
       .catch((error) => {
         console.log(error);
       });
-    const item = data.find((item) => item.id === id);
-    if (item.versions.length === 1) {
-      handleDelete(id);
-    } else {
-      const newData = data.map((item) => {
-        if (item.id === id) {
-          const newVersions = item.versions.filter(
-            (version) => version.versionId !== versionId
-          );
-          return { ...item, versions: newVersions };
-        }
-        return item;
-      });
-      setData(newData);
-    }
   };
 
   const filteredData = data.filter((item) => {
@@ -335,6 +329,11 @@ const ArtworkManagement = ({ setContentHeight }) => {
     }));
   };
 
+  const handleFilterStatusChange = (status) => {
+    setFilterStatus(status);
+    setShowDropdown(false); // 드롭다운 메뉴 닫기
+  };
+
   return (
     <Content>
       <Header>작품 및 리스트</Header>
@@ -344,26 +343,7 @@ const ArtworkManagement = ({ setContentHeight }) => {
           <ClipLoader color="rgba(139, 0, 36, 1)"></ClipLoader>
         </LoadingBar>
       ) : null}
-      {/* <button
-        onClick={async () => {
-          await axios
-            .put("https://api.litmap.store/api/version/rollback/17/0.1")
-            .then((result) => {
-              setLoading(true);
-              addWorkInfos(result.data.result);
-              setCondition(false);
-              if (result.data.result?.workId) {
-                setLoading(false);
-                navigate("/category1");
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      >
-        수정하기
-      </button> */}
+
       <BigButton onClick={() => (window.location.href = "/category1")}>
         <img src="/registration.png" alt="등록 아이콘" />
         <div className="text-container">
@@ -382,20 +362,26 @@ const ArtworkManagement = ({ setContentHeight }) => {
           </DropdownButton>
           <DropdownContent show={showDropdown}>
             <DropdownItem
+              selected={filterStatus === "all"}
+              onClick={() => handleFilterStatusChange("all")}
+            >
+              전체
+            </DropdownItem>
+            <DropdownItem
               selected={filterStatus === "임시 저장"}
-              onClick={() => setFilterStatus("임시 저장")}
+              onClick={() => handleFilterStatusChange("임시 저장")}
             >
               임시저장
             </DropdownItem>
             <DropdownItem
               selected={filterStatus === "승인 중"}
-              onClick={() => setFilterStatus("승인 중")}
+              onClick={() => handleFilterStatusChange("승인 중")}
             >
               승인중
             </DropdownItem>
             <DropdownItem
               selected={filterStatus === "게시 완료"}
-              onClick={() => setFilterStatus("게시 완료")}
+              onClick={() => handleFilterStatusChange("게시 완료")}
             >
               게시완료
             </DropdownItem>
@@ -451,7 +437,8 @@ const ArtworkManagement = ({ setContentHeight }) => {
                         onClick={async () => {
                           await axios
                             .put(
-                              `https://api.litmap.store/api/version/rollback/${version.versionId}/0.1`
+                              `https://api.litmap.store/api/version/rollback/${version.versionId}/0.1`,
+                              { withCredentials: true }
                             )
                             .then((result) => {
                               console.log(result);
@@ -472,8 +459,9 @@ const ArtworkManagement = ({ setContentHeight }) => {
                       <button
                         onClick={() =>
                           handleDeleteVersion(
-                            item.workId,
-                            item.versions[i].versionNum
+                            version.versionId,
+                            version.versionNum,
+                            item.workId
                           )
                         }
                       >
