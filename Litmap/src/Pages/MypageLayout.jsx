@@ -140,7 +140,7 @@ const MypageLayout = () => {
     myMessage: "",
     userImage: "",
     urlLink: "",
-    memberRoleStatus: "대표",
+    memberRoleStatus: "ACTIVE_MEMBER",
     roleStatus: "",
     publisher: null,
     works: [],
@@ -148,38 +148,23 @@ const MypageLayout = () => {
   });
   const [contentHeight, setContentHeight] = useState(1000);
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
-
-  const cookie = document.cookie;
-  // console.log(cookie);
+  const [profileImage, setProfileImage] = useState("");
 
   useEffect(() => {
-    // console.log(cookie);
     const fetchUserProfile = async () => {
-      await axios
-        .get("https://api.litmap.store/api/members/mypage", {
+      try {
+        const response = await axios.get("https://api.litmap.store/api/members/mypage", {
           withCredentials: true,
-        })
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
         });
-      // try {
-      //   const response = await axios.get("https://api.litmap.store/api/members/profile", {
-      //     withCredentials: true,
-      //   });
-
-      //   setProfile(response.data);
-      // } catch (error) {
-      //   if (error.response) {
-      //     // 서버에서 응답이 있었던 경우
-      //     console.error("Failed to fetch user profile:", error.response.status, error.response.data);
-      //   } else {
-      //     // 서버에서 응답이 없던 경우
-      //     console.error("Failed to fetch user profile:", error.message);
-      //   }
-      // }
+        if (response.data.resultCode === 200) {
+          setProfile(response.data.result);
+          setProfileImage(response.data.result.userImage);
+        } else {
+          console.error("Failed to fetch user profile");
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile", error);
+      }
     };
 
     const fetchStats = async () => {
@@ -203,18 +188,18 @@ const MypageLayout = () => {
     fetchStats();
   }, []);
 
-  const getDefaultProfileImage = (role) => {
+  const getRoleLabel = (role) => {
     switch (role) {
-      case "대표":
-        return "/representative.png";
-      case "직원":
-        return "/staff.png";
-      case "1인작가":
-        return "/writer.png";
-      case "협력사":
-        return "/cooperation.png";
+      case "ACTIVE_MEMBER":
+        return "작가";
+      case "PENDING_MEMBER":
+        return "승인중";
+      case "ADMIN":
+        return "관리자";
+      case "PUBLISHER_MEMBER":
+        return "출판사";
       default:
-        return "https://via.placeholder.com/60";
+        return "기타";
     }
   };
 
@@ -224,14 +209,11 @@ const MypageLayout = () => {
         <Box>
           <ProfileSection>
             <img
-              src={
-                profile.userImage ||
-                getDefaultProfileImage(profile.memberRoleStatus)
-              }
+              src={profileImage || "/default_profile.png"}
               alt="프로필 이미지"
             />
             <div className="name">{profile.nickname}님</div>
-            <div className="role">{profile.memberRoleStatus}</div>
+            <div className="role">{getRoleLabel(profile.memberRoleStatus)}</div>
           </ProfileSection>
           <StatsSection>
             <div className="stat">
@@ -303,7 +285,12 @@ const MypageLayout = () => {
           <Route
             path="manage-profile"
             element={
-              <ProfileManage profile={profile} setProfile={setProfile} />
+              <ProfileManage
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+                profile={profile}
+                setProfile={setProfile}
+              />
             }
           />
           <Route path="edit-member" element={<MemberEdit />} />
