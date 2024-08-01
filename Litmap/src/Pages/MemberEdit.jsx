@@ -179,7 +179,7 @@ const MemberEdit = () => {
     const [phone, setPhone] = useState("");
     const [website, setWebsite] = useState("");
     const [address, setAddress] = useState("");
-    const [Password, setPassword] = useState("");
+    const [password, setpassword] = useState(""); // 비밀번호 입력 상태 (Password에서 password로 변경)
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -187,7 +187,7 @@ const MemberEdit = () => {
     const [isPhoneEditable, setIsPhoneEditable] = useState(false);
     const [isWebsiteEditable, setIsWebsiteEditable] = useState(false);
     const [isAddressEditable, setIsAddressEditable] = useState(false);
-    const [memberType, setMemberType] = useState(""); // 대표, 직원, 1인작가, 협력사
+    const [memberType, setMemberType] = useState(""); 
     const [name, setName] = useState("");
     const [nickname, setNickname] = useState("");
     const [myMessage, setMyMessage] = useState("");
@@ -196,6 +196,8 @@ const MemberEdit = () => {
     const [memberRoleStatus, setMemberRoleStatus] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const navigate = useNavigate();
+
+    const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false); // 비밀번호 확인 완료 여부
 
     useEffect(() => {
         // 사용자 정보를 불러오는 API 호출
@@ -239,12 +241,12 @@ const MemberEdit = () => {
     const handleSave = async () => {
         const passwordPattern = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,20}$/;
 
-        if (Password && !passwordPattern.test(Password)) {
+        if (password && !passwordPattern.test(password)) {
             setErrorMessage("비밀번호 조건에 맞지 않습니다.");
             return;
         }
 
-        if (Password !== confirmPassword) {
+        if (password !== confirmPassword) {
             setErrorMessage("비밀번호가 일치하지 않습니다.");
             return;
         }
@@ -256,7 +258,7 @@ const MemberEdit = () => {
             myMessage,
             userImage,
             urlLink: website, // 작품 URL로 website 값을 사용
-            ...(Password && { password: Password, confirmPassword }),
+            ...(password && { password, confirmPassword }),
             ...(memberType === "출판사 직원" && {
                 publisherAddress: address,
                 publisherPhoneNumber: phone,
@@ -297,133 +299,182 @@ const MemberEdit = () => {
         navigate("/category2/edit-member/withdrawal"); // 탈퇴 페이지로 이동
     };
 
+    const handleNext = async () => {
+        try {
+            const response = await axios.post('https://api.litmap.store/api/members/verify-password', {
+                litmapEmail: email,  // 사용자 이메일 사용
+                password: password   // 사용자가 입력한 비밀번호
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (response.data.result && response.data.resultCode === 200) {
+                setIsPasswordConfirmed(true);
+                setErrorMessage("");
+            } else {
+                setErrorMessage("비밀번호가 일치하지 않습니다.");
+            }
+        } catch (error) {
+            console.error("비밀번호 확인 중 오류가 발생했습니다:", error);
+            setErrorMessage("비밀번호 확인에 실패했습니다.");
+        }
+    };
+    
+
     return (
         <Content>
-            <Header>회원정보 및 수정</Header>
-            <InfoItem>
-                <div className="title">이메일</div>
-                <div>{email}</div>
-            </InfoItem>
-            <InfoItem>
-                <div className="title">새 비밀번호</div>
-                <div className="input-container">
-                    <input
-                        type={isPasswordVisible ? "text" : "password"}
-                        value={Password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="새 비밀번호를 입력해주세요."
-                    />
-                    <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
-                        {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
-                    </div>
-                </div>
-            </InfoItem>
-            <SmallText>영문 대소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력해주세요.</SmallText>
-            <InfoItem>
-                <div className="title">새 비밀번호 확인</div>
-                <div className="input-container">
-                    <input
-                        type={isConfirmPasswordVisible ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="새 비밀번호를 한번 더 입력해주세요."
-                    />
-                    <div className="password-toggle" onClick={handleConfirmPasswordVisibilityToggle}>
-                        {isConfirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
-                    </div>
-                </div>
-            </InfoItem>
-            <Divider />
-            <InfoItem>
-                <div className="title">이름</div>
-                <div>{name}</div>
-            </InfoItem>
-            <InfoItem>
-                <div className="title">회원 구분</div>
-                <div>{memberType}</div>
-            </InfoItem>
-            {memberType === "1인작가" ? (
+            {!isPasswordConfirmed ? (
                 <>
+                    <Header>비밀번호 확인</Header>
+                    <div className="description">안전한 개인정보를 위해 비밀번호를 입력해주세요.</div>
                     <InfoItem>
-                        <div className="title">작품 URL</div>
-                        {isWebsiteEditable ? (
+                        <div className="title">비밀번호</div>
+                        <div className="input-container">
                             <input
-                                type="text"
-                                value={website}
-                                onChange={(e) => setWebsite(e.target.value)}
+                                type={isPasswordVisible ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setpassword(e.target.value)}
+                                placeholder="비밀번호를 입력해주세요."
                             />
-                        ) : (
-                            <div>{website}</div>
-                        )}
-                        <SmallButton onClick={() => setIsWebsiteEditable(!isWebsiteEditable)}>
-                            {isWebsiteEditable ? "완료" : "변경"}
-                        </SmallButton>
+                            <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
+                                {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                            </div>
+                        </div>
+                        {errorMessage && <div className="error">{errorMessage}</div>}
                     </InfoItem>
-                    <InfoItem>
-                        <div className="title">업무용 이메일</div>
-                        {isPhoneEditable ? (
-                            <input
-                                type="text"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                            />
-                        ) : (
-                            <div>{phone}</div>
-                        )}
-                        <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
-                            {isPhoneEditable ? "완료" : "변경"}
-                        </SmallButton>
-                    </InfoItem>
+                    <Button onClick={handleNext}>다음</Button>
                 </>
             ) : (
                 <>
-                    <InfoItem>
-                        <div className="title">대표 번호</div>
-                        {isPhoneEditable ? (
-                            <input
-                                type="text"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                            />
-                        ) : (
-                            <div>{phone}</div>
-                        )}
-                        <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
-                            {isPhoneEditable ? "완료" : "변경"}
-                        </SmallButton>
-                    </InfoItem>
-                    <InfoItem>
-                        <div className="title">사업자 주소</div>
-                        {isAddressEditable ? (
-                            <>
+                <Header>회원정보 및 수정</Header>
+                <InfoItem>
+                    <div className="title">이메일</div>
+                    <div>{email}</div>
+                </InfoItem>
+                <InfoItem>
+                    <div className="title">새 비밀번호</div>
+                    <div className="input-container">
+                        <input
+                            type={isPasswordVisible ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setpassword(e.target.value)}
+                            placeholder="새 비밀번호를 입력해주세요."
+                        />
+                        <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
+                            {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                        </div>
+                    </div>
+                </InfoItem>
+                <SmallText>영문 대소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력해주세요.</SmallText>
+                <InfoItem>
+                    <div className="title">새 비밀번호 확인</div>
+                    <div className="input-container">
+                        <input
+                            type={isConfirmPasswordVisible ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="새 비밀번호를 한번 더 입력해주세요."
+                        />
+                        <div className="password-toggle" onClick={handleConfirmPasswordVisibilityToggle}>
+                            {isConfirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                        </div>
+                    </div>
+                </InfoItem>
+                <Divider />
+                <InfoItem>
+                    <div className="title">이름</div>
+                    <div>{name}</div>
+                </InfoItem>
+                <InfoItem>
+                    <div className="title">회원 구분</div>
+                    <div>{memberType}</div>
+                </InfoItem>
+                {memberType === "1인작가" ? (
+                    <>
+                        <InfoItem>
+                            <div className="title">작품 URL</div>
+                            {isWebsiteEditable ? (
                                 <input
                                     type="text"
-                                    value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
+                                    value={website}
+                                    onChange={(e) => setWebsite(e.target.value)}
                                 />
-                            </>
-                        ) : (
-                            <>
-                                <div>{address}</div>
-                            </>
-                        )}
-                        <SmallButton onClick={() => setIsAddressEditable(!isAddressEditable)}>
-                            {isAddressEditable ? "완료" : "변경"}
-                        </SmallButton>
-                    </InfoItem>
+                            ) : (
+                                <div>{website}</div>
+                            )}
+                            <SmallButton onClick={() => setIsWebsiteEditable(!isWebsiteEditable)}>
+                                {isWebsiteEditable ? "완료" : "변경"}
+                            </SmallButton>
+                        </InfoItem>
+                        <InfoItem>
+                            <div className="title">업무용 이메일</div>
+                            {isPhoneEditable ? (
+                                <input
+                                    type="text"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            ) : (
+                                <div>{phone}</div>
+                            )}
+                            <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
+                                {isPhoneEditable ? "완료" : "변경"}
+                            </SmallButton>
+                        </InfoItem>
+                    </>
+                ) : (
+                    <>
+                        <InfoItem>
+                            <div className="title">대표 번호</div>
+                            {isPhoneEditable ? (
+                                <input
+                                    type="text"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            ) : (
+                                <div>{phone}</div>
+                            )}
+                            <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
+                                {isPhoneEditable ? "완료" : "변경"}
+                            </SmallButton>
+                        </InfoItem>
+                        <InfoItem>
+                            <div className="title">사업자 주소</div>
+                            {isAddressEditable ? (
+                                <>
+                                    <input
+                                        type="text"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <div>{address}</div>
+                                </>
+                            )}
+                            <SmallButton onClick={() => setIsAddressEditable(!isAddressEditable)}>
+                                {isAddressEditable ? "완료" : "변경"}
+                            </SmallButton>
+                        </InfoItem>
+                    </>
+                )}
+                {errorMessage && <div className="error">{errorMessage}</div>}
+                {successMessage && <div className="success">{successMessage}</div>}
+                <ButtonContainer>
+                    <div className="left">
+                        <WithdrawalButton onClick={handleServiceWithdrawal}>서비스 탈퇴하기</WithdrawalButton>
+                    </div>
+                    <div className="right">
+                        <CloseButton onClick={handleCancel}>취소하기</CloseButton>
+                        <RestoreButton onClick={handleSave}>저장하기</RestoreButton>
+                    </div>
+                </ButtonContainer>
                 </>
             )}
-            {errorMessage && <div className="error">{errorMessage}</div>}
-            {successMessage && <div className="success">{successMessage}</div>}
-            <ButtonContainer>
-                <div className="left">
-                    <WithdrawalButton onClick={handleServiceWithdrawal}>서비스 탈퇴하기</WithdrawalButton>
-                </div>
-                <div className="right">
-                    <CloseButton onClick={handleCancel}>취소하기</CloseButton>
-                    <RestoreButton onClick={handleSave}>저장하기</RestoreButton>
-                </div>
-            </ButtonContainer>
         </Content>
     );
 };
