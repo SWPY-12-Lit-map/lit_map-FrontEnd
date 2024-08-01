@@ -365,7 +365,13 @@ const ArtworkManagement = ({ setContentHeight }) => {
       >
         수정하기
       </button> */}
-      <BigButton onClick={() => (window.location.href = "/category1")}>
+      <BigButton
+        onClick={() => {
+          setCondition(true);
+          console.log(condition);
+          window.location.href = "/category1";
+        }}
+      >
         <img src="/registration.png" alt="등록 아이콘" />
         <div className="text-container">
           <div className="text-title">릿맵 등록하기</div>
