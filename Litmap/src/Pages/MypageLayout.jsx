@@ -153,9 +153,12 @@ const MypageLayout = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("https://api.litmap.store/api/members/mypage", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "https://api.litmap.store/api/members/mypage",
+          {
+            withCredentials: true,
+          }
+        );
         if (response.data.resultCode === 200) {
           setProfile(response.data.result);
           setProfileImage(response.data.result.userImage);
@@ -192,7 +195,7 @@ const MypageLayout = () => {
     switch (role) {
       case "ACTIVE_MEMBER":
         return "작가";
-      case "ㅈ":
+      case "PENDING_MEMBER":
         return "승인중";
       case "ADMIN":
         return "관리자";
