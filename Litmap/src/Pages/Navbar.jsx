@@ -221,22 +221,29 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
       } else {
         setLogin(true);
         // 로그인 상태에서 프로필 이미지 불러오기
-        try {
-          const response = await axios.get(
-            "https://api.litmap.store/api/members/mypage",
-            { withCredentials: true }
-          );
-          if (response.data.result && response.data.result.userImage) {
-            setProfileImage(response.data.result.userImage);
-          }
-        } catch (error) {
-          console.error("Failed to load profile image:", error);
+        await loadProfileImage();
+      }
+    };
+
+    const loadProfileImage = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.litmap.store/api/members/mypage",
+          { withCredentials: true }
+        );
+        if (response.data.result && response.data.result.userImage) {
+          setProfileImage(response.data.result.userImage);
+        } else {
+          setProfileImage("/profile.png"); // 기본 이미지로 설정
         }
+      } catch (error) {
+        console.error("Failed to load profile image:", error);
+        setProfileImage("/profile.png"); // 에러 발생 시 기본 이미지로 설정
       }
     };
 
     checkLoginStatus();
-  }, [setLogin]);
+  }, [login, setLogin]);
 
   // 쿠키 값 가져오기
   const getCookie = (name) => {
