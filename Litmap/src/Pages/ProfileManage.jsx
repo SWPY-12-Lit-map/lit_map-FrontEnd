@@ -188,15 +188,30 @@ const ProfileManage = ({ profileImage, setProfileImage, profile, setProfile }) =
     }
   }, [profile, setProfileImage]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const imageUrl = reader.result;
-        setProfileImage(imageUrl);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("path", "profile");
+
+      try {
+        const response = await axios.post(
+          "https://api.litmap.store/api/files",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        );
+        if (response.data.result) {
+          setProfileImage(response.data.result);
+        }
+      } catch (error) {
+        console.error("Failed to upload image", error);
+      }
     }
   };
 
