@@ -9,6 +9,7 @@ import ArtworkManagement from "./ArtworkManagement";
 import RegisterAllow from "./RegisterAllow";
 import MemberManage from "./MemberManage";
 import BannerManage from "./BannerManage";
+import WithdrawalPage from "./WithdrawalPage";
 
 const Container = styled.div`
   display: flex;
@@ -297,6 +298,10 @@ const MypageLayout = () => {
             }
           />
           <Route path="edit-member" element={<MemberEdit />} />
+          <Route
+            path="edit-member/withdrawal"
+            element={<WithdrawalPage memberId={profile.id} />}
+          />
           <Route
             path="manage-artworks"
             element={<ArtworkManagement setContentHeight={setContentHeight} />}
