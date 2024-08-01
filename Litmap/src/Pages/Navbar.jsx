@@ -159,6 +159,7 @@ const ProfileImg = styled.img`
   display: flex;
   width: 40px;
   height: auto;
+  border-radius: 50%;
 `;
 
 const StyledLink = styled(Link)`
@@ -207,18 +208,30 @@ const LogoutDropdown = styled(Dropdown)`
 
 function Navbar({ login, setLogin, userInput, setUserInput }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [profileImage, setProfileImage] = useState("/profile.png"); // 기본 프로필 이미지 설정
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     // 로그인 상태 확인
-    const checkLoginStatus = () => {
+    const checkLoginStatus = async () => {
       const litmapEmail = getCookie("litmapEmail");
-      console.log(litmapEmail);
       if (!litmapEmail) {
         setLogin(false);
       } else {
         setLogin(true);
+        // 로그인 상태에서 프로필 이미지 불러오기
+        try {
+          const response = await axios.get(
+            "https://api.litmap.store/api/members/mypage",
+            { withCredentials: true }
+          );
+          if (response.data.result && response.data.result.userImage) {
+            setProfileImage(response.data.result.userImage);
+          }
+        } catch (error) {
+          console.error("Failed to load profile image:", error);
+        }
       }
     };
 
@@ -256,7 +269,6 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
     axios
       .post("https://api.litmap.store/api/board/search", postBody)
       .then((result) => {
-        console.log(result);
         addSearchResult(result.data.result);
         if (result.data.resultCode === 200) {
           navigate("/searchresult");
@@ -273,9 +285,12 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get("https://api.litmap.store/api/members/logout", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "https://api.litmap.store/api/members/logout",
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         setLogin(false); // 로그아웃 상태로 설정
@@ -285,7 +300,6 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
           const name = cookie.split("=")[0].trim();
           document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
         });
-
         console.log("로그아웃 성공, 모든 쿠키 삭제됨");
 
         navigate("/login"); // 로그인 페이지로 리다이렉트
@@ -458,7 +472,7 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
               </svg>
             </AlertBtn>
             <Profile onClick={handleProfileClick}>
-              <ProfileImg src="profile.png" alt="프로필" />
+              <ProfileImg src={profileImage} alt="프로필" />
             </Profile>
             <LogoutDropdown>
               <Dropdown.Toggle id="dropdown-custom-components"></Dropdown.Toggle>
