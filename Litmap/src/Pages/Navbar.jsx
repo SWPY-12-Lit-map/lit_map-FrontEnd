@@ -272,22 +272,27 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   };
 
   const handleLogout = async () => {
-    await axios
-      .get("https://api.litmap.store/api/members/logout")
-      .then((response) => {
-        setLogin(false);
+    try {
+      const response = await axios.get("https://api.litmap.store/api/members/logout", {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        setLogin(false); // 로그아웃 상태로 설정
+
         // 모든 쿠키 삭제
         document.cookie.split(";").forEach((cookie) => {
-          document.cookie = cookie
-            .replace(/^ +/, "")
-            .replace(/=.*/, "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/");
+          const name = cookie.split("=")[0].trim();
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
         });
-        console.log("쿠키 삭제됨");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+
+        console.log("로그아웃 성공, 모든 쿠키 삭제됨");
+
+        navigate("/login"); // 로그인 페이지로 리다이렉트
+      }
+    } catch (error) {
+      console.log("로그아웃 실패:", error);
+    }
   };
 
   // 특정 영역 외 클릭 시 발생하는 이벤트

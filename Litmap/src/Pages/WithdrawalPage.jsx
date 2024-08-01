@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Content = styled.div`
     padding: 20px;
@@ -162,9 +164,10 @@ const Button = styled.button`
     }
 `;
 
-const WithdrawalPage = ({ onCancel, onConfirm }) => {
+const WithdrawalPage = ({ memberId }) => {
     const [selectedReason, setSelectedReason] = useState("");
     const [checked, setChecked] = useState(false);
+    const navigate = useNavigate();
 
     const handleReasonChange = (event) => {
         setSelectedReason(event.target.value);
@@ -174,12 +177,60 @@ const WithdrawalPage = ({ onCancel, onConfirm }) => {
         setChecked(!checked);
     };
 
-    const handleConfirmClick = () => {
+    const handleConfirmClick = async () => {
         if (selectedReason && checked) {
-            onConfirm();
+            try {
+                console.log("Sending withdrawal request for memberId:", memberId);  
+                const response = await axios.post(
+                    `https://api.litmap.store/api/members/${memberId}/request-withdrawal`,
+                    {},
+                    {
+                        withCredentials: true,
+                    }
+                );
+    
+                if (response.data.resultCode === 204) {
+                    alert("회원 탈퇴 요청이 완료되었습니다.");
+                    await handleLogout();  // 로그아웃 처리
+                } else {
+                    alert("탈퇴 요청에 실패했습니다. 다시 시도해 주세요.");
+                }
+            } catch (error) {
+                console.error("회원 탈퇴 요청 실패:", error);
+                if (error.response && error.response.data) {
+                    console.error("서버 응답:", error.response.data);
+                }
+                alert("탈퇴 요청에 실패했습니다. 다시 시도해 주세요.");
+            }
         } else {
             alert("모든 항목을 체크해주세요.");
         }
+    };
+    
+    const handleLogout = async () => {
+        try {
+            const response = await axios.get('https://api.litmap.store/api/members/logout', {
+                withCredentials: true,
+            });
+            
+            console.log("로그아웃 응답:", response);
+            localStorage.removeItem('authToken');
+            
+            // 모든 쿠키 삭제
+            document.cookie.split(";").forEach((cookie) => {
+                const name = cookie.split("=")[0].trim();
+                document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+            });
+    
+            navigate("/login"); // 로그아웃 후 로그인 페이지로 이동
+        } catch (error) {
+            console.error("로그아웃 요청 실패:", error);
+            alert("로그아웃에 실패했습니다. 다시 시도해 주세요.");
+        }
+    };    
+    
+    const handleCancelClick = () => {
+        navigate("/category2/edit-member"); // 취소하기 누르면 edit-member로 이동
     };
 
     return (
@@ -284,7 +335,7 @@ const WithdrawalPage = ({ onCancel, onConfirm }) => {
                 위 내용을 확인했으며, 탈퇴를 진행합니다.
             </OkCheckboxLabel>
             <ButtonContainer>
-                <Button onClick={onCancel}>취소하기</Button>
+                <Button onClick={handleCancelClick}>취소하기</Button>
                 <Button primary onClick={handleConfirmClick}>탈퇴하기</Button>
             </ButtonContainer>
         </Content>
