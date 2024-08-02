@@ -174,7 +174,7 @@ const Note = styled.div`
 `;
 
 const ProfileManage = ({ profileImage, setProfileImage, profile, setProfile }) => {
-  const [nickname, setNickname] = useState(profile.nickname || "문학동네");
+  const [nickname, setNickname] = useState(profile.nickname || "");
   const [message, setMessage] = useState(profile.myMessage || "");
   const [editing, setEditing] = useState(false);
   const [originalImage, setOriginalImage] = useState(profile.userImage || "/profile.png");
@@ -239,8 +239,8 @@ const ProfileManage = ({ profileImage, setProfileImage, profile, setProfile }) =
       };
 
       const apiUrl = profile.memberRoleStatus === "ACTIVE_MEMBER"
-        ? "https://api.litmap.store/api/members/update"
-        : "https://api.litmap.store/api/publishers/update";
+        ? "https://api.litmap.store/api/members/profile/update"
+        : "https://api.litmap.store/api/publishers/profile/update";
 
       const response = await axios.put(apiUrl, updateData, {
         withCredentials: true,
