@@ -66,7 +66,7 @@ const CategoryCount = styled.span`
 
 const Works = styled.div`
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   grid-template-columns: repeat(5, 1fr);
   justify-content: center;
   gap: 50px 0px;
@@ -203,7 +203,12 @@ export default function SearchResult({ userInput, setUserInput }) {
               {category}{" "}
               <CategoryCount>{filteredResults[category].count}</CategoryCount>
             </CategoryTitle>
-            <Works>
+            <Works
+              style={{
+                gridTemplateRows:
+                  worksCount < 5 ? "repeat(1, 1fr)" : "repeat(5, 1fr)",
+              }}
+            >
               {filteredResults[category].works.map((work) => (
                 <div
                   key={work.workId}
