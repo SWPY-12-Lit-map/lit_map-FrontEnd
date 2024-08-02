@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import AdminPage from "./AdminPage";
@@ -151,6 +151,8 @@ const MypageLayout = () => {
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
   const [profileImage, setProfileImage] = useState("");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -167,7 +169,12 @@ const MypageLayout = () => {
           console.error("Failed to fetch user profile");
         }
       } catch (error) {
-        console.error("Failed to fetch user profile", error);
+        if (error.response && error.response.data.reason) {
+          alert(error.response.data.reason);
+          navigate("/");
+        } else {
+          console.error("Failed to fetch user profile", error);
+        }
       }
     };
 
@@ -190,7 +197,7 @@ const MypageLayout = () => {
 
     fetchUserProfile();
     fetchStats();
-  }, []);
+  }, [navigate]);
 
   const getRoleLabel = (role) => {
     switch (role) {

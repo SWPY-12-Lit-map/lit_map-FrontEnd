@@ -290,30 +290,6 @@ const InfoBox = styled.div`
   margin-top: 20px;
 `;
 
-// 추가된 부분: 모달 스타일 및 내용
-const ModalInputField = styled.input`
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-`;
-
-const ModalButton = styled.button`
-  background-color: #8b0024;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-  width: 100%;
-
-  &:hover {
-    background-color: #e7c6ce;
-  }
-`;
-
 const SignupPage = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [step, setStep] = useState(1);
@@ -346,19 +322,10 @@ const SignupPage = () => {
     publisherAddress: "",
     publisherPhoneNumber: "",
     publisherCeo: "",
-    publisherStartDate: "",
   });
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
   const [emailCheckResult, setEmailCheckResult] = useState("");
-  const [businessCheckResult, setBusinessCheckResult] = useState(""); // 사업자 인증 결과 상태 추가
-
-  // 추가된 상태: 모달에서 입력받은 데이터
-  const [modalInputData, setModalInputData] = useState({
-    modalPublisherNumber: "",
-    modalPublisherCeo: "",
-    modalPublisherStartDate: "",
-  });
 
   useEffect(() => {
     Modal.setAppElement("#root");
@@ -401,9 +368,7 @@ const SignupPage = () => {
           formData.publisherName &&
           formData.publisherAddress &&
           formData.publisherPhoneNumber &&
-          formData.publisherCeo &&
-          formData.publisherStartDate &&
-          businessCheckResult === "사업자 인증에 성공했습니다."; // 사업자 인증 성공 확인
+          formData.publisherCeo;
       }
   
       if (allFieldsFilled) {
@@ -459,59 +424,6 @@ const SignupPage = () => {
     }));
   };
 
-  // 모달 입력값 처리
-  const handleModalInputChange = (e) => {
-    const { name, value } = e.target;
-    setModalInputData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // 사업자 인증 API 호출 함수 (모달 입력 데이터 사용)
-  const handleBusinessVerification = async () => {
-    const { modalPublisherNumber, modalPublisherCeo, modalPublisherStartDate } = modalInputData;
-
-    const businessData = {
-      businesses: [
-        {
-          b_no: modalPublisherNumber,
-          p_nm: modalPublisherCeo,
-          start_dt: modalPublisherStartDate.replace(/-/g, ""), // 날짜 포맷 변경
-        },
-      ],
-    };
-
-    try {
-      const response = await axios.post(
-        "https://api.litmap.store/api/business/verify",
-        businessData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200 && response.data.status === "401 UNAUTHORIZED") {
-        setBusinessCheckResult("사업자 인증에 실패했습니다. 정보를 확인해 주세요.");
-      } else {
-        setBusinessCheckResult("사업자 인증에 성공했습니다.");
-        setFormData({
-          ...formData,
-          publisherNumber: modalPublisherNumber,
-          publisherCeo: modalPublisherCeo,
-          publisherStartDate: modalPublisherStartDate,
-        });
-      }
-    } catch (error) {
-      setBusinessCheckResult("사업자 인증 중 오류가 발생했습니다.");
-    }
-
-    // 인증 후 모달 닫기
-    closeBusinessModal();
-  };
-
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setTerms((prevTerms) => {
@@ -540,16 +452,6 @@ const SignupPage = () => {
 
   const closeModal = () => {
     setModalIsOpen(false);
-  };
-
-  const [businessModalIsOpen, setBusinessModalIsOpen] = useState(false);
-
-  const openBusinessModal = () => {
-    setBusinessModalIsOpen(true);
-  };
-
-  const closeBusinessModal = () => {
-    setBusinessModalIsOpen(false);
   };
 
   const handleLibraryClick = () => {
@@ -777,6 +679,7 @@ const SignupPage = () => {
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
+              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
             </InputFieldWithButton>
           </BoxContainer>
           <BoxContainer>
@@ -819,9 +722,8 @@ const SignupPage = () => {
                 value={formData.publisherNumber}
                 onChange={handleInputChange}
               />
-              <Button onClick={openBusinessModal}>사업자 인증</Button>
+              {/* <Button onClick={() => handleValidationCheck('publisherNumber')}>사업자 인증</Button> */}
             </InputFieldWithButton>
-            {businessCheckResult && <SmallText>{businessCheckResult}</SmallText>}
 
             <label>사업자 주소</label>
             <InputFieldWithButton>
@@ -832,7 +734,15 @@ const SignupPage = () => {
                 value={formData.publisherAddress}
                 onChange={handleInputChange}
               />
+              {/* <Button onClick={() => handleValidationCheck('publisherAddress')}>주소 검색</Button> */}
             </InputFieldWithButton>
+            {/* <InputField
+              type="text"
+              name="publisherDetailAddress"
+              placeholder="상세 주소를 입력해주세요."
+              value={formData.publisherDetailAddress}
+              onChange={handleInputChange}
+            /> */}
 
             <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
             {validationFailed && (
@@ -900,6 +810,7 @@ const SignupPage = () => {
                 value={formData.nickname}
                 onChange={handleInputChange}
               />
+              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
             </InputFieldWithButton>
           </BoxContainer>
           <BoxContainer>
@@ -1119,50 +1030,6 @@ const SignupPage = () => {
           {modalContent}
         </pre>
         <CloseButton onClick={closeModal}>닫기</CloseButton>
-      </Modal>
-
-      {/* 추가된 모달: 사업자 인증 입력용 */}
-      <Modal
-        isOpen={businessModalIsOpen}
-        onRequestClose={closeBusinessModal}
-        contentLabel="Business Verification"
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            width: "400px",
-          },
-        }}
-      >
-        <h2>사업자 인증</h2>
-        <ModalInputField
-          type="text"
-          name="modalPublisherNumber"
-          placeholder="사업자 등록번호"
-          value={modalInputData.modalPublisherNumber}
-          onChange={handleModalInputChange}
-        />
-        <ModalInputField
-          type="text"
-          name="modalPublisherCeo"
-          placeholder="대표자명"
-          value={modalInputData.modalPublisherCeo}
-          onChange={handleModalInputChange}
-        />
-        <ModalInputField
-          type="text"
-          name="modalPublisherStartDate"
-          placeholder="사업 시작일"
-          value={modalInputData.modalPublisherStartDate}
-          onChange={handleModalInputChange}
-        />
-        <ModalButton onClick={handleBusinessVerification}>
-          인증하기
-        </ModalButton>
       </Modal>
     </PageContainer>
   );
