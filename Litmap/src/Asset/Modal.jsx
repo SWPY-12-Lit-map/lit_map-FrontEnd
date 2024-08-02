@@ -2,6 +2,13 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+const CustomButton = styled(Button)`
+  background-color: unset;
+  color: white;
+`;
+
 export default function MyVerticallyCenteredModal(props) {
   const work = props.work;
   const setWork = props.setWork;
@@ -18,39 +25,25 @@ export default function MyVerticallyCenteredModal(props) {
           작품 등록 완료
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <p>
-          인물관계도 작성 완료! <br />
-          제출하시겠습니까?
-        </p>
+      <Modal.Body
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <p>작품이 등록 완료되었습니다!</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button
-          variant="Light"
+        <CustomButton
           style={{ border: "solid 1px black" }}
-          onClick={props.onHide}
-        >
-          취소
-        </Button>
-        <Button
           onClick={() => {
-            const setSaveState = { ...work, confirmCheck: true };
-            setWork(setSaveState);
-            if (work.confirmCheck) {
-              axios
-                .post("https://api.litmap.store/api/work", work)
-                .then((result) => {
-                  console.log(result);
-                  navigate("/category1/postdone");
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
+            navigate("/");
           }}
         >
-          확인
-        </Button>
+          홈 바로가기
+        </CustomButton>
+        <CustomButton onClick={() => {}}>작품 바로가기</CustomButton>
       </Modal.Footer>
     </Modal>
   );

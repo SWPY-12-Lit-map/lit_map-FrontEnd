@@ -151,6 +151,7 @@ const HumanInput = styled(TextInput)`
     -webkit-appearance: none !important;
   }
 `;
+
 export default function InfoInput(props) {
   const count = props.count;
   const setCount = props.setCount;
@@ -201,7 +202,7 @@ export default function InfoInput(props) {
     return (
       <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
         <Dropzone id="dropzone">
-          {work.thumbnail ? (
+          {imageFile ? (
             "Dropped!"
           ) : (
             <IoFolderOpenOutline

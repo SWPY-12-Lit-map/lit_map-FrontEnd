@@ -16,7 +16,6 @@ import CustomConnectionLine from "./CustomConnectionLine";
 import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
-import DownloadImg from "../Share/DownloadImg";
 import ModalBtn from "../Share/ModalBtn";
 import { useStore } from "../store";
 
@@ -121,7 +120,7 @@ const Mindmap = (props) => {
     count,
     work,
     setWork,
-    backgroundImg,
+    // backgroundImg,
     setBackImg,
     workInfo,
     relationship,
@@ -130,8 +129,9 @@ const Mindmap = (props) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [backColor, setBackColor] = useState();
+  const { workInfos, read, backgroundColor, backgroundImg, condition } =
+    useStore();
   const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
-  const { workInfos, read, backgroundColor } = useStore();
 
   const [rfInstance, setRfInstance] = useState(null);
   const { fitView, setViewport } = useReactFlow();
@@ -139,6 +139,7 @@ const Mindmap = (props) => {
 
   // 노드 생성
   const createNodes = useCallback(() => {
+    console.log(count);
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
       type: "custom",
@@ -151,8 +152,8 @@ const Mindmap = (props) => {
         ...characterInfos[i],
       },
     }));
-    setNodes((nodes) => [...nodes, ...newNodes]);
-  }, [count, setNodes, characterInfos, read]);
+    setNodes(() => [...newNodes]);
+  }, [count, setNodes, characterInfos]);
 
   /* 연결 되었을 때 */
   const onConnect = useCallback(
@@ -264,17 +265,18 @@ const Mindmap = (props) => {
 
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
-    console.log(read);
+    console.log(work);
     createNodes();
-  }, [count, createNodes]);
+  }, [count, createNodes, characterInfos]);
 
+  // 가져오기 할때
   useEffect(() => {
     const loadRelationship = () => {
       try {
         if (read) {
           onRestore(relationship);
           fitView(); // fitView 호출
-        } else {
+        } else if (!condition) {
           onRestore(work.relationship);
         }
       } finally {
@@ -337,7 +339,7 @@ const Mindmap = (props) => {
         <Background
           id="1"
           style={{
-            backgroundImage: backgroundImage ? `url(${backgroundImage})` : null,
+            backgroundImage: backgroundImg ? `url(${backgroundImg})` : null,
             backgroundSize: backgroundImage ? "cover" : null,
             background: backgroundColor ? backgroundColor : null,
             //   "linear-gradient(135deg, rgba(35,185,168,1) 0%, rgba(2,0,36,1) 80%)",

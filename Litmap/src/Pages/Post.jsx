@@ -48,6 +48,10 @@ const Prevbtn = styled.button`
   border-radius: 5px;
   padding: 5px 20px;
   width: 110px;
+  &:hover {
+    background-color: #8b0024;
+    color: white;
+  }
 `;
 
 const Nextbtn = styled.button`
@@ -57,6 +61,11 @@ const Nextbtn = styled.button`
   border-radius: 5px;
   padding: 5px 20px;
   width: 110px;
+  :not(:disabled),
+  &:hover {
+    background-color: #8b0024;
+    color: white;
+  }
 `;
 
 const ExtraSave = styled.button`
@@ -331,16 +340,16 @@ export default function Post(props) {
             <Nextbtn
               id="nextBtn"
               disabled={!next}
-              onClick={() => {
+              onClick={async () => {
                 if (state === 1) {
                   setState(2);
                   document.querySelector("#nextBtn").innerHTML = "저장";
                   console.log(work);
                 } else if (state === 2) {
                   // 저장 로직 추가
-                  setModalShow(true);
+
                   const Extrasave = { ...work, confirmCheck: true };
-                  setWork(Extrasave);
+                  await setWork(Extrasave);
                   console.log(work);
                   {
                     work.confirmCheck
@@ -348,9 +357,12 @@ export default function Post(props) {
                           .post("https://api.litmap.store/api/work", work)
                           .then((result) => {
                             console.log(result);
+                            setModalShow(true);
                           })
                           .catch((error) => {
                             console.log(error);
+                            setModalShow(false);
+                            alert("잠시 후 다시 시도해주세요");
                           })
                       : console.log("loading");
                   }

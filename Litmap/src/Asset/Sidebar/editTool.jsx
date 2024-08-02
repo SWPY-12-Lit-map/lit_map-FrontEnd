@@ -3,8 +3,6 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import styled from "styled-components";
 import { FileUploader } from "react-drag-drop-files";
-import { useColor, ColorPicker } from "react-color-palette";
-import "react-color-palette/css";
 import { IoFolderOpenOutline } from "react-icons/io5";
 import { BsPaperclip } from "react-icons/bs";
 import { useStore } from "../store";
@@ -33,13 +31,13 @@ const Dropzone = styled.div`
   justify-content: center;
 `;
 
-// const Filename = styled.div`
-//   background-color: #f5f5f5;
-//   border-radius: 5px;
-//   margin-top: 10px;
-//   height: 30px;
-//   text-align: center;
-// `;
+const Filename = styled.div`
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  margin-top: 10px;
+  height: 30px;
+  text-align: center;
+`;
 
 const LineSelect = styled.div`
   margin-top: 10%;
@@ -108,82 +106,56 @@ export default function EditTool(props) {
     edgeType,
     lineStyle,
     setBackImg,
-    setBackground,
-    backgroundType,
     backgroundImg,
     setWork,
     work,
+    backgroundType,
+    setBackground,
   } = props;
 
-  const { backgroundColor, setBackgroundColor } = useStore();
+  const { backgroundColor, setBackgroundColor, setBackgroundImg } = useStore();
 
   const fileTypes = ["JPG", "PNG", "JPEG"];
   const [imageFile, setFile] = useState("");
+
   // 이미지 업로드
-  function DragDrop() {
-    const handleChange = (file) => {
-      setFile(file);
-      console.log(file.name);
-      const formData = new FormData();
-      formData.append("image", file); // 여기를 imageFile 대신 file로 수정
-      formData.append("path", "relationshipBackground");
-      axios
-        .post("https://api.litmap.store/api/files", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
+  const handleChange = async (file) => {
+    setFile(file);
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("path", "relationshipBackground");
+    await axios
+      .post("https://api.litmap.store/api/files", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        const ImgUrl = {
+          ...work,
+          relationship: {
+            ...work.relationship,
+            backgroundImage: response.data.result,
           },
-        })
-        .then((response) => {
-          console.log(response.data.result);
-          const ImgUrl = {
-            ...work,
-            relationship: {
-              ...work.relationship,
-              backgroundImage: response.data.result,
-            },
-          };
-          setWork(ImgUrl);
-          console.log(work);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      console.log(work);
-    };
-    return (
-      <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
-        <Dropzone id="dropzone">
-          {backgroundImg ? (
-            "Dropped!"
-          ) : (
-            <IoFolderOpenOutline
-              style={{ fontSize: "100px", color: "#C5C5C5" }}
-            />
-          )}
-        </Dropzone>
-        {/* <Filename>
-          <BsPaperclip />
-          {backgroundImg.name}
-        </Filename> */}
-      </FileUploader>
-    );
-  }
+        };
+        setWork(ImgUrl);
+        setBackgroundImg(response.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   // 색깔 고르기
-  const ColorPick = () => {
-    const handleChangeComplete = (color) => {
-      setBackgroundColor(color.hex);
-      setWork({
-        ...work,
-        relationship: {
-          ...work.relationship,
-          backgroundColor: color.hex,
-        },
-      });
-    };
-    return (
-      <ChromePicker color={backgroundColor} onChange={handleChangeComplete} />
-    );
+  const handleColorChangeComplete = (color) => {
+    setBackgroundColor(color.hex);
+    setWork({
+      ...work,
+      relationship: {
+        ...work.relationship,
+        backgroundColor: color.hex,
+      },
+    });
   };
 
   return (
@@ -228,7 +200,32 @@ export default function EditTool(props) {
             색상
           </RadioLabel>
         </SelectBar>
-        {backgroundType ? <DragDrop /> : <ColorPick />}
+        {backgroundType ? (
+          <FileUploader
+            handleChange={handleChange}
+            name="file"
+            types={fileTypes}
+          >
+            <Dropzone id="dropzone">
+              {imageFile ? (
+                "Dropped!"
+              ) : (
+                <IoFolderOpenOutline
+                  style={{ fontSize: "100px", color: "#C5C5C5" }}
+                />
+              )}
+            </Dropzone>
+            <Filename>
+              <BsPaperclip />
+              {backgroundImg?.name}
+            </Filename>
+          </FileUploader>
+        ) : (
+          <ChromePicker
+            color={backgroundColor}
+            onChange={handleColorChangeComplete}
+          />
+        )}
       </SelectBackground>
       <LineSelect>
         관계선 설정

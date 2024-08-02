@@ -20,8 +20,6 @@ export const useStore = create((set) => ({
 
   read: false,
   setRead: (data) => set({ read: data }),
-  // 노드 가져오기
-  // store.js
 
   edges: [],
   setEdges: (edges) => set({ edges }),
@@ -30,7 +28,7 @@ export const useStore = create((set) => ({
       edges: state.edges.filter((edge) => edge.id !== edgeId),
     })),
 
-  backgroundColor: "#fff",
+  backgroundColor: "",
   setBackgroundColor: (data) => set({ backgroundColor: data }),
 
   backgroundImg: "",

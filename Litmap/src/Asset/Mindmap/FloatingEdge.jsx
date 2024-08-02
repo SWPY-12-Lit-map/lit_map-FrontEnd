@@ -2,15 +2,11 @@ import { useCallback, useState, useEffect } from "react";
 import {
   useStore,
   getStraightPath,
-  useReactFlow,
   EdgeLabelRenderer,
   getBezierPath,
+  useReactFlow,
 } from "reactflow";
 import { getEdgeParams } from "./util";
-
-function getAngle(sx, sy, tx, ty) {
-  return Math.atan2(ty - sy, tx - sx) * (180 / Math.PI);
-}
 
 function FloatingEdge({
   id,
@@ -19,7 +15,6 @@ function FloatingEdge({
   markerEnd,
   style,
   data = {},
-  // onTextChange,
   selected,
 }) {
   const sourceNode = useStore(
@@ -30,6 +25,8 @@ function FloatingEdge({
   );
 
   const [text, setText] = useState(data.text || "");
+
+  const { setEdges } = useReactFlow(); // Move useReactFlow here
 
   useEffect(() => {
     if (data.text != text) {
@@ -57,8 +54,6 @@ function FloatingEdge({
     targetPosition: targetPos,
   });
 
-  // const angle = getAngle(sx, sy, tx, ty);
-
   const handleTextChange = (event) => {
     const newText = event.target.value;
     setText(newText);
@@ -68,7 +63,6 @@ function FloatingEdge({
   };
 
   const onEdgeClick = () => {
-    const { setEdges } = useReactFlow();
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
   };
 
