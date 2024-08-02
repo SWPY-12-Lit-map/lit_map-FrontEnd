@@ -223,7 +223,7 @@ const MypageLayout = () => {
     if (userId == 62) {
       fetchUserProfile("admin");
     } else {
-      fetchUserProfile("member");
+      fetchUserProfile("api/members");
     }
 
     fetchStats();
@@ -262,10 +262,7 @@ const MypageLayout = () => {
       >
         <Box>
           <ProfileSection>
-            <img
-              src={profileImage || "/profile.png"}
-              alt="프로필 이미지"
-            />
+            <img src={profileImage || "/profile.png"} alt="프로필 이미지" />
             <div className="name">{profile.nickname}님</div>
             <div className="role">{getRoleLabel(profile.memberRoleStatus)}</div>
           </ProfileSection>
