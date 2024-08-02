@@ -7,7 +7,7 @@ import ModalBtn from "../Asset/Share/ModalBtn";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import { ReactFlowProvider } from "reactflow";
 import { useParams } from "react-router-dom";
-import { useStore } from "../Asset/store";
+import { ReadStore, useStore } from "../Asset/store";
 import { format } from "date-fns";
 
 const Body = styled.div`
@@ -103,12 +103,15 @@ export default function Work({
   edgeType,
   lineStyle,
   setWork,
+  mega,
+  setMega,
 }) {
   const [state, setState] = useState(false);
   const date = new Date();
   const [workInfo, setWorkInfo] = useState({}); // 백엔드에서 받은거를 저장
   const { id } = useParams();
-  const { read, setRead, setBackgroundColor } = useStore();
+  const { setBackgroundColor } = useStore();
+  const { read, setRead } = ReadStore();
 
   const GetWork = async () => {
     await axios
@@ -171,9 +174,21 @@ export default function Work({
     console.log(workInfo);
   }, [read]);
 
+  // 연관작품 가져오기
+  useEffect(() => {
+    axios
+      .get(`https://api.litmap.store/api/relate/related/${id}`)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+
   return (
     <>
-      <Category />
+      <Category mega={mega} setMega={setMega} />
       <Body>
         <Workinfo>
           <Thumbnail src={workInfo.imageUrl} alt="썸네일 자리"></Thumbnail>

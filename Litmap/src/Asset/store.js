@@ -18,9 +18,6 @@ export const useStore = create((set) => ({
   url: "",
   setUrl: (data) => set({ url: data }),
 
-  read: false,
-  setRead: (data) => set({ read: data }),
-
   edges: [],
   setEdges: (edges) => set({ edges }),
   removeEdge: (edgeId) =>
@@ -36,4 +33,9 @@ export const useStore = create((set) => ({
 
   userId: "",
   setUserId: (data) => set({ userId: data }),
+}));
+
+export const ReadStore = create((set) => ({
+  read: false,
+  setRead: (data) => set({ read: data }),
 }));
