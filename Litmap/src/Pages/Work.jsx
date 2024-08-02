@@ -118,7 +118,11 @@ export default function Work({
         setWorkInfo(Get);
         console.log(workInfo);
         console.log(result);
-        setBackgroundColor(Get.versions.relationship.backgroundColor);
+        setBackgroundColor(
+          Get.versions.relationship.backgroundColor
+            ? Get.versions.relationship.backgroundColor
+            : "white"
+        );
       })
       .catch((error) => {
         console.log(error);

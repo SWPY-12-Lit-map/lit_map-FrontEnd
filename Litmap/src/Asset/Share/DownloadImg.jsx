@@ -26,7 +26,11 @@ const logoStyle = {
 export default function DownloadImg(props) {
   const { fitView } = useReactFlow();
   const fileType = props.fileType;
-  const { imgUrl, setImgUrl, backgroundColor } = useStore();
+  const { imgUrl, setImgUrl, backgroundColor, backgroundImg } = useStore();
+
+  useEffect(() => {
+    console.log(backgroundImg);
+  }, []);
 
   /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
@@ -37,40 +41,70 @@ export default function DownloadImg(props) {
   }
 
   /* HTML을 PNG 이미지로 변환하는 함수 */
-  function ImgtoPng() {
+  async function ImgtoPng() {
     const viewport = document.querySelector(".react-flow__viewport");
+    if (!viewport) {
+      console.error("Viewport not found");
+      return;
+    }
 
-    const container = document.createElement("div");
-    container.style.position = "relative";
-    container.style.width = viewport.offsetWidth + "px";
-    container.style.height = viewport.offsetHeight + "px";
-
-    const clonedViewport = viewport.cloneNode(true);
-
-    const viewportStyles = getComputedStyle(viewport);
-    clonedViewport.style.backgroundImage = viewportStyles.backgroundImage;
-    clonedViewport.style.backgroundColor = viewportStyles.backgroundColor;
-
-    container.appendChild(clonedViewport);
-    const logo = document.createElement("img");
-    logo.src = "/Logo.png";
-    Object.assign(logo.style, logoStyle);
-    container.appendChild(logo);
-    document.body.appendChild(container);
-
-    toPng(container, {
-      cacheBust: true,
-      backgroundColor: backgroundColor == "" ? "white" : backgroundColor,
-    })
-      .then((dataUrl) => {
-        setImgUrl(dataUrl);
-        downloadImage(dataUrl);
-        document.body.removeChild(container);
-      })
-      .catch((error) => {
-        console.error("Image conversion error:", error);
-        document.body.removeChild(container);
+    try {
+      const viewportDataUrl = await toPng(viewport, {
+        cacheBust: true,
       });
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      img.src = viewportDataUrl;
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        if (backgroundImg) {
+          const bgImg = new Image();
+          bgImg.src = backgroundImg;
+          bgImg.onload = () => {
+            ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            // 로고 추가
+            const logo = new Image();
+            logo.src = "/Logo.png";
+            logo.onload = () => {
+              ctx.drawImage(logo, img.width - 170, img.height - 80, 120, 50);
+
+              // 최종 이미지 다운로드
+              const finalDataUrl = canvas.toDataURL();
+              setImgUrl(finalDataUrl);
+              downloadImage(finalDataUrl);
+            };
+          };
+        } else {
+          // 배경색 설정
+          ctx.fillStyle =
+            backgroundColor == undefined ? "white" : backgroundColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.drawImage(img, 0, 0);
+
+          // 로고 추가
+          const logo = new Image();
+          logo.src = "/Logo.png";
+          logo.onload = () => {
+            ctx.drawImage(logo, img.width - 170, img.height - 80, 120, 50);
+
+            // 최종 이미지 다운로드
+            const finalDataUrl = canvas.toDataURL();
+            setImgUrl(finalDataUrl);
+            downloadImage(finalDataUrl);
+          };
+        }
+      };
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /* 다운로드 버튼 클릭 시 호출되는 함수 */
