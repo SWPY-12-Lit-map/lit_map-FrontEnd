@@ -224,88 +224,7 @@ const ChooseBtn = styled.div`
 export default function ArtworkManagement() {
   const { addWorkInfos } = useStore();
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      id: 1,
-      date: "2024.07.01",
-      userName: "1",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 2,
-      date: "2024.07.01",
-      userName: "2",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 3,
-      date: "2024.07.01",
-      userName: "3",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 4,
-      date: "2024.07.01",
-      userName: "4",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 5,
-      date: "2024.07.01",
-      userName: "5",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 6,
-      date: "2024.07.01",
-      userName: "6",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 7,
-      date: "2024.07.01",
-      userName: "7",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 8,
-      date: "2024.07.01",
-      userName: "8",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 9,
-      date: "2024.07.01",
-      userName: "9",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-    {
-      id: 10,
-      date: "2024.07.01",
-      userName: "10",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -355,7 +274,7 @@ export default function ArtworkManagement() {
   /* 가입 승인 */
   const AllowAccess = (memberId) => {
     axios
-      .get(`https://api.litmap.store/api/members/${memberId}/approve`)
+      .get(`https://api.litmap.store/admin/approve/${memberId}/`)
       .then((result) => {
         console.log(result);
       })
@@ -363,6 +282,21 @@ export default function ArtworkManagement() {
         console.log(error);
       });
   };
+
+  const GetwaitMembers = () => {
+    axios
+      .get("https://api.litmap.store/admin/pending")
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    GetwaitMembers();
+  }, []);
 
   return (
     <Content>

@@ -166,6 +166,8 @@ const Login = ({ setLogin }) => {
     }
   }, [setLogin, navigate]);
 
+  useEffect(() => {}, [userId]);
+
   const handleLogin = async () => {
     if (!email || !password) {
       alert("이메일과 비밀번호를 모두 입력해주세요.");

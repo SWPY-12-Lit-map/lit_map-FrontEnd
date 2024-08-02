@@ -14,10 +14,8 @@ const Container = styled.div`
 `;
 
 const Banner = styled(Carousel)`
-  height: 350px;
   & > div {
     height: 100%;
-
     > div {
       height: 100%;
       > div {
@@ -105,13 +103,25 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
   const navigate = useNavigate();
 
   // 캐러셀 이미지
-  const slides = ["/advertise1.png", "/advertise2.png", "/advertise3.png"];
+  const [slides, setSlides] = useState([]);
 
   const [index, setIndex] = useState();
 
   const handleSelect = (selectedIndex) => {
     setIndex(selectedIndex);
   };
+
+  useEffect(() => {
+    axios
+      .get("https://api.litmap.store/api/board/banner")
+      .then((response) => {
+        console.log(response);
+        setSlides(response.data.result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
 
   return (
     <>

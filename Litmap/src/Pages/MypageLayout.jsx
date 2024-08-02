@@ -10,6 +10,7 @@ import RegisterAllow from "./RegisterAllow";
 import MemberManage from "./MemberManage";
 import BannerManage from "./BannerManage";
 import WithdrawalPage from "./WithdrawalPage";
+import { useStore } from "../Asset/store";
 
 const Container = styled.div`
   display: flex;
@@ -150,14 +151,15 @@ const MypageLayout = () => {
   const [contentHeight, setContentHeight] = useState(1000);
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
   const [profileImage, setProfileImage] = useState("");
+  const { userId } = useStore();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = async (type) => {
       try {
         const response = await axios.get(
-          "https://api.litmap.store/api/members/mypage",
+          `https://api.litmap.store/${type}/mypage`,
           {
             withCredentials: true,
           }
@@ -194,8 +196,12 @@ const MypageLayout = () => {
         console.error("Failed to fetch stats", error);
       }
     };
+    if (userId == 62) {
+      fetchUserProfile("admin");
+    } else {
+      fetchUserProfile("member");
+    }
 
-    fetchUserProfile();
     fetchStats();
   }, [navigate]);
 
@@ -215,8 +221,17 @@ const MypageLayout = () => {
   };
 
   return (
-    <Container $contentHeight={contentHeight}>
-      <Sidebar>
+    <Container
+      $contentHeight={contentHeight}
+      style={{
+        backgroundColor: userId == 62 ? "#ABB0BC" : null,
+      }}
+    >
+      <Sidebar
+        style={{
+          backgroundColor: userId == 62 ? "#ABB0BC" : null,
+        }}
+      >
         <Box>
           <ProfileSection>
             <img
@@ -263,27 +278,32 @@ const MypageLayout = () => {
                 </Link>
               </li>
             </ul>
-            <AdminMenu>
-              <h3>관리자용 메뉴</h3>
-              <li>
-                <Link to="adminpage">
-                  <img src="/Shape.png" alt="가입승인 이미지" />
-                  가입승인
-                </Link>
-                <Link to="adminregister">
-                  <img src="/mypage_list.png" alt="작품 등록 승인" />
-                  작품 등록 승인
-                </Link>
-                <Link to="membermanage">
-                  <img src="/heart-circle-outline.png" alt="회원 관리 이미지" />
-                  회원 관리
-                </Link>
-                <Link to="bannermannage">
-                  <img src="/home-outline.png" alt="홈 화면 관리 이미지" />홈
-                  화면 관리
-                </Link>
-              </li>
-            </AdminMenu>
+            {userId == 62 ? (
+              <AdminMenu>
+                <h3>관리자용 메뉴</h3>
+                <li>
+                  <Link to="adminpage">
+                    <img src="/Shape.png" alt="가입승인 이미지" />
+                    가입승인
+                  </Link>
+                  <Link to="adminregister">
+                    <img src="/mypage_list.png" alt="작품 등록 승인" />
+                    작품 등록 승인
+                  </Link>
+                  <Link to="membermanage">
+                    <img
+                      src="/heart-circle-outline.png"
+                      alt="회원 관리 이미지"
+                    />
+                    회원 관리
+                  </Link>
+                  <Link to="bannermannage">
+                    <img src="/home-outline.png" alt="홈 화면 관리 이미지" />홈
+                    화면 관리
+                  </Link>
+                </li>
+              </AdminMenu>
+            ) : null}
           </MenuSection>
         </Box>
       </Sidebar>

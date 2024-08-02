@@ -285,12 +285,22 @@ export default function MemberManage() {
     pageNumbers.push(i);
   }
 
+  // 회원 조회
+  useEffect(() => {
+    axios
+      .get("https://api.litmap.store/admin/all")
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   // 회원 탈퇴 승인
   const DenyAccess = (memberId) => {
     axios
-      .post(
-        `https://api.litmap.store/api/members/${memberId}/approve-withdrawl`
-      )
+      .post(`https://api.litmap.store/admin/approve-withdrawl/${memberId}/`)
       .then((result) => {
         console.log(result);
       })
