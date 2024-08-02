@@ -121,7 +121,7 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
       .catch((error) => {
         console.log(error);
       });
-  });
+  }, []);
 
   return (
     <>
