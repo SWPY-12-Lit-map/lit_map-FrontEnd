@@ -13,8 +13,7 @@ const CategoryMenu = styled.ul`
   align-items: center;
   list-style: none;
   padding: 20px 50px;
-  gap: 15px;
-  margin: 20px auto;
+  margin: 20px auto 0px;
   position: relative;
   font-size: 20px;
 `;
@@ -23,18 +22,25 @@ const CategoryMenuItem = styled.li`
   padding: 0 20px;
 `;
 
-const StyledLink = styled(Link)`
+const CategoryTab = styled.div`
+  text-align: center;
+  width: 60px;
   text-decoration: none;
   color: black;
+  cursor: pointer;
+  color: ${(props) => (props.active ? "#8B0024" : "black")};
+  border-bottom: ${(props) => (props.active ? "4px solid #8B0024" : "unset")};
 `;
 
 const BarsIcon = styled(FontAwesomeIcon)`
   color: #000000;
   cursor: pointer;
   font-size: 20px;
+  margin-right: 20px;
 `;
 
 function Category({ setMega, mega }) {
+  const [activeCategory, setActiveCategory] = useState("홈");
   return (
     <CategoryMenu>
       <BarsIcon
@@ -43,21 +49,19 @@ function Category({ setMega, mega }) {
           setMega(true);
         }}
       />
-      <CategoryMenuItem>
-        <StyledLink>홈</StyledLink>
-      </CategoryMenuItem>
-      <CategoryMenuItem>
-        <StyledLink>도서</StyledLink>
-      </CategoryMenuItem>
-      <CategoryMenuItem>
-        <StyledLink>드라마</StyledLink>
-      </CategoryMenuItem>
-      <CategoryMenuItem>
-        <StyledLink>영화</StyledLink>
-      </CategoryMenuItem>
-      <CategoryMenuItem>
-        <StyledLink>웹툰</StyledLink>
-      </CategoryMenuItem>
+      {["홈", "도서", "드라마", "영화", "웹툰"].map((a, i) => {
+        return (
+          <CategoryMenuItem>
+            <CategoryTab
+              active={activeCategory === a}
+              onClick={() => setActiveCategory(a)}
+            >
+              {a}
+            </CategoryTab>
+          </CategoryMenuItem>
+        );
+      })}
+
       {mega && <Megamenu mega={mega} setMega={setMega} />}
     </CategoryMenu>
   );

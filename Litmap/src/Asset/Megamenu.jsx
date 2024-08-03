@@ -11,9 +11,10 @@ const MegamenuWrapper = styled.div`
   box-sizing: border-box;
   padding: 20px;
   border: 1px solid #ccc;
+  border-radius: 5px;
   width: 90%;
   position: absolute;
-  top: 0%;
+  top: 100%;
   z-index: 10000;
 `;
 

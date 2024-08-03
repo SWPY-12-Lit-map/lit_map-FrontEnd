@@ -115,7 +115,6 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
     axios
       .get("https://api.litmap.store/api/board/banner")
       .then((response) => {
-        console.log(response);
         setSlides(response.data.result);
       })
       .catch((error) => {
