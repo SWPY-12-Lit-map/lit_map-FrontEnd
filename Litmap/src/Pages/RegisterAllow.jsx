@@ -318,7 +318,7 @@ export default function RegisterAllow() {
   // 승인 안된 작품 가져오기
   const getAxios = () => {
     axios
-      .get("https://api.litmap.store/api/board/confirm")
+      .get("https://api.litmap.store/api/board/confirm",{withCredentials: true})
       .then((result) => {
         console.log(result);
         setData([...result.data.result]);
@@ -332,7 +332,7 @@ export default function RegisterAllow() {
   const confirm = (versionId) => {
     console.log(versionId);
     axios
-      .put(`https://api.litmap.store/api/version/${versionId}/confirm`)
+      .put(`https://api.litmap.store/api/version/${versionId}/confirm`,{withCredentials:true})
       .then((result) => {
         console.log(result);
       })
