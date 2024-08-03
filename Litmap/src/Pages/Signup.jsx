@@ -726,7 +726,7 @@ const SignupPage = () => {
                 <InputField
                   type="text"
                   name="publisherPhoneNumber"
-                  placeholder="(예시) 01013245768"
+                  placeholder="(예시) 0212341234"
                   value={formData.publisherPhoneNumber}
                   onChange={handleInputChange}
                 />
