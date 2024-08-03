@@ -149,72 +149,45 @@ const MypageLayout = () => {
     }
     return null;
   };
+
   const memberRoleStatus = getCookie("memberRoleStatus");
 
   useEffect(() => {
-    const fetchUserProfile = async (type) => {
+    const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(
-          `https://api.litmap.store/${type}/mypage`,
-          {
-            withCredentials: true,
-          }
-        );
+        let response;
+        if (memberRoleStatus === "PUBLISHER_MEMBER") {
+          response = await axios.get(
+            "https://api.litmap.store/api/publishers/mypage",
+            { withCredentials: true }
+          );
+        } else if (memberRoleStatus === "ADMIN") {
+          response = await axios.get(
+            "https://api.litmap.store/admin/mypage",
+            { withCredentials: true }
+          );
+        } else {
+          response = await axios.get(
+            "https://api.litmap.store/api/members/mypage",
+            { withCredentials: true }
+          );
+        }
 
         if (response.data.resultCode === 200) {
           const profileData = response.data.result;
-          console.log("Profile Data:", profileData);
+          setProfile(profileData);
+          setProfileImage(profileData.userImage);
 
-          // 역할에 따라 API 호출
-          if (profileData.memberRoleStatus === "PUBLISHER_MEMBER") {
-            const publisherResponse = await axios.get(
-              "https://api.litmap.store/api/publishers/mypage",
-              {
-                withCredentials: true,
-              }
-            );
-            if (publisherResponse.data.resultCode === 200) {
-              setProfile(publisherResponse.data.result);
-              setProfileImage(publisherResponse.data.result.userImage);
-            } else {
-              console.error("Failed to fetch publisher profile");
-            }
-          } else if (profileData.memberRoleStatus === "PENDING_MEMBER") {
+          if (profileData.memberRoleStatus === "PENDING_MEMBER") {
             alert("승인중인 회원입니다");
             navigate("/");
-          } else if (
-            profileData.memberRoleStatus === "ACTIVE_MEMBER" ||
-            profileData.memberRoleStatus === "ADMIN"
-          ) {
-            setProfile(profileData);
-            setProfileImage(profileData.userImage);
           }
         } else {
           console.error("Failed to fetch user profile");
         }
       } catch (error) {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.reason === "사용자 정보가 일치하지 않습니다."
-        ) {
-          // PUBLISHER_MEMBER로 로그인했는데 잘못된 API 호출 시 예외 처리
-          const publisherResponse = await axios.get(
-            "https://api.litmap.store/api/publishers/mypage",
-            {
-              withCredentials: true,
-            }
-          );
-          if (publisherResponse.data.resultCode === 200) {
-            setProfile(publisherResponse.data.result);
-            setProfileImage(publisherResponse.data.result.userImage);
-          } else {
-            console.error("Failed to fetch publisher profile");
-          }
-        } else {
-          console.error("Failed to fetch user profile", error);
-          navigate("/");
-        }
+        console.error("Failed to fetch user profile", error);
+        navigate("/");
       }
     };
 
@@ -235,15 +208,9 @@ const MypageLayout = () => {
       }
     };
 
-    console.log(memberRoleStatus);
-    if (memberRoleStatus === "ADMIN") {
-      fetchUserProfile("admin");
-    } else {
-      fetchUserProfile("api/members");
-    }
-
+    fetchUserProfile();
     fetchStats();
-  }, [navigate]);
+  }, [navigate, memberRoleStatus]);
 
   const getRoleLabel = (role) => {
     switch (role) {
@@ -309,11 +276,10 @@ const MypageLayout = () => {
                   회원정보 수정
                 </Link>
               </li>
-            </ul>{" "}
-            {memberRoleStatus === "ADMIN" ? null : (
+            </ul>
+            {memberRoleStatus !== "ADMIN" && (
               <>
                 <h3>관리</h3>
-
                 <ul>
                   <li>
                     <Link to="manage-artworks">
@@ -324,7 +290,7 @@ const MypageLayout = () => {
                 </ul>
               </>
             )}
-            {memberRoleStatus === "ADMIN" ? (
+            {memberRoleStatus === "ADMIN" && (
               <AdminMenu>
                 <h3>관리자용 메뉴</h3>
                 <li>
@@ -349,7 +315,7 @@ const MypageLayout = () => {
                   </Link>
                 </li>
               </AdminMenu>
-            ) : null}
+            )}
           </MenuSection>
         </Box>
       </Sidebar>

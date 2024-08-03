@@ -176,7 +176,8 @@ const SmallText = styled.p`
 
 const MemberEdit = () => {
     const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
+    const [workEmail, setWorkEmail] = useState(""); // 업무용 이메일 (1인작가)
+    const [representativePhone, setRepresentativePhone] = useState(""); // 대표 전화번호 (출판사)
     const [website, setWebsite] = useState("");
     const [address, setAddress] = useState("");
     const [currentPassword, setCurrentPassword] = useState(""); // 비밀번호 확인 단계에서 사용
@@ -185,7 +186,7 @@ const MemberEdit = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-    const [isPhoneEditable, setIsPhoneEditable] = useState(false);
+    const [isWorkEmailEditable, setIsWorkEmailEditable] = useState(false);
     const [isWebsiteEditable, setIsWebsiteEditable] = useState(false);
     const [isAddressEditable, setIsAddressEditable] = useState(false);
     const [memberType, setMemberType] = useState(""); 
@@ -201,52 +202,71 @@ const MemberEdit = () => {
     const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false); // 비밀번호 확인 완료 여부
 
     useEffect(() => {
-        // 사용자 정보를 불러오는 API 호출
         const fetchData = async () => {
             try {
                 let response;
                 
-                // 1인 작가일 경우
-                response = await axios.get("https://api.litmap.store/api/members/mypage", {
-                    withCredentials: true,
-                });
-    
-                let data = response.data.result;
-    
-                // 출판사 회원일 경우
-                if (data.memberRoleStatus === "PUBLISHER_MEMBER") {
+                // 먼저 쿠키 또는 로컬 스토리지에서 memberRoleStatus를 가져옵니다.
+                const memberRoleStatus = getCookie("memberRoleStatus");
+
+                if (memberRoleStatus === "PUBLISHER_MEMBER") {
+                    // PUBLISHER_MEMBER의 경우 출판사 전용 API 호출
                     response = await axios.get("https://api.litmap.store/api/publishers/mypage", {
                         withCredentials: true,
                     });
-                    data = response.data.result;
-                }
-    
-                console.log("Fetched user data:", data); // Fetch된 데이터 확인
-    
-                // litmapEmail을 email 상태에 설정
-                setEmail(data.litmapEmail);
-                setPhone(data.workEmail || "");
-                setWebsite(data.urlLink || "");
-                setAddress(data.publisherAddress || ""); // 출판사 주소 설정
-                setName(data.name);
-                setNickname(data.nickname);
-                setMyMessage(data.myMessage || "");
-                setUserImage(data.userImage || "/profile.png");
-                setUrlLink(data.urlLink || "");
-                setMemberRoleStatus(data.memberRoleStatus);
-    
-                if (data.memberRoleStatus === "PUBLISHER_MEMBER") {
-                    setMemberType("출판사 직원"); // 출판사 직원일 경우
+
                 } else {
-                    setMemberType("1인작가");
+                    // 그 외의 경우 일반 회원 API 호출
+                    response = await axios.get("https://api.litmap.store/api/members/mypage", {
+                        withCredentials: true,
+                    });
+                }
+
+                if (response.data.resultCode === 200) {
+                    const data = response.data.result;
+
+                    console.log("Fetched user data:", data);
+
+                    // 상태 업데이트
+                    setEmail(data.litmapEmail);
+                    setWorkEmail(data.workEmail || "");
+                    setRepresentativePhone(data.publisherPhoneNumber || ""); // 대표 전화번호 설정
+                    setWebsite(data.urlLink || "");
+                    setAddress(data.publisherAddress || "");
+                    setName(data.name);
+                    setNickname(data.nickname);
+                    setMyMessage(data.myMessage || "");
+                    setUserImage(data.userImage || "/profile.png");
+                    setUrlLink(data.urlLink || "");
+                    setMemberRoleStatus(data.memberRoleStatus);
+
+                    if (data.memberRoleStatus === "PUBLISHER_MEMBER") {
+                        setMemberType("출판사 직원");
+                    } else {
+                        setMemberType("1인작가");
+                    }
+                } else {
+                    throw new Error("Failed to fetch member data");
                 }
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
+                setErrorMessage("사용자 정보를 불러오는데 실패했습니다.");
             }
         };
-    
+
         fetchData();
-    }, []);    
+    }, []);
+
+    const getCookie = (name) => {
+        const cookieArr = document.cookie.split("; ");
+        for (let i = 0; i < cookieArr.length; i++) {
+            const cookiePair = cookieArr[i].split("=");
+            if (name === cookiePair[0]) {
+                return cookiePair[1];
+            }
+        }
+        return null;
+    };
 
     const handlePasswordVisibilityToggle = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -272,7 +292,8 @@ const MemberEdit = () => {
     
         // 기본적인 업데이트 데이터 객체 생성
         const updatedData = {
-            workEmail: phone,
+            workEmail: memberType === "1인작가" ? workEmail : "",
+            publisherPhone: memberType === "출판사 직원" ? representativePhone : "",
             name,
             nickname,
             myMessage,
@@ -435,17 +456,17 @@ const MemberEdit = () => {
                         </InfoItem>
                         <InfoItem>
                             <div className="title">업무용 이메일</div>
-                            {isPhoneEditable ? (
+                            {isWorkEmailEditable ? (
                                 <input
                                     type="text"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={workEmail}
+                                    onChange={(e) => setWorkEmail(e.target.value)}
                                 />
                             ) : (
-                                <div>{phone}</div>
+                                <div>{workEmail}</div>
                             )}
-                            <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
-                                {isPhoneEditable ? "완료" : "변경"}
+                            <SmallButton onClick={() => setIsWorkEmailEditable(!isWorkEmailEditable)}>
+                                {isWorkEmailEditable ? "완료" : "변경"}
                             </SmallButton>
                         </InfoItem>
                     </>
@@ -453,17 +474,17 @@ const MemberEdit = () => {
                     <>
                         <InfoItem>
                             <div className="title">대표 번호</div>
-                            {isPhoneEditable ? (
+                            {isWorkEmailEditable ? (
                                 <input
                                     type="text"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={representativePhone}
+                                    onChange={(e) => setRepresentativePhone(e.target.value)}
                                 />
                             ) : (
-                                <div>{phone}</div>
+                                <div>{representativePhone}</div>
                             )}
-                            <SmallButton onClick={() => setIsPhoneEditable(!isPhoneEditable)}>
-                                {isPhoneEditable ? "완료" : "변경"}
+                            <SmallButton onClick={() => setIsWorkEmailEditable(!isWorkEmailEditable)}>
+                                {isWorkEmailEditable ? "완료" : "변경"}
                             </SmallButton>
                         </InfoItem>
                         <InfoItem>
