@@ -201,8 +201,7 @@ const LoadingBar = styled.div`
 `;
 
 const ArtworkManagement = ({ setContentHeight }) => {
-  const { workInfos, addWorkInfos, setCondition, condition, userId } =
-    useStore();
+  const { workInfos, addWorkInfos, setCondition, condition } = useStore();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -283,10 +282,9 @@ const ArtworkManagement = ({ setContentHeight }) => {
     console.log(versionId);
     console.log(versionNum);
     axios
-      .delete(
-        `https://api.litmap.store/api/version/${versionId}/${versionNum}`,
-        { withCredentials: true }
-      )
+      .delete(`https://api.litmap.store/api/version/${workId}/${versionNum}`, {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
         let newData = data.map((item) => {
@@ -333,6 +331,7 @@ const ArtworkManagement = ({ setContentHeight }) => {
       ...prevState,
       [id]: !prevState[id],
     }));
+    console.log(currentItems[0]);
   };
 
   const handleFilterStatusChange = (status) => {
@@ -349,31 +348,11 @@ const ArtworkManagement = ({ setContentHeight }) => {
           <ClipLoader color="rgba(139, 0, 36, 1)"></ClipLoader>
         </LoadingBar>
       ) : null}
-      {/* <button
-        onClick={async () => {
-          await axios
-            .put("https://api.litmap.store/api/version/rollback/17/0.1")
-            .then((result) => {
-              setLoading(true);
-              addWorkInfos(result.data.result);
-              setCondition(false);
-              if (result.data.result?.workId) {
-                setLoading(false);
-                navigate("/category1");
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      >
-        수정하기
-      </button> */}
       <BigButton
         onClick={() => {
           setCondition(true);
           console.log(condition);
-          window.location.href = "/category1";
+          navigate("/category1");
         }}
       >
         <img src="/registration.png" alt="등록 아이콘" />
@@ -468,11 +447,13 @@ const ArtworkManagement = ({ setContentHeight }) => {
                         onClick={async () => {
                           await axios
                             .put(
-                              `https://api.litmap.store/api/version/rollback/${version.versionId}/0.1`,
+                              `https://api.litmap.store/api/version/rollback/${item.workId}/${version.versionNum}`,
+                              {},
                               { withCredentials: true }
                             )
                             .then((result) => {
                               console.log(result);
+                              setCondition(false);
                               addWorkInfos(result.data.result);
                               if (result.data.result?.workId) {
                                 navigate("/category1");
