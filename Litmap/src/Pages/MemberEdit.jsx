@@ -179,8 +179,9 @@ const MemberEdit = () => {
     const [phone, setPhone] = useState("");
     const [website, setWebsite] = useState("");
     const [address, setAddress] = useState("");
-    const [password, setpassword] = useState(""); // 비밀번호 입력 상태 (Password에서 password로 변경)
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [currentPassword, setCurrentPassword] = useState(""); // 비밀번호 확인 단계에서 사용
+    const [newPassword, setNewPassword] = useState(""); // 비밀번호 변경 단계에서 사용
+    const [confirmNewPassword, setConfirmNewPassword] = useState(""); // 비밀번호 확인 단계에서 사용
     const [errorMessage, setErrorMessage] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
@@ -203,21 +204,37 @@ const MemberEdit = () => {
         // 사용자 정보를 불러오는 API 호출
         const fetchData = async () => {
             try {
-                const response = await axios.get("https://api.litmap.store/api/members/mypage", {
+                let response;
+                
+                // 1인 작가일 경우
+                response = await axios.get("https://api.litmap.store/api/members/mypage", {
                     withCredentials: true,
                 });
-                const data = response.data.result;
+    
+                let data = response.data.result;
+    
+                // 출판사 회원일 경우
+                if (data.memberRoleStatus === "PUBLISHER_MEMBER") {
+                    response = await axios.get("https://api.litmap.store/api/publishers/mypage", {
+                        withCredentials: true,
+                    });
+                    data = response.data.result;
+                }
+    
+                console.log("Fetched user data:", data); // Fetch된 데이터 확인
+    
+                // litmapEmail을 email 상태에 설정
                 setEmail(data.litmapEmail);
-                setPhone(data.workEmail);
-                setWebsite(data.urlLink);
-                setAddress(""); // 1인작가는 주소 없음
+                setPhone(data.workEmail || "");
+                setWebsite(data.urlLink || "");
+                setAddress(data.publisherAddress || ""); // 출판사 주소 설정
                 setName(data.name);
                 setNickname(data.nickname);
-                setMyMessage(data.myMessage);
-                setUserImage(data.userImage);
-                setUrlLink(data.urlLink);
+                setMyMessage(data.myMessage || "");
+                setUserImage(data.userImage || "/profile.png");
+                setUrlLink(data.urlLink || "");
                 setMemberRoleStatus(data.memberRoleStatus);
-
+    
                 if (data.memberRoleStatus === "PUBLISHER_MEMBER") {
                     setMemberType("출판사 직원"); // 출판사 직원일 경우
                 } else {
@@ -227,8 +244,9 @@ const MemberEdit = () => {
                 console.error("Failed to fetch user data:", error);
             }
         };
+    
         fetchData();
-    }, []);
+    }, []);    
 
     const handlePasswordVisibilityToggle = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -237,60 +255,62 @@ const MemberEdit = () => {
     const handleConfirmPasswordVisibilityToggle = () => {
         setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
     };
-
+    
     const handleSave = async () => {
         const passwordPattern = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,20}$/;
-
-        if (password && !passwordPattern.test(password)) {
+    
+        // 비밀번호가 입력된 경우에만 유효성 검사
+        if (newPassword && !passwordPattern.test(newPassword)) {
             setErrorMessage("비밀번호 조건에 맞지 않습니다.");
             return;
         }
-
-        if (password !== confirmPassword) {
+    
+        if (newPassword && newPassword !== confirmNewPassword) {
             setErrorMessage("비밀번호가 일치하지 않습니다.");
             return;
         }
-
+    
+        // 기본적인 업데이트 데이터 객체 생성
         const updatedData = {
             workEmail: phone,
             name,
             nickname,
             myMessage,
             userImage,
-            urlLink: website, // 작품 URL로 website 값을 사용
-            ...(password && { password, confirmPassword }),
-            ...(memberType === "출판사 직원" && {
-                publisherAddress: address,
-                publisherPhoneNumber: phone,
-                publisherCeo: name,
-            }),
+            urlLink: website,
         };
-
-        console.log("Sending updated data:", updatedData); // 콘솔 로그 추가
-
+    
+        // 비밀번호가 입력된 경우에만 필드를 추가
+        if (newPassword) {
+            updatedData.password = newPassword;
+            updatedData.confirmPassword = confirmNewPassword;
+        }
+    
+        console.log("Sending updated data:", updatedData);
+    
         try {
             const apiUrl =
                 memberType === "1인작가"
                     ? "https://api.litmap.store/api/members/update"
                     : "https://api.litmap.store/api/publishers/update";
-
+    
             const response = await axios.put(apiUrl, updatedData, {
                 withCredentials: true,
             });
-
+    
             if (response.data.resultCode === 200 || response.data.resultCode === 204) {
                 setSuccessMessage("정보가 성공적으로 저장되었습니다.");
                 console.log("정보가 성공적으로 저장되었습니다.");
             } else {
                 setErrorMessage("정보 수정에 실패했습니다.");
-                console.error("Failed response data:", response.data); // 콘솔 로그 추가
+                console.error("Failed response data:", response.data);
             }
         } catch (error) {
             console.error("Error updating user info:", error);
             setErrorMessage("정보 수정에 실패했습니다.");
         }
     };
-
+    
     const handleCancel = () => {
         // 필요한 경우 취소 시 초기화 로직 추가
     };
@@ -301,14 +321,20 @@ const MemberEdit = () => {
 
     const handleNext = async () => {
         try {
+            console.log("Verifying password with data:", {
+                password: currentPassword
+            });
+    
             const response = await axios.post('https://api.litmap.store/api/members/verify-password', {
-                litmapEmail: email,  // 사용자 이메일 사용
-                password: password   // 사용자가 입력한 비밀번호
+                password: currentPassword   // 사용자가 입력한 비밀번호만 전송
             }, {
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                withCredentials: true,
             });
+    
+            console.log("API response:", response.data);
     
             if (response.data.result && response.data.resultCode === 200) {
                 setIsPasswordConfirmed(true);
@@ -321,7 +347,6 @@ const MemberEdit = () => {
             setErrorMessage("비밀번호 확인에 실패했습니다.");
         }
     };
-    
 
     return (
         <Content>
@@ -334,8 +359,8 @@ const MemberEdit = () => {
                         <div className="input-container">
                             <input
                                 type={isPasswordVisible ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setpassword(e.target.value)}
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
                                 placeholder="비밀번호를 입력해주세요."
                             />
                             <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
@@ -358,8 +383,8 @@ const MemberEdit = () => {
                     <div className="input-container">
                         <input
                             type={isPasswordVisible ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setpassword(e.target.value)}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="새 비밀번호를 입력해주세요."
                         />
                         <div className="password-toggle" onClick={handlePasswordVisibilityToggle}>
@@ -373,8 +398,8 @@ const MemberEdit = () => {
                     <div className="input-container">
                         <input
                             type={isConfirmPasswordVisible ? "text" : "password"}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            value={confirmNewPassword}
+                            onChange={(e) => setConfirmNewPassword(e.target.value)}
                             placeholder="새 비밀번호를 한번 더 입력해주세요."
                         />
                         <div className="password-toggle" onClick={handleConfirmPasswordVisibilityToggle}>
