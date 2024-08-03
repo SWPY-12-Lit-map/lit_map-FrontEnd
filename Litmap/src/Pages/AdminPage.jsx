@@ -234,6 +234,7 @@ export default function ArtworkManagement() {
   const itemsPerPage = 5;
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [member, setMember] = useState([]);
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
@@ -274,7 +275,9 @@ export default function ArtworkManagement() {
   /* 가입 승인 */
   const AllowAccess = (memberId) => {
     axios
-      .get(`https://api.litmap.store/admin/approve/${memberId}/`)
+      .put(`https://api.litmap.store/admin/approve/${memberId}/`, {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
       })
@@ -285,9 +288,12 @@ export default function ArtworkManagement() {
 
   const GetwaitMembers = () => {
     axios
-      .get("https://api.litmap.store/admin/pending")
+      .get("https://api.litmap.store/admin/pending", {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
+        setMember(result.data.result);
       })
       .catch((error) => {
         console.log(error);
@@ -336,15 +342,15 @@ export default function ArtworkManagement() {
             <CheckboxCustom />
           </CheckboxContainer>
           <Category>
-            <div>가입 날짜</div>
+            <div>릿맵 아이디</div>
             <div>이름</div>
-            <div>선택 분야</div>
+            <div>닉네임</div>
             <div>작품 링크</div>
             <div>상태</div>
           </Category>
         </div>
 
-        {currentItems.map((item) => (
+        {member.map((item) => (
           <div
             key={item.id}
             style={{
@@ -365,9 +371,9 @@ export default function ArtworkManagement() {
             </div>
 
             <Category id="memberInfo">
-              <span>{item.date}</span>
-              <span>{item.userName}</span>
-              <span>{item.area}</span>
+              <span>{item.litmapEmail}</span>
+              <span>{item.name}</span>
+              <span>{item.nickname}</span>
               <span>
                 <Status
                   onClick={() => {

@@ -309,17 +309,22 @@ const MypageLayout = () => {
                   회원정보 수정
                 </Link>
               </li>
-            </ul>
-            <h3>관리</h3>
-            <ul>
-              <li>
-                <Link to="manage-artworks">
-                  <img src="/mypage_list.png" alt="작품 리스트" />
-                  작품 리스트
-                </Link>
-              </li>
-            </ul>
-            {memberRoleStatus === "62" ? (
+            </ul>{" "}
+            {memberRoleStatus === "ADMIN" ? null : (
+              <>
+                <h3>관리</h3>
+
+                <ul>
+                  <li>
+                    <Link to="manage-artworks">
+                      <img src="/mypage_list.png" alt="작품 리스트" />
+                      작품 리스트
+                    </Link>
+                  </li>
+                </ul>
+              </>
+            )}
+            {memberRoleStatus === "ADMIN" ? (
               <AdminMenu>
                 <h3>관리자용 메뉴</h3>
                 <li>

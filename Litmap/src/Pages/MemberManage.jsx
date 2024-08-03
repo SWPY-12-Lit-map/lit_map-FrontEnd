@@ -288,9 +288,12 @@ export default function MemberManage() {
   // 회원 조회
   useEffect(() => {
     axios
-      .get("https://api.litmap.store/admin/all")
+      .get("https://api.litmap.store/admin/all", {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
+        setData(result.data.result);
       })
       .catch((error) => {
         console.log(error);
@@ -376,8 +379,8 @@ export default function MemberManage() {
             </div>
 
             <Category id="memberInfo">
-              <span>{item.date}</span>
-              <span>{item.userName}</span>
+              <span>{item.memberRoleStatus}</span>
+              <span>{item.name}</span>
               <span>{item.area}</span>
               <span>회사이름</span>
               <span
