@@ -19,6 +19,7 @@ import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
 import SearchResult from "./Pages/SearchResult";
 import WithdrawalPage from "./Pages/WithdrawalPage";
+import { useStore } from "./Asset/store";
 
 const GlobalStyle = createGlobalStyle`html {
     height: 100%;
@@ -39,6 +40,20 @@ function App() {
   const [num, setNum] = useState(0);
   const [dataState, setDataState] = useState(false);
   const [workId, setWorkId] = useState([]);
+
+  // 쿠키에 userId 가져오기
+
+  const getCookie = (name) => {
+    const cookieArr = document.cookie.split("; ");
+    for (let i = 0; i < cookieArr.length; i++) {
+      const cookiePair = cookieArr[i].split("=");
+      if (name === cookiePair[0]) {
+        return cookiePair[1];
+      }
+    }
+    return null;
+  };
+  const [userId, setUserId] = useState(Number(getCookie("userId")));
 
   const updateOrder = async (i) => {
     await axios
@@ -97,12 +112,12 @@ function App() {
     genre: [], // 장르
     author: [], // 작가
     imageUrl: "", // 썸넬 이미지
-    memberId: 24, // 작성자 id
+    memberId: userId, // 작성자 id
     title: "", // 제목
     contents: "", // 설명
     publisherDate: date, // 출판일자
-    version: 0.1, // 시스템 버전
-    versionName: "", // 작성자 임의 버전
+    version: "1.0", // 시스템 버전
+    versionName: "none", // 작성자 임의 버전
     publisherName: "민음사",
     casts: [
       {
@@ -197,6 +212,8 @@ function App() {
                 lineStyle={lineStyle}
                 read={read}
                 setRead={setRead}
+                mega={mega}
+                setMega={setMega}
               />
             }
           ></Route>

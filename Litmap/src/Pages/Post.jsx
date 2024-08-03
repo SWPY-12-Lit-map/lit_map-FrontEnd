@@ -6,7 +6,9 @@ import EditCharacter from "../Asset/EditCharacter";
 import { useEffect, useRef, useState, version } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
-import { useStore } from "../Asset/store";
+import { ReadStore, useStore } from "../Asset/store";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const Posting = styled.div`
   height: 100%;
@@ -78,6 +80,20 @@ const ExtraSave = styled.button`
   margin-right: 10px;
 `;
 
+const CustomToast = styled(ToastContainer)`
+  text-align: center;
+  color: #8b0024;
+
+  & > div {
+    background-color: unset;
+    & > div {
+      border: 1px solid #8b0024;
+      border-radius: 3px;
+      font-size: 16px;
+    }
+  }
+`;
+
 export default function Post(props) {
   const [state, setState] = useState(1); // 1 = 작품정보입력, 2 = 인물정보입력 ,3 = 관계도입력
 
@@ -91,10 +107,14 @@ export default function Post(props) {
   const [modalShow, setModalShow] = useState(false); // 인물 관계도 저장 후 모달
   const [backgroundType, setBackground] = useState(true); // 이미지 = true. 단색 = false
   const [backgroundImg, setBackImg] = useState(null); // 인물 관계도 배경 이미지
-  const { read, setRead, userId } = useStore();
+  const { read, setRead } = ReadStore();
 
   // nav 조작
   const [hideNav, setHide] = useState(false);
+
+  // 토스트 조작
+  const [showA, setShowA] = useState(false);
+  const toggleShowA = () => setShowA(!showA);
 
   const count = props.count;
   const setCount = props.setCount;
@@ -106,13 +126,8 @@ export default function Post(props) {
   const setEdgetype = props.setEdgetype;
   const lineStyle = props.lineStyle;
   const setLine = props.setLine;
-  const {
-    workInfos,
-    addWorkInfos,
-    setBackgroundColor,
-    setBackgroundImg,
-    condition,
-  } = useStore();
+  const { workInfos, setBackgroundColor, setBackgroundImg, condition } =
+    useStore();
 
   useEffect(() => {
     PrevCountRef.current = count;
@@ -120,11 +135,27 @@ export default function Post(props) {
 
   const prevCount = PrevCountRef.current;
 
+  useEffect(() => {}, []);
+
   // 컴포넌트가 마운트될 때 실행되는 useEffect
   useEffect(() => {
+    const getCookie = (name) => {
+      const cookieArr = document.cookie.split("; ");
+      for (let i = 0; i < cookieArr.length; i++) {
+        const cookiePair = cookieArr[i].split("=");
+        if (name === cookiePair[0]) {
+          return cookiePair[1];
+        }
+      }
+      return null;
+    };
+    const userId = getCookie("userId");
+
+    console.log(work);
     setRead(false);
     console.log(condition);
     if (!condition) {
+      console.log(condition);
       // 임시저장 불러오기
       setWork({
         category: workInfos.category,
@@ -145,18 +176,20 @@ export default function Post(props) {
       });
       setInfos(workInfos.versions.casts);
       setCount(workInfos.versions.casts.length);
-      setBackgroundColor(
-        workInfos.versions.relationship.backgroundColor != null
-          ? workInfos.versions.relationship.backgroundColor
-          : "#ffffff"
-      );
-      setBackgroundImg(
-        workInfos.versions.relationship.backgroundColor != null
-          ? workInfos.versions.relationship.backgroundColor
-          : "#ffffff"
-      );
+      if (workInfos.versions.relationship) {
+        setBackgroundColor(
+          workInfos.versions.relationship.backgroundColor != null
+            ? workInfos.versions.relationship.backgroundColor
+            : "#ffffff"
+        );
+        setBackgroundImg(
+          workInfos.versions.relationship.backgroundImage != null
+            ? workInfos.versions.relationship.backgroundImage
+            : ""
+        );
+      }
 
-      console.log(workInfos);
+      console.log(backgroundImg);
     } else {
       setWork({
         confirmCheck: false,
@@ -164,12 +197,12 @@ export default function Post(props) {
         genre: [], // 장르
         author: [], // 작가
         imageUrl: "", // 썸넬 이미지
-        memberId: userId, // 작성자 id
+        memberId: Number(userId), // 작성자 id
         title: "", // 제목
         contents: "", // 설명
         publisherDate: date, // 출판일자
-        version: 0.1, // 시스템 버전
-        versionName: "", // 작성자 임의 버전
+        version: "1.0", // 시스템 버전
+        versionName: "?", // 작성자 임의 버전
         publisherName: "민음사",
       });
       // 초기 상태 설정
@@ -186,7 +219,7 @@ export default function Post(props) {
       setInfos(newInfos);
       setMount(true);
     }
-  }, []);
+  }, [condition, workInfos]);
 
   useEffect(() => {
     if (mount && prevCount !== count) {
@@ -314,6 +347,15 @@ export default function Post(props) {
             </Prevbtn>
           ) : null}
           <div>
+            <CustomToast
+              position="bottom-center"
+              style={{ position: "absolute", top: "-600px" }}
+            >
+              <Toast show={showA} onClose={toggleShowA} autohide={3000}>
+                <Toast.Body>임시저장이 완료되었습니다</Toast.Body>
+              </Toast>
+            </CustomToast>
+
             <ExtraSave
               disabled={!isSaveEnabled}
               onClick={() => {
@@ -321,9 +363,12 @@ export default function Post(props) {
                 setWork(Extrasave);
                 console.log(work);
                 axios
-                  .post("https://api.litmap.store/api/work", work)
+                  .post("https://api.litmap.store/api/work", work, {
+                    withCredentials: true,
+                  })
                   .then((result) => {
                     console.log(result);
+                    setShowA(true);
                   })
                   .catch((error) => {
                     console.log(error);
@@ -344,17 +389,17 @@ export default function Post(props) {
                 if (state === 1) {
                   setState(2);
                   document.querySelector("#nextBtn").innerHTML = "저장";
-                  console.log(work);
                 } else if (state === 2) {
                   // 저장 로직 추가
-
                   const Extrasave = { ...work, confirmCheck: true };
                   await setWork(Extrasave);
                   console.log(work);
                   {
                     work.confirmCheck
                       ? axios
-                          .post("https://api.litmap.store/api/work", work)
+                          .post("https://api.litmap.store/api/work", work, {
+                            withCredentials: true,
+                          })
                           .then((result) => {
                             console.log(result);
                             setModalShow(true);
