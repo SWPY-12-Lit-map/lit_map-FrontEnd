@@ -213,38 +213,53 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // useEffect(() => {
-  //   // 로그인 상태 확인
-  //   const checkLoginStatus = async () => {
-  //     const litmapEmail = getCookie("litmapEmail");
-  //     if (!litmapEmail) {
-  //       setLogin(false);
-  //     } else {
-  //       setLogin(true);
-  //       // 로그인 상태에서 프로필 이미지 불러오기
-  //       await loadProfileImage(userId);
-  //     }
-  //   };
+  useEffect(() => {
+    // 로그인 상태 확인 및 프로필 이미지 불러오기
+    const checkLoginStatus = async () => {
+      const litmapEmail = getCookie("litmapEmail");
+      const memberRoleStatus = getCookie("memberRoleStatus");
+      if (litmapEmail) {
+        setLogin(true);
+        await loadProfileImage(memberRoleStatus);
+      } else {
+        setLogin(false);
+      }
+    };
 
-  //   const loadProfileImage = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         "https://api.litmap.store/api/members/mypage",
-  //         { withCredentials: true }
-  //       );
-  //       if (response.data.result && response.data.result.userImage) {
-  //         setProfileImage(response.data.result.userImage);
-  //       } else {
-  //         setProfileImage("/profile.png"); // 기본 이미지로 설정
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to load profile image:", error);
-  //       setProfileImage("/profile.png"); // 에러 발생 시 기본 이미지로 설정
-  //     }
-  //   };
+    const loadProfileImage = async (memberRoleStatus) => {
+      try {
+        let response;
+        if (memberRoleStatus === "PUBLISHER_MEMBER") {
+          response = await axios.get(
+            "https://api.litmap.store/api/publishers/mypage",
+            { withCredentials: true }
+          );
+        } else {
+          response = await axios.get(
+            "https://api.litmap.store/api/members/mypage",
+            { withCredentials: true }
+          );
+        }
+    
+        if (response.data.result && response.data.result.userImage) {
+          setProfileImage(response.data.result.userImage);
+        } else {
+          setProfileImage("/profile.png"); // 기본 이미지로 설정
+        }
+      } catch (error) {
+        console.error("Failed to load profile image:", error);
+    
+        if (error.response && error.response.status === 500) {
+          // 서버 측 오류일 경우 사용자에게 알림
+          alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        } else {
+          setProfileImage("/profile.png"); // 에러 발생 시 기본 이미지로 설정
+        }
+      }
+    };    
 
-  //   checkLoginStatus();
-  // }, [login, setLogin]);
+    checkLoginStatus();
+  }, [login, setLogin]);
 
   // 쿠키 값 가져오기
   const getCookie = (name) => {
