@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled, { css } from "styled-components";
-import Modal from "react-modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -36,6 +35,10 @@ const BoxContainer = styled.div`
   text-align: left;
   width: 400px;
   margin-bottom: 20px;
+`;
+
+const WideBoxContainer = styled(BoxContainer)`
+  width: 600px; /* 약관 표시용 BoxContainer의 너비를 더 넓게 설정 */
 `;
 
 const BoxContainerCentered = styled(BoxContainer)`
@@ -208,17 +211,18 @@ const ErrorMessage = styled.div`
 `;
 
 const CloseButton = styled.button`
-  background-color: #8b0024;
-  color: white;
-  padding: 10px 20px;
+  background-color: transparent;
+  color: #8b0024;
+  padding: 5px 10px;
   border: none;
-  border-radius: 5px;
+  font-size: 18px;
   cursor: pointer;
-  font-size: 14px;
-  margin-top: 20px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 
   &:hover {
-    background-color: #e7c6ce;
+    color: #e7c6ce;
   }
 `;
 
@@ -293,6 +297,11 @@ const InfoBox = styled.div`
 const SignupPage = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [step, setStep] = useState(1);
+  const [showTermsContent, setShowTermsContent] = useState(false);
+  const [termsContent, setTermsContent] = useState({
+    title: "",
+    content: "",
+  });
   const [terms, setTerms] = useState({
     spoilerAgreement: false,
     allAgreement: false,
@@ -300,15 +309,7 @@ const SignupPage = () => {
     termsOfService: false,
     privacyPolicy: false,
   });
-  const [showTerms, setShowTerms] = useState({
-    spoiler: false,
-    termsOfService: false,
-    privacyPolicy: false,
-  });
   const [validationFailed, setValidationFailed] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [modalTitle, setModalTitle] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     litmapEmail: "",
@@ -327,12 +328,7 @@ const SignupPage = () => {
   const navigate = useNavigate();
   const [emailCheckResult, setEmailCheckResult] = useState("");
 
-  useEffect(() => {
-    Modal.setAppElement("#root");
-  }, []);
-
   const handleOptionClick = (option) => {
-    console.log("Selected Option:", option); // 선택된 옵션을 콘솔에 출력
     setSelectedOption(option);
   };
 
@@ -347,7 +343,7 @@ const SignupPage = () => {
       }
     } else if (step === 2) {
       let allFieldsFilled = false;
-  
+
       if (selectedOption === "writer") {
         allFieldsFilled =
           formData.name &&
@@ -370,7 +366,7 @@ const SignupPage = () => {
           formData.publisherPhoneNumber &&
           formData.publisherCeo;
       }
-  
+
       if (allFieldsFilled) {
         const passwordPattern = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,20}$/;
         if (!passwordPattern.test(formData.password)) {
@@ -378,14 +374,13 @@ const SignupPage = () => {
           setApiError("비밀번호가 조건에 맞지 않습니다.");
           return;
         }
-  
+
         if (formData.password !== formData.confirmPassword) {
           setValidationFailed(true);
           setApiError("비밀번호가 일치하지 않습니다.");
           return;
         }
-  
-        // 이메일 중복체크 결과 확인
+
         if (emailCheckResult === "사용 가능한 이메일입니다.") {
           setStep(3);
           setValidationFailed(false);
@@ -414,8 +409,8 @@ const SignupPage = () => {
         setApiError("모든 필수 항목에 동의해야 합니다.");
       }
     }
-  };  
-  
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -445,13 +440,15 @@ const SignupPage = () => {
   const handleDropdownClick = async (term, title) => {
     const response = await fetch(`/${term}.txt`);
     const content = await response.text();
-    setModalContent(content);
-    setModalTitle(title);
-    setModalIsOpen(true);
+    setTermsContent({
+      title,
+      content,
+    });
+    setShowTermsContent(true); // 약관 보기 활성화
   };
 
-  const closeModal = () => {
-    setModalIsOpen(false);
+  const closeTermsContent = () => {
+    setShowTermsContent(false); // 약관 보기 비활성화
   };
 
   const handleLibraryClick = () => {
@@ -463,10 +460,11 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async () => {
-    const memberRoleStatus = selectedOption === "writer" ? "ACTIVE_MEMBER" : "PUBLISHER_MEMBER";
-  
+    const memberRoleStatus =
+      selectedOption === "writer" ? "ACTIVE_MEMBER" : "PUBLISHER_MEMBER";
+
     let submitData = new FormData();
-  
+
     if (selectedOption === "writer") {
       submitData.append("litmapEmail", formData.litmapEmail);
       submitData.append("workEmail", formData.workEmail);
@@ -492,21 +490,30 @@ const SignupPage = () => {
       submitData.append("myMessage", "");
       submitData.append("userImage", "");
     }
-  
+
     try {
-      const response = selectedOption === "writer" 
-        ? await axios.post("https://api.litmap.store/api/members/register", submitData, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-        : await axios.post("https://api.litmap.store/api/publishers/register", submitData, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+      const response =
+        selectedOption === "writer"
+          ? await axios.post(
+              "https://api.litmap.store/api/members/register",
+              submitData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+          : await axios.post(
+              "https://api.litmap.store/api/publishers/register",
+              submitData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
       console.log("Response:", response); // 서버 응답을 콘솔에 출력
-  
+
       return true;
     } catch (error) {
       console.error("There was an error!", error);
@@ -522,19 +529,20 @@ const SignupPage = () => {
       return false;
     }
   };
-  
+
   const handleEmailCheck = async () => {
     try {
-      const apiUrl = selectedOption === "writer"
-        ? "https://api.litmap.store/api/members/check-email"
-        : "https://api.litmap.store/api/publishers/check-email";
-  
+      const apiUrl =
+        selectedOption === "writer"
+          ? "https://api.litmap.store/api/members/check-email"
+          : "https://api.litmap.store/api/publishers/check-email";
+
       const response = await axios.get(apiUrl, {
         params: {
           litmapEmail: formData.litmapEmail,
         },
       });
-  
+
       if (response.data === true) {
         setEmailCheckResult("이미 사용 중인 이메일입니다.");
       } else {
@@ -544,7 +552,7 @@ const SignupPage = () => {
       setEmailCheckResult("이미 사용 중인 이메일입니다.");
     }
   };
-  
+
   return (
     <PageContainer>
       <Logo>
@@ -552,485 +560,475 @@ const SignupPage = () => {
       </Logo>
       <Title>회원가입</Title>
 
-      {step === 1 && (
+      {showTermsContent ? (
+        <WideBoxContainer style={{ position: "relative" }}>
+          <CloseButton onClick={closeTermsContent}>×</CloseButton>
+          <h2>{termsContent.title}</h2>
+          <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
+            {termsContent.content}
+          </pre>
+        </WideBoxContainer>
+      ) : (
         <>
-          <BoxContainer>
-            <SubTitle>안녕하세요! 릿맵에 오신걸 환영합니다.</SubTitle>
-            <SubTitle>릿맵의 회원은</SubTitle>
-            <SubTitle>
-              <HighlightedText>콘텐츠 공급자와 창작자만</HighlightedText> 가입이
-              가능합니다.
-            </SubTitle>
-            <br />
-            <SubTitle>회원가입을 진행하기를 원하시면</SubTitle>
-            <SubTitle>회원 구분을 먼저 선택해주세요.</SubTitle>
+          {step === 1 && (
+            <>
+              <BoxContainer>
+                <SubTitle>안녕하세요! 릿맵에 오신걸 환영합니다.</SubTitle>
+                <SubTitle>릿맵의 회원은</SubTitle>
+                <SubTitle>
+                  <HighlightedText>콘텐츠 공급자와 창작자만</HighlightedText>{" "}
+                  가입이 가능합니다.
+                </SubTitle>
+                <br />
+                <SubTitle>회원가입을 진행하기를 원하시면</SubTitle>
+                <SubTitle>회원 구분을 먼저 선택해주세요.</SubTitle>
 
-            <OptionGrid>
-              <OptionBox
-                selected={selectedOption === "representative"}
-                onClick={() => handleOptionClick("representative")}
-              >
-                <OptionImageWrapper className="option-image-wrapper">
-                  <OptionImage src="/representative.png" alt="대표" />
-                </OptionImageWrapper>
-                <OptionTitle>대표</OptionTitle>
-                <OptionDescription>
-                  출판사, 제작사 등의 사업자 본인
-                </OptionDescription>
-              </OptionBox>
-              <OptionBox
-                selected={selectedOption === "staff"}
-                onClick={() => handleOptionClick("staff")}
-              >
-                <OptionImageWrapper className="option-image-wrapper">
-                  <OptionImage src="/staff.png" alt="직원" />
-                </OptionImageWrapper>
-                <OptionTitle>직원</OptionTitle>
-                <OptionDescription>
-                  출판사, 제작사 등의 임직원
-                </OptionDescription>
-              </OptionBox>
-              <OptionBox
-                selected={selectedOption === "writer"}
-                onClick={() => handleOptionClick("writer")}
-              >
-                <OptionImageWrapper className="option-image-wrapper">
-                  <OptionImage src="/writer.png" alt="1인 작가" />
-                </OptionImageWrapper>
-                <OptionTitle>1인 작가</OptionTitle>
-                <OptionDescription>독립, 프리랜서 작가</OptionDescription>
-              </OptionBox>
-              <OptionBox
-                selected={selectedOption === "cooperation"}
-                onClick={() => handleOptionClick("cooperation")}
-              >
-                <OptionImageWrapper className="option-image-wrapper">
-                  <OptionImage src="/cooperation.png" alt="협력사" />
-                </OptionImageWrapper>
-                <OptionTitle>협력사</OptionTitle>
-                <OptionDescription>
-                  출판사, 제작사 등의 파트너사
-                </OptionDescription>
-              </OptionBox>
-            </OptionGrid>
-            <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
-            {validationFailed && (
-              <ErrorMessage>회원 구분을 선택해 주세요.</ErrorMessage>
-            )}
-          </BoxContainer>
-          <Footer>릿맵 | 01 |</Footer>
+                <OptionGrid>
+                  <OptionBox
+                    selected={selectedOption === "representative"}
+                    onClick={() => handleOptionClick("representative")}
+                  >
+                    <OptionImageWrapper className="option-image-wrapper">
+                      <OptionImage src="/representative.png" alt="대표" />
+                    </OptionImageWrapper>
+                    <OptionTitle>대표</OptionTitle>
+                    <OptionDescription>
+                      출판사, 제작사 등의 사업자 본인
+                    </OptionDescription>
+                  </OptionBox>
+                  <OptionBox
+                    selected={selectedOption === "staff"}
+                    onClick={() => handleOptionClick("staff")}
+                  >
+                    <OptionImageWrapper className="option-image-wrapper">
+                      <OptionImage src="/staff.png" alt="직원" />
+                    </OptionImageWrapper>
+                    <OptionTitle>직원</OptionTitle>
+                    <OptionDescription>
+                      출판사, 제작사 등의 임직원
+                    </OptionDescription>
+                  </OptionBox>
+                  <OptionBox
+                    selected={selectedOption === "writer"}
+                    onClick={() => handleOptionClick("writer")}
+                  >
+                    <OptionImageWrapper className="option-image-wrapper">
+                      <OptionImage src="/writer.png" alt="1인 작가" />
+                    </OptionImageWrapper>
+                    <OptionTitle>1인 작가</OptionTitle>
+                    <OptionDescription>
+                      독립, 프리랜서 작가
+                    </OptionDescription>
+                  </OptionBox>
+                  <OptionBox
+                    selected={selectedOption === "cooperation"}
+                    onClick={() => handleOptionClick("cooperation")}
+                  >
+                    <OptionImageWrapper className="option-image-wrapper">
+                      <OptionImage src="/cooperation.png" alt="협력사" />
+                    </OptionImageWrapper>
+                    <OptionTitle>협력사</OptionTitle>
+                    <OptionDescription>
+                      출판사, 제작사 등의 파트너사
+                    </OptionDescription>
+                  </OptionBox>
+                </OptionGrid>
+                <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                {validationFailed && (
+                  <ErrorMessage>회원 구분을 선택해 주세요.</ErrorMessage>
+                )}
+              </BoxContainer>
+              <Footer>릿맵 | 01 |</Footer>
+            </>
+          )}
+
+          {step === 2 && selectedOption !== "writer" && (
+            <>
+              <BoxContainer>
+                <Title>기본 정보</Title>
+
+                <label>이름</label>
+                <InputField
+                  type="text"
+                  name="name"
+                  placeholder="이름을 입력해주세요."
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+
+                <label>이메일</label>
+                <InputFieldWithButton>
+                  <InputField
+                    type="email"
+                    name="litmapEmail"
+                    placeholder="이메일을 입력해주세요."
+                    value={formData.litmapEmail}
+                    onChange={handleInputChange}
+                  />
+                  <Button onClick={handleEmailCheck}>중복확인</Button>
+                </InputFieldWithButton>
+                {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
+
+                <label>비밀번호</label>
+                <InputField
+                  type="password"
+                  name="password"
+                  placeholder="비밀번호를 입력해주세요."
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+
+                <label>비밀번호 확인</label>
+                <InputField
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="비밀번호를 다시 한번 입력해주세요."
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                />
+                <SmallText>
+                  영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력하세요.
+                </SmallText>
+
+                <label>닉네임</label>
+                <InputFieldWithButton>
+                  <InputField
+                    type="text"
+                    name="nickname"
+                    placeholder="닉네임을 입력해주세요."
+                    value={formData.nickname}
+                    onChange={handleInputChange}
+                  />
+                </InputFieldWithButton>
+              </BoxContainer>
+              <BoxContainer>
+                <Title>사업자 정보</Title>
+
+                <label>대표자명</label>
+                <InputField
+                  type="text"
+                  name="publisherCeo"
+                  placeholder="대표자명을 입력해주세요."
+                  value={formData.publisherCeo}
+                  onChange={handleInputChange}
+                />
+
+                <label>회사명(국문 또는 영문)</label>
+                <InputField
+                  type="text"
+                  name="publisherName"
+                  placeholder="출판사나 제작사명을 입력해주세요."
+                  value={formData.publisherName}
+                  onChange={handleInputChange}
+                />
+
+                <label>출판사 전화번호</label>
+                <InputField
+                  type="text"
+                  name="publisherPhoneNumber"
+                  placeholder="(예시) 01013245768"
+                  value={formData.publisherPhoneNumber}
+                  onChange={handleInputChange}
+                />
+
+                <label>사업자 번호</label>
+                <SmallText2>
+                  사업자 번호 입력 후 사업자 인증을 진행해주세요.
+                </SmallText2>
+                <InputFieldWithButton>
+                  <InputField
+                    type="text"
+                    name="publisherNumber"
+                    placeholder="사업자 등록번호 숫자 10자리를 입력해주세요."
+                    value={formData.publisherNumber}
+                    onChange={handleInputChange}
+                  />
+                </InputFieldWithButton>
+
+                <label>사업자 주소</label>
+                <InputFieldWithButton>
+                  <InputField
+                    type="text"
+                    name="publisherAddress"
+                    placeholder="주소를 입력해주세요."
+                    value={formData.publisherAddress}
+                    onChange={handleInputChange}
+                  />
+                </InputFieldWithButton>
+
+                <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                {validationFailed && <ErrorMessage>{apiError}</ErrorMessage>}
+              </BoxContainer>
+              <Footer>릿맵 | 02 |</Footer>
+            </>
+          )}
+
+          {step === 2 && selectedOption === "writer" && (
+            <>
+              <BoxContainer>
+                <Title>기본 정보</Title>
+
+                <label>이름</label>
+                <InputField
+                  type="text"
+                  name="name"
+                  placeholder="이름을 입력해주세요."
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+
+                <label>이메일</label>
+                <InputFieldWithButton>
+                  <InputField
+                    type="email"
+                    name="litmapEmail"
+                    placeholder="이메일을 입력해주세요."
+                    value={formData.litmapEmail}
+                    onChange={handleInputChange}
+                  />
+                  <Button onClick={handleEmailCheck}>중복확인</Button>
+                  {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
+                </InputFieldWithButton>
+
+                <label>비밀번호</label>
+                <InputField
+                  type="password"
+                  name="password"
+                  placeholder="비밀번호를 입력해주세요."
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+
+                <label>비밀번호 확인</label>
+                <InputField
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="비밀번호를 다시 한번 입력해주세요."
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                />
+                <SmallText>
+                  영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력하세요.
+                </SmallText>
+
+                <label>닉네임</label>
+                <InputFieldWithButton>
+                  <InputField
+                    type="text"
+                    name="nickname"
+                    placeholder="닉네임을 입력해주세요."
+                    value={formData.nickname}
+                    onChange={handleInputChange}
+                  />
+                </InputFieldWithButton>
+              </BoxContainer>
+              <BoxContainer>
+                <Title>1인작가 정보</Title>
+
+                <label>업무용 이메일</label>
+                <SmallText2>
+                  업무용으로 쓰는 이메일을 추가 등록해주세요.
+                </SmallText2>
+                <InputField
+                  type="email"
+                  name="workEmail"
+                  placeholder="이메일을 입력해주세요."
+                  value={formData.workEmail}
+                  onChange={handleInputChange}
+                />
+
+                <label>작품정보(국문 또는 영문)</label>
+                <SmallText2>
+                  작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.
+                </SmallText2>
+                <InputField
+                  type="text"
+                  name="workURL"
+                  placeholder="http://www.litmap.com"
+                  value={formData.workURL}
+                  onChange={handleInputChange}
+                />
+
+                <InfoBox>
+                  <SubTitle>1인 작가 가입 안내사항</SubTitle>
+                  <SubTitle2>
+                    1인 작가의 경우 별도의 관리자 승인이 필요함으로
+                  </SubTitle2>
+                  <SubTitle2>
+                    가입 정보 작성 후 승인까지 1~3일이 소요될 수 있습니다.
+                  </SubTitle2>
+                </InfoBox>
+
+                <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
+                {validationFailed && (
+                  <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
+                )}
+              </BoxContainer>
+              <Footer>릿맵 | 02 |</Footer>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <BoxContainer>
+                <SubTitle>
+                  릿맵 <HighlightedText>이용 약관에 동의</HighlightedText>하시면
+                </SubTitle>
+                <SubTitle>가입이 완료됩니다.</SubTitle>
+                <br />
+                <CheckboxContainer>
+                  <CheckboxWrapper>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Checkbox
+                        name="spoilerAgreement"
+                        checked={terms.spoilerAgreement}
+                        onChange={handleCheckboxChange}
+                      />
+                      <CheckboxLabel>
+                        릿맵 스포일러 방지 및 이용 동의 (필수)
+                      </CheckboxLabel>
+                    </div>
+                    <Dropdown
+                      onClick={() =>
+                        handleDropdownClick(
+                          "spoiler",
+                          "스포일러 방지 및 이용 동의 (필수)"
+                        )
+                      }
+                    >
+                      &gt;
+                    </Dropdown>
+                  </CheckboxWrapper>
+                  <WarningMessage>
+                    스포일러에 대한 내용이 있는 게시물은 사전 경고 없이 삭제될
+                    수 있고
+                  </WarningMessage>
+                  <WarningMessage>
+                    법적인 조치를 취할 수 있습니다.
+                  </WarningMessage>
+                </CheckboxContainer>
+                <Blank></Blank>
+                <CheckboxContainer>
+                  <CheckboxWrapper>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Checkbox
+                        name="allAgreement"
+                        checked={terms.allAgreement}
+                        onChange={handleCheckboxChange}
+                      />
+                      <CheckboxLabel>전체 동의</CheckboxLabel>
+                    </div>
+                  </CheckboxWrapper>
+                </CheckboxContainer>
+                <CheckboxContainer>
+                  <CheckboxWrapper>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Checkbox
+                        name="age"
+                        checked={terms.age}
+                        onChange={handleCheckboxChange}
+                      />
+                      <CheckboxLabel>만 14세 이상입니다.(필수)</CheckboxLabel>
+                    </div>
+                  </CheckboxWrapper>
+                </CheckboxContainer>
+                <CheckboxContainer>
+                  <CheckboxWrapper>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Checkbox
+                        name="termsOfService"
+                        checked={terms.termsOfService}
+                        onChange={handleCheckboxChange}
+                      />
+                      <CheckboxLabel>릿맵 이용약관 동의 (필수)</CheckboxLabel>
+                    </div>
+                    <Dropdown
+                      onClick={() =>
+                        handleDropdownClick(
+                          "termsofservice",
+                          "릿맵 이용약관 동의 (필수)"
+                        )
+                      }
+                    >
+                      &gt;
+                    </Dropdown>
+                  </CheckboxWrapper>
+                </CheckboxContainer>
+                <CheckboxContainer>
+                  <CheckboxWrapper>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Checkbox
+                        name="privacyPolicy"
+                        checked={terms.privacyPolicy}
+                        onChange={handleCheckboxChange}
+                      />
+                      <CheckboxLabel>
+                        릿맵 개인정보 수집 및 이용 동의(필수)
+                      </CheckboxLabel>
+                    </div>
+                    <Dropdown
+                      onClick={() =>
+                        handleDropdownClick(
+                          "privacypolicy",
+                          "릿맵 개인정보 수집 및 이용 동의 (필수)"
+                        )
+                      }
+                    >
+                      &gt;
+                    </Dropdown>
+                  </CheckboxWrapper>
+                </CheckboxContainer>
+                <FullWidthButton onClick={handleNextClick}>
+                  회원가입 완료
+                </FullWidthButton>
+                {validationFailed && (
+                  <ErrorMessage>모든 필수 항목에 동의해야 합니다.</ErrorMessage>
+                )}
+              </BoxContainer>
+              <Footer>릿맵 | 03 |</Footer>
+            </>
+          )}
+
+          {step === 4 && (
+            <>
+              <BoxContainerCentered>
+                <Title>환영합니다!</Title>
+                <SubTitle>릿맵에 가입이 완료되었습니다.</SubTitle>
+                <br />
+                {selectedOption === "writer" ? (
+                  <>
+                    <SubTitle>승인 절차는 약 1~3일 정도 소요되며,</SubTitle>
+                    <SubTitle>
+                      승인 완료 시 확인 메일을 발송해드립니다.
+                    </SubTitle>
+                    <LibraryImage src="/library.png" alt="Library" />
+                    <ButtonContainer>
+                      <FullWidthButton onClick={handleLibraryClick}>
+                        작품 둘러보기
+                      </FullWidthButton>
+                    </ButtonContainer>
+                  </>
+                ) : (
+                  <>
+                    <SubTitle>이제부터 릿맵과 함께</SubTitle>
+                    <SubTitle>작품의 완성을 함께해요.</SubTitle>
+                    <LibraryImage src="/library.png" alt="Library" />
+                    <ButtonContainer>
+                      <FullWidthButton2 onClick={handleLibraryClick}>
+                        작품 둘러보기
+                      </FullWidthButton2>
+                      <FullWidthButton onClick={handleRegisterClick}>
+                        작품 등록하기
+                      </FullWidthButton>
+                    </ButtonContainer>
+                  </>
+                )}
+              </BoxContainerCentered>
+              <Footer>릿맵 | 04 |</Footer>
+            </>
+          )}
         </>
       )}
-
-      {step === 2 && selectedOption !== "writer" && (
-        <>
-          <BoxContainer>
-            <Title>기본 정보</Title>
-
-            <label>이름</label>
-            <InputField
-              type="text"
-              name="name"
-              placeholder="이름을 입력해주세요."
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-
-            <label>이메일</label>
-            <InputFieldWithButton>
-              <InputField
-                type="email"
-                name="litmapEmail"
-                placeholder="이메일을 입력해주세요."
-                value={formData.litmapEmail}
-                onChange={handleInputChange}
-              />
-              <Button onClick={handleEmailCheck}>중복확인</Button>
-            </InputFieldWithButton>
-            {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
-
-            <label>비밀번호</label>
-            <InputField
-              type="password"
-              name="password"
-              placeholder="비밀번호를 입력해주세요."
-              value={formData.password}
-              onChange={handleInputChange}
-            />
-
-            <label>비밀번호 확인</label>
-            <InputField
-              type="password"
-              name="confirmPassword"
-              placeholder="비밀번호를 다시 한번 입력해주세요."
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-            />
-            <SmallText>
-              영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력하세요.
-            </SmallText>
-
-            <label>닉네임</label>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="nickname"
-                placeholder="닉네임을 입력해주세요."
-                value={formData.nickname}
-                onChange={handleInputChange}
-              />
-              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
-            </InputFieldWithButton>
-          </BoxContainer>
-          <BoxContainer>
-            <Title>사업자 정보</Title>
-
-            <label>대표자명</label>
-            <InputField
-              type="text"
-              name="publisherCeo"
-              placeholder="대표자명을 입력해주세요."
-              value={formData.publisherCeo}
-              onChange={handleInputChange}
-            />
-
-            <label>회사명(국문 또는 영문)</label>
-            <InputField
-              type="text"
-              name="publisherName"
-              placeholder="출판사나 제작사명을 입력해주세요."
-              value={formData.publisherName}
-              onChange={handleInputChange}
-            />
-
-            <label>출판사 전화번호</label>
-            <InputField
-              type="text"
-              name="publisherPhoneNumber"
-              placeholder="(예시) 01013245768"
-              value={formData.publisherPhoneNumber}
-              onChange={handleInputChange}
-            />
-
-            <label>사업자 번호</label>
-            <SmallText2>사업자 번호 입력 후 사업자 인증을 진행해주세요.</SmallText2>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="publisherNumber"
-                placeholder="사업자 등록번호 숫자 10자리를 입력해주세요."
-                value={formData.publisherNumber}
-                onChange={handleInputChange}
-              />
-              {/* <Button onClick={() => handleValidationCheck('publisherNumber')}>사업자 인증</Button> */}
-            </InputFieldWithButton>
-
-            <label>사업자 주소</label>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="publisherAddress"
-                placeholder="주소를 입력해주세요."
-                value={formData.publisherAddress}
-                onChange={handleInputChange}
-              />
-              {/* <Button onClick={() => handleValidationCheck('publisherAddress')}>주소 검색</Button> */}
-            </InputFieldWithButton>
-            {/* <InputField
-              type="text"
-              name="publisherDetailAddress"
-              placeholder="상세 주소를 입력해주세요."
-              value={formData.publisherDetailAddress}
-              onChange={handleInputChange}
-            /> */}
-
-            <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
-            {validationFailed && (
-              <ErrorMessage>{apiError}</ErrorMessage>
-            )}
-          </BoxContainer>
-          <Footer>릿맵 | 02 |</Footer>
-        </>
-      )}
-
-      {step === 2 && selectedOption === "writer" && (
-        <>
-          <BoxContainer>
-            <Title>기본 정보</Title>
-
-            <label>이름</label>
-            <InputField
-              type="text"
-              name="name"
-              placeholder="이름을 입력해주세요."
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-
-            <label>이메일</label>
-            <InputFieldWithButton>
-              <InputField
-                type="email"
-                name="litmapEmail"
-                placeholder="이메일을 입력해주세요."
-                value={formData.litmapEmail}
-                onChange={handleInputChange}
-              />
-              <Button onClick={handleEmailCheck}>중복확인</Button>
-              {emailCheckResult && <SmallText>{emailCheckResult}</SmallText>}
-              </InputFieldWithButton>
-
-            <label>비밀번호</label>
-            <InputField
-              type="password"
-              name="password"
-              placeholder="비밀번호를 입력해주세요."
-              value={formData.password}
-              onChange={handleInputChange}
-            />
-
-            <label>비밀번호 확인</label>
-            <InputField
-              type="password"
-              name="confirmPassword"
-              placeholder="비밀번호를 다시 한번 입력해주세요."
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-            />
-            <SmallText>
-              영문 소문자, 숫자를 조합하여 8자 이상 20자 이하로 입력하세요.
-            </SmallText>
-
-            <label>닉네임</label>
-            <InputFieldWithButton>
-              <InputField
-                type="text"
-                name="nickname"
-                placeholder="닉네임을 입력해주세요."
-                value={formData.nickname}
-                onChange={handleInputChange}
-              />
-              {/* <Button onClick={() => handleValidationCheck('nickname')}>중복확인</Button> */}
-            </InputFieldWithButton>
-          </BoxContainer>
-          <BoxContainer>
-            <Title>1인작가 정보</Title>
-
-            <label>업무용 이메일</label>
-            <SmallText2>업무용으로 쓰는 이메일을 추가 등록해주세요.</SmallText2>
-            <InputField
-              type="email"
-              name="workEmail"
-              placeholder="이메일을 입력해주세요."
-              value={formData.workEmail}
-              onChange={handleInputChange}
-            />
-
-            <label>작품정보(국문 또는 영문)</label>
-            <SmallText2>작품의 정보가 나와있는 사이트나 판매처의 URL을 입력해주세요.</SmallText2>
-            <InputField
-              type="text"
-              name="workURL"
-              placeholder="http://www.litmap.com"
-              value={formData.workURL}
-              onChange={handleInputChange}
-            />
-
-            <InfoBox>
-              <SubTitle>1인 작가 가입 안내사항</SubTitle>
-              <SubTitle2>1인 작가의 경우 별도의 관리자 승인이 필요함으로</SubTitle2>
-              <SubTitle2>가입 정보 작성 후 승인까지 1~3일이 소요될 수 있습니다.</SubTitle2>
-            </InfoBox>
-
-            <FullWidthButton onClick={handleNextClick}>다음</FullWidthButton>
-            {validationFailed && (
-              <ErrorMessage>모든 정보가 채워져야 합니다.</ErrorMessage>
-            )}
-          </BoxContainer>
-          <Footer>릿맵 | 02 |</Footer>
-        </>
-      )}
-
-      {step === 3 && (
-        <>
-          <BoxContainer>
-            <SubTitle>
-              릿맵 <HighlightedText>이용 약관에 동의</HighlightedText>하시면
-            </SubTitle>
-            <SubTitle>가입이 완료됩니다.</SubTitle>
-            <br />
-            <CheckboxContainer>
-              <CheckboxWrapper>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    name="spoilerAgreement"
-                    checked={terms.spoilerAgreement}
-                    onChange={handleCheckboxChange}
-                  />
-                  <CheckboxLabel>
-                    릿맵 스포일러 방지 및 이용 동의 (필수)
-                  </CheckboxLabel>
-                </div>
-                <Dropdown
-                  onClick={() =>
-                    handleDropdownClick(
-                      "spoiler",
-                      "스포일러 방지 및 이용 동의 (필수)"
-                    )
-                  }
-                >
-                  &gt;
-                </Dropdown>
-              </CheckboxWrapper>
-              <WarningMessage>
-                스포일러에 대한 내용이 있는 게시물은 사전 경고 없이 삭제될 수
-                있고
-              </WarningMessage>
-              <WarningMessage>법적인 조치를 취할 수 있습니다.</WarningMessage>
-            </CheckboxContainer>
-            <Blank></Blank>
-            <CheckboxContainer>
-              <CheckboxWrapper>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    name="allAgreement"
-                    checked={terms.allAgreement}
-                    onChange={handleCheckboxChange}
-                  />
-                  <CheckboxLabel>전체 동의</CheckboxLabel>
-                </div>
-              </CheckboxWrapper>
-            </CheckboxContainer>
-            <CheckboxContainer>
-              <CheckboxWrapper>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    name="age"
-                    checked={terms.age}
-                    onChange={handleCheckboxChange}
-                  />
-                  <CheckboxLabel>만 14세 이상입니다.(필수)</CheckboxLabel>
-                </div>
-              </CheckboxWrapper>
-            </CheckboxContainer>
-            <CheckboxContainer>
-              <CheckboxWrapper>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    name="termsOfService"
-                    checked={terms.termsOfService}
-                    onChange={handleCheckboxChange}
-                  />
-                  <CheckboxLabel>릿맵 이용약관 동의 (필수)</CheckboxLabel>
-                </div>
-                <Dropdown
-                  onClick={() =>
-                    handleDropdownClick(
-                      "termsofservice",
-                      "릿맵 이용약관 동의 (필수)"
-                    )
-                  }
-                >
-                  &gt;
-                </Dropdown>
-              </CheckboxWrapper>
-            </CheckboxContainer>
-            <CheckboxContainer>
-              <CheckboxWrapper>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <Checkbox
-                    name="privacyPolicy"
-                    checked={terms.privacyPolicy}
-                    onChange={handleCheckboxChange}
-                  />
-                  <CheckboxLabel>
-                    릿맵 개인정보 수집 및 이용 동의(필수)
-                  </CheckboxLabel>
-                </div>
-                <Dropdown
-                  onClick={() =>
-                    handleDropdownClick(
-                      "privacypolicy",
-                      "릿맵 개인정보 수집 및 이용 동의 (필수)"
-                    )
-                  }
-                >
-                  &gt;
-                </Dropdown>
-              </CheckboxWrapper>
-            </CheckboxContainer>
-            <FullWidthButton onClick={handleNextClick}>
-              회원가입 완료
-            </FullWidthButton>
-            {validationFailed && (
-              <ErrorMessage>모든 필수 항목에 동의해야 합니다.</ErrorMessage>
-            )}
-          </BoxContainer>
-          <Footer>릿맵 | 03 |</Footer>
-        </>
-      )}
-
-      {step === 4 && (
-        <>
-          <BoxContainerCentered>
-            <Title>환영합니다!</Title>
-            <SubTitle>릿맵에 가입이 완료되었습니다.</SubTitle>
-            <br />
-            {selectedOption === "writer" ? (
-              <>
-                <SubTitle>승인 절차는 약 1~3일 정도 소요되며,</SubTitle>
-                <SubTitle>승인 완료 시 확인 메일을 발송해드립니다.</SubTitle>
-                <LibraryImage src="/library.png" alt="Library" />
-                <ButtonContainer>
-                  <FullWidthButton onClick={handleLibraryClick}>
-                    작품 둘러보기
-                  </FullWidthButton>
-                </ButtonContainer>
-              </>
-            ) : (
-              <>
-                <SubTitle>이제부터 릿맵과 함께</SubTitle>
-                <SubTitle>작품의 완성을 함께해요.</SubTitle>
-                <LibraryImage src="/library.png" alt="Library" />
-                <ButtonContainer>
-                  <FullWidthButton2 onClick={handleLibraryClick}>
-                    작품 둘러보기
-                  </FullWidthButton2>
-                  <FullWidthButton onClick={handleRegisterClick}>
-                    작품 등록하기
-                  </FullWidthButton>
-                </ButtonContainer>
-              </>
-            )}
-          </BoxContainerCentered>
-          <Footer>릿맵 | 04 |</Footer>
-        </>
-      )}
-
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Terms and Conditions"
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            width: "80%",
-            maxHeight: "80vh",
-            overflowY: "auto",
-          },
-        }}
-      >
-        <h2>{modalTitle}</h2>
-        <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
-          {modalContent}
-        </pre>
-        <CloseButton onClick={closeModal}>닫기</CloseButton>
-      </Modal>
     </PageContainer>
   );
 };
