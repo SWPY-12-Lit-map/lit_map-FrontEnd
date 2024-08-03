@@ -482,12 +482,24 @@ export default function InfoInput(props) {
           <CiCirclePlus /> 작가 추가하기
         </AuthorAddBtn>
       </Input>
-      {/* 사용자 임의 버전등록 */}
+      {/* 시스템 버전등록 */}
       <Input id="versionName">
         <span>버전명: </span>
         <VersionBar placeholder="버전명을 입력해주세요">
           {work.version}
-        </VersionBar>
+        </VersionBar>{" "}
+      </Input>
+      {/* 사용자 임의 버전등록 */}
+      <Input id="versionName">
+        <span>버전명: </span>
+        <TextInput
+          placeholder="버전명을 입력해주세요"
+          value={work.versionName}
+          onChange={(e) => {
+            const info = { ...work, versionName: e.target.value };
+            setWork(info);
+          }}
+        ></TextInput>
       </Input>
       {/* 카테고리 */}
       <Input id="category">

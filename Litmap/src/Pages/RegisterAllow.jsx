@@ -1,4 +1,4 @@
-import React, { useEffect, useState, version } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
@@ -259,14 +259,7 @@ const DenyBar = styled.div`
 
 export default function RegisterAllow() {
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      id: 1,
-      title: "테스트용",
-      workId: 1,
-      versionList: [{ versionName: 0.1, lastUpdateDate: "2020-01-01" }],
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -318,7 +311,9 @@ export default function RegisterAllow() {
   // 승인 안된 작품 가져오기
   const getAxios = () => {
     axios
-      .get("https://api.litmap.store/api/board/confirm",{withCredentials: true})
+      .get("https://api.litmap.store/api/board/confirm", {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
         setData([...result.data.result]);
@@ -332,7 +327,9 @@ export default function RegisterAllow() {
   const confirm = (versionId) => {
     console.log(versionId);
     axios
-      .put(`https://api.litmap.store/api/version/${versionId}/confirm`,{withCredentials:true})
+      .put(`https://api.litmap.store/api/version/${versionId}/confirm`, {
+        withCredentials: true,
+      })
       .then((result) => {
         console.log(result);
       })
@@ -428,6 +425,14 @@ export default function RegisterAllow() {
               <span>
                 <Status
                   onClick={() => {
+                    axios
+                      .get(`https://api.litmap.store/api/work/${item.workId}`)
+                      .then((result) => {
+                        console.log(result);
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
                     navigate(`/work/${item.workId}`);
                   }}
                 >

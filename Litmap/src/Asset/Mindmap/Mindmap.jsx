@@ -133,7 +133,7 @@ const Mindmap = (props) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
-  const [backColor, setBackColor] = useState();
+  const [backColor, setBackColor] = useState("");
   const { workInfos, backgroundColor, backgroundImg, condition } = useStore();
   const { read, setRead } = ReadStore();
   const [backgroundImage, setBackgroundImg] = useState("");
@@ -234,7 +234,7 @@ const Mindmap = (props) => {
       flow.work_id = work.title;
       flow.viewport = rfInstance.getViewport(); // FitView 설정
       flow.backgroundImage = backgroundImage;
-      flow.backgroundColor = backColor;
+      flow.backgroundColor = backgroundColor;
       flow.nodes = nodes;
       flow.edges = edges.map((edge) => ({
         ...edge,
@@ -243,7 +243,11 @@ const Mindmap = (props) => {
           text: edge.data.text, // 엣지의 텍스트 포함
         },
       }));
-      const updateRelationship = { ...work, relationship: flow, version: 1.0 };
+      const updateRelationship = {
+        ...work,
+        relationship: flow,
+        version: " 1.0 ",
+      };
 
       setWork(updateRelationship);
     }
@@ -347,7 +351,7 @@ const Mindmap = (props) => {
       >
         <CustomBackground
           backgroundImage={backgroundImage}
-          backgroundColor={backColor}
+          backgroundColor={backgroundColor}
         />
         <CustomControls>
           <PreviewButton onClick={fitView}>미리보기</PreviewButton>

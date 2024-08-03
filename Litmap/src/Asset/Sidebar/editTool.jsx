@@ -150,14 +150,16 @@ export default function EditTool(props) {
 
   // 색깔 고르기
   const handleColorChangeComplete = (color) => {
+    console.log(color.hex);
     setBackgroundColor(color.hex);
     setWork({
       ...work,
       relationship: {
         ...work.relationship,
-        backgroundColor: color.hex,
+        backgroundColor: "11",
       },
     });
+    console.log(work);
   };
 
   return (

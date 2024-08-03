@@ -234,13 +234,17 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
             "https://api.litmap.store/api/publishers/mypage",
             { withCredentials: true }
           );
-        } else {
+        } else if (memberRoleStatus === "ACTIVE_MEMBER") {
           response = await axios.get(
             "https://api.litmap.store/api/members/mypage",
             { withCredentials: true }
           );
+        } else {
+          response = await axios.get("https://api.litmap.store/admin/mypage", {
+            withCredentials: true,
+          });
         }
-    
+
         if (response.data.result && response.data.result.userImage) {
           setProfileImage(response.data.result.userImage);
         } else {
@@ -248,7 +252,7 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
         }
       } catch (error) {
         console.error("Failed to load profile image:", error);
-    
+
         if (error.response && error.response.status === 500) {
           // 서버 측 오류일 경우 사용자에게 알림
           alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -256,7 +260,7 @@ function Navbar({ login, setLogin, userInput, setUserInput }) {
           setProfileImage("/profile.png"); // 에러 발생 시 기본 이미지로 설정
         }
       }
-    };    
+    };
 
     checkLoginStatus();
   }, [login, setLogin]);

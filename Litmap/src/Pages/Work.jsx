@@ -91,9 +91,12 @@ const Recommend = styled.div`
 `;
 
 const Recommends = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  & > div > img {
+    width: 200px;
+  }
 `;
 
 export default function Work({
@@ -112,11 +115,13 @@ export default function Work({
   const { id } = useParams();
   const { setBackgroundColor } = useStore();
   const { read, setRead } = ReadStore();
+  const [relatedWork, setRelatedWork] = useState([]);
 
   const GetWork = async () => {
     await axios
       .get(`https://api.litmap.store/api/work/${id}`)
       .then((result) => {
+        setRead(true);
         const Get = result.data.result;
         setWorkInfo(Get);
         console.log(workInfo);
@@ -179,12 +184,13 @@ export default function Work({
     axios
       .get(`https://api.litmap.store/api/relate/related/${id}`)
       .then((result) => {
-        console.log(result);
+        console.log(result.data);
+        setRelatedWork([...result.data]);
       })
       .catch((error) => {
         console.log(error);
       });
-  });
+  }, []);
 
   return (
     <>
@@ -262,10 +268,15 @@ export default function Work({
         <Recommend>
           <h3>함께 볼만한 드라마</h3>
           <Recommends>
-            <img src="/poster1.png" alt="추천 포스터 1" />
-            <img src="/poster2.png" alt="추천 포스터 2" />
-            <img src="/poster3.png" alt="추천 포스터 3" />
-            <img src="/poster4.png" alt="추천 포스터 4" />
+            {relatedWork?.map((data, i) => {
+              console.log(data);
+              return (
+                <div>
+                  <img src={data.imageUrl} alt="추천 포스터 1" key={i} />
+                  {data.title}
+                </div>
+              );
+            })}
           </Recommends>
         </Recommend>
       </Body>
