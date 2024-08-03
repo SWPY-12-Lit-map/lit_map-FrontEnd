@@ -8,7 +8,9 @@ import axios from "axios";
 import { IoFolderOpenOutline } from "react-icons/io5";
 import { BsPaperclip } from "react-icons/bs";
 import { CiCirclePlus } from "react-icons/ci";
-
+import { FaPlus } from "react-icons/fa6";
+import { MdDelete } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
 const Input = styled.div`
   display: flex;
   flex-direction: column;
@@ -39,7 +41,7 @@ const Radio = styled.input`
 `;
 const RadioLabel = styled.label`
   position: absolute;
-  right: 0px;
+  right: 10px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -93,6 +95,7 @@ const Dropzone = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 `;
 
 const Filename = styled.div`
@@ -101,6 +104,11 @@ const Filename = styled.div`
   margin-top: 10px;
   height: 30px;
   text-align: center;
+  width: 300px;
+  display: flex;
+  align-items: center;
+  & > span {
+  }
 `;
 
 const TextInput = styled.input`
@@ -112,6 +120,14 @@ const TextInput = styled.input`
   ::placeholder {
     color: #7d7d7d;
   }
+`;
+
+const VersionBar = styled.div`
+  background-color: unset;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #575757;
+  border-radius: 5px;
 `;
 
 const TextAreaInput = styled.textarea`
@@ -137,8 +153,9 @@ const InputArea = styled.div`
   }
 
   & > button:last-of-type {
+    width: 10px;
     position: absolute;
-    right: 70px;
+    left: 230px;
     background-color: unset;
     border: none;
     color: #7d7d7d;
@@ -150,6 +167,12 @@ const HumanInput = styled(TextInput)`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none !important;
   }
+`;
+
+const DeleteButton = styled.button`
+  background-color: unset;
+  border: none;
+  color: #8b0024;
 `;
 
 export default function InfoInput(props) {
@@ -199,22 +222,65 @@ export default function InfoInput(props) {
           console.log(error);
         });
     };
+
+    const deleteImage = () => {
+      const ImgUrl = { ...work, imageUrl: "" };
+      setWork(ImgUrl);
+    };
     return (
-      <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
-        <Dropzone id="dropzone">
-          {imageFile ? (
-            "Dropped!"
-          ) : (
-            <IoFolderOpenOutline
-              style={{ fontSize: "100px", color: "#C5C5C5" }}
-            />
-          )}
-        </Dropzone>
-        <Filename>
-          <BsPaperclip />
-          {imageFile.name}
-        </Filename>
-      </FileUploader>
+      <>
+        <FileUploader handleChange={handleChange} name="file" types={fileTypes}>
+          <Dropzone id="dropzone">
+            {work.imageUrl != "" ? (
+              <img
+                src={work.imageUrl}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <>
+                <IoFolderOpenOutline
+                  style={{ fontSize: "100px", color: "#C5C5C5" }}
+                />
+                <FaPlus
+                  style={{
+                    fontSize: "40px",
+                    top: "65px",
+                    color: "#c5c5c5",
+                    position: "absolute",
+                  }}
+                />
+              </>
+            )}
+          </Dropzone>
+        </FileUploader>{" "}
+        {work.imageUrl == "" ? null : (
+          <Filename>
+            <span
+              style={{
+                display: "block",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {" "}
+              <BsPaperclip />
+              {work.imageUrl}
+            </span>{" "}
+            <DeleteButton
+              onClick={() => {
+                deleteImage();
+              }}
+            >
+              <MdDelete />
+            </DeleteButton>
+          </Filename>
+        )}
+      </>
     );
   }
 
@@ -223,6 +289,16 @@ export default function InfoInput(props) {
 
   const handleAddInput = () => {
     setInputs([...inputs, { id: Date.now(), value: "" }]);
+  };
+
+  // 작가 삭제 버튼
+  const handleRemoveInput = (id) => {
+    const updatedInputs = inputs.filter((input) => input.id !== id);
+    setInputs(updatedInputs);
+    setWork({
+      ...work,
+      author: updatedInputs.map((item) => item.value),
+    });
   };
 
   // 라디오 기능
@@ -261,6 +337,7 @@ export default function InfoInput(props) {
       setNext(false); // 빈 값이 있는 경우 false로 설정
     }
   };
+
   // 장르 복수 선택
   const handleGenreSelection = (data) => {
     let updatedGenres = [...work.genre];
@@ -341,43 +418,63 @@ export default function InfoInput(props) {
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {inputs.map((data, index) => (
-            <div
-              key={data.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                position: "relative",
-                marginBottom: "10px",
-              }}
-            >
-              <RadioLabel checked={isChecked(index)}>
-                <Radio
-                  type="radio"
-                  name="mainAuthor"
-                  id={data.id}
-                  value={data.value}
-                  checked={isChecked(index)}
-                  onChange={() => radioChange(index)}
-                />
-                <span className="material-symbols-outlined">check</span>
-              </RadioLabel>
-              <TextInput
-                placeholder="작가를 입력해주세요"
-                value={work.author[index]}
-                onChange={(e) => {
-                  const updatedInputs = inputs.map((item) =>
-                    item.id === data.id
-                      ? { ...item, value: e.target.value }
-                      : item
-                  );
-                  setInputs(updatedInputs);
-                  setWork({
-                    ...work,
-                    author: updatedInputs.map((item) => item.value),
-                  });
+            <>
+              <div
+                key={data.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  position: "relative",
+                  marginBottom: "10px",
                 }}
-              />
-            </div>
+              >
+                <RadioLabel checked={isChecked(index)}>
+                  <Radio
+                    type="radio"
+                    name="mainAuthor"
+                    id={data.id}
+                    value={data.value}
+                    checked={isChecked(index)}
+                    onChange={() => radioChange(index)}
+                  />
+                  <span className="material-symbols-outlined">check</span>
+                </RadioLabel>
+                <TextInput
+                  style={{
+                    width: "95%",
+                  }}
+                  placeholder="작가를 입력해주세요"
+                  value={work.author[index]}
+                  onChange={(e) => {
+                    const updatedInputs = inputs.map((item) =>
+                      item.id === data.id
+                        ? { ...item, value: e.target.value }
+                        : item
+                    );
+                    setInputs(updatedInputs);
+                    setWork({
+                      ...work,
+                      author: updatedInputs.map((item) => item.value),
+                    });
+                  }}
+                />
+                {work.author.length <= 1 ? null : (
+                  <button
+                    onClick={() => handleRemoveInput(data.id)}
+                    style={{
+                      backgroundColor: "unset",
+                      border: "none",
+                      position: "absolute",
+                      right: "0px",
+                      color: "#8b0024",
+                      width: "5%",
+                    }}
+                  >
+                    <MdDelete />
+                  </button>
+                )}
+              </div>
+            </>
           ))}
         </div>
 
@@ -388,14 +485,9 @@ export default function InfoInput(props) {
       {/* 사용자 임의 버전등록 */}
       <Input id="versionName">
         <span>버전명: </span>
-        <TextInput
-          placeholder="버전명을 입력해주세요"
-          value={work.versionName}
-          onChange={(e) => {
-            const info = { ...work, versionName: e.target.value };
-            setWork(info);
-          }}
-        ></TextInput>
+        <VersionBar placeholder="버전명을 입력해주세요">
+          {work.version}
+        </VersionBar>
       </Input>
       {/* 카테고리 */}
       <Input id="category">
@@ -410,7 +502,6 @@ export default function InfoInput(props) {
                 key={i}
                 onClick={() => {
                   ChangeDrop("카테고리", "category", category.name);
-                  console.log(work.category);
                 }}
               >
                 {category.name}
@@ -446,7 +537,7 @@ export default function InfoInput(props) {
       {/* 이미지 업로드 */}
       <Input id="imageUrl" style={{ display: "flex", width: " 100%" }}>
         <span>대표 이미지: </span>
-        <DragDrop></DragDrop>
+        <DragDrop />
       </Input>
       {/* 대체 이미지 업로드 */}
       <p>
@@ -481,7 +572,7 @@ export default function InfoInput(props) {
           등장인물 수 설정{" "}
           <span
             style={{
-              margin: "0 21px",
+              margin: "0 14px",
               color: "red",
               fontSize: "10px",
             }}
@@ -490,13 +581,13 @@ export default function InfoInput(props) {
           </span>
         </span>{" "}
         <InputArea>
-          <button
+          {/* <button
             onClick={() => {
               setCount(count - 1);
             }}
           >
             -
-          </button>
+          </button> */}
           <HumanInput
             value={count}
             onChange={(e) => {

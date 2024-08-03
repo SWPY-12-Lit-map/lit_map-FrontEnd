@@ -17,7 +17,7 @@ import "reactflow/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
 import ModalBtn from "../Share/ModalBtn";
-import { useStore } from "../store";
+import { ReadStore, useStore } from "../store";
 
 const Mapping = styled.div`
   width: 100%;
@@ -84,10 +84,16 @@ const CustomMiniMap = styled(MiniMap)`
   margin-bottom: 7%;
 `;
 
-const Logo = styled.img`
+const CustomBackground = styled.div`
+  background-image: url(${(props) => props.backgroundImage});
+  background-size: cover;
+  background-color: ${(props) => props.backgroundColor || "transparent"};
+  width: 100%;
+  height: 100%;
   position: absolute;
-  right: 0;
-  bottom: 0;
+  top: 0;
+  left: 0;
+  z-index: -1;
 `;
 
 const initialNodes = [];
@@ -120,7 +126,6 @@ const Mindmap = (props) => {
     count,
     work,
     setWork,
-    // backgroundImg,
     setBackImg,
     workInfo,
     relationship,
@@ -129,9 +134,9 @@ const Mindmap = (props) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [backColor, setBackColor] = useState();
-  const { workInfos, read, backgroundColor, backgroundImg, condition } =
-    useStore();
-  const [backgroundImage, setBackgroundImg] = useState(backgroundImg);
+  const { workInfos, backgroundColor, backgroundImg, condition } = useStore();
+  const { read, setRead } = ReadStore();
+  const [backgroundImage, setBackgroundImg] = useState("");
 
   const [rfInstance, setRfInstance] = useState(null);
   const { fitView, setViewport } = useReactFlow();
@@ -190,6 +195,7 @@ const Mindmap = (props) => {
   // 마인드맵 저장 복구
   const onRestore = useCallback(
     (data) => {
+      console.log(work.relationship);
       const restoreFlow = async () => {
         const flow = data;
         if (flow) {
@@ -224,7 +230,7 @@ const Mindmap = (props) => {
   const onSave = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
-      flow.version = Number(work.defaultVersion);
+      flow.version = Number(work.version);
       flow.work_id = work.title;
       flow.viewport = rfInstance.getViewport(); // FitView 설정
       flow.backgroundImage = backgroundImage;
@@ -237,7 +243,7 @@ const Mindmap = (props) => {
           text: edge.data.text, // 엣지의 텍스트 포함
         },
       }));
-      const updateRelationship = { ...work, relationship: flow, version: 0.1 };
+      const updateRelationship = { ...work, relationship: flow, version: 1.0 };
 
       setWork(updateRelationship);
     }
@@ -246,6 +252,7 @@ const Mindmap = (props) => {
   // 이미지나 컬러가 업데이트 될 때 재렌더링
   useEffect(() => {
     setBackgroundImg(backgroundImg);
+    console.log(backgroundImg);
   }, [setBackImg, backgroundImg]);
 
   /* 선 지우기 */
@@ -272,12 +279,14 @@ const Mindmap = (props) => {
   // 가져오기 할때
   useEffect(() => {
     const loadRelationship = () => {
+      console.log(condition);
       try {
         if (read) {
           onRestore(relationship);
           fitView(); // fitView 호출
         } else if (!condition) {
           onRestore(work.relationship);
+          console.log(work.relationship);
         }
       } finally {
         setIsLoading(false);
@@ -336,15 +345,9 @@ const Mindmap = (props) => {
         defaultViewport={defaultViewport}
         onInit={setRfInstance}
       >
-        <Background
-          id="1"
-          style={{
-            backgroundImage: backgroundImg ? `url(${backgroundImg})` : null,
-            backgroundSize: backgroundImage ? "cover" : null,
-            background: backgroundColor ? backgroundColor : null,
-            //   "linear-gradient(135deg, rgba(35,185,168,1) 0%, rgba(2,0,36,1) 80%)",
-          }}
-          variant="none"
+        <CustomBackground
+          backgroundImage={backgroundImage}
+          backgroundColor={backColor}
         />
         <CustomControls>
           <PreviewButton onClick={fitView}>미리보기</PreviewButton>

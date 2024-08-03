@@ -38,6 +38,7 @@ const SideMain = styled.div`
   border-radius: 0 10px 10px 0;
   z-index: 200;
   overflow: scroll;
+  overflow-x: hidden;
 `;
 
 const SideHideBtn = styled.button`

@@ -21,6 +21,7 @@ const SelectBackground = styled.div`
     width: 100%;
   }
 `;
+
 const Dropzone = styled.div`
   height: 150px;
   width: 100%;
@@ -67,6 +68,7 @@ const RadioLabel = styled.label`
     display: none;
   }
 `;
+
 const CustomDropdownButton = styled(DropdownButton)`
   > .btn {
     text-align: left;

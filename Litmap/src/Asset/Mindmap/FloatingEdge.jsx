@@ -7,6 +7,7 @@ import {
   useReactFlow,
 } from "reactflow";
 import { getEdgeParams } from "./util";
+import { ReadStore } from "../store";
 
 function FloatingEdge({
   id,
@@ -26,10 +27,12 @@ function FloatingEdge({
 
   const [text, setText] = useState(data.text || "");
 
-  const { setEdges } = useReactFlow(); // Move useReactFlow here
+  const { setEdges } = useReactFlow();
+
+  const { read, setRead } = ReadStore();
 
   useEffect(() => {
-    if (data.text != text) {
+    if (data.text !== text) {
       setText(data.text || "");
     }
   }, [data.text]);
@@ -58,7 +61,7 @@ function FloatingEdge({
     const newText = event.target.value;
     setText(newText);
     if (data.onTextChange) {
-      data.onTextChange(id, newText); // onTextChange 호출
+      data.onTextChange(id, newText);
     }
   };
 
@@ -99,12 +102,12 @@ function FloatingEdge({
             value={text}
             onChange={handleTextChange}
             style={{
-              border: data.read ? "none" : null,
+              border: read ? "none" : null,
               textAlign: "center",
             }}
-            readOnly={data.read}
+            readOnly={read}
           />
-          {!data.read && (
+          {!read && (
             <button className="edgebutton" onClick={onEdgeClick}>
               ×
             </button>

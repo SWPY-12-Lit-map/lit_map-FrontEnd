@@ -6,7 +6,8 @@ import styled from "styled-components";
 
 const CustomButton = styled(Button)`
   background-color: unset;
-  color: white;
+  color: #8d2741;
+  border-color: #8d2741;
 `;
 
 export default function MyVerticallyCenteredModal(props) {
@@ -16,7 +17,7 @@ export default function MyVerticallyCenteredModal(props) {
   return (
     <Modal
       {...props}
-      size="lg"
+      size="sm"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
@@ -43,7 +44,13 @@ export default function MyVerticallyCenteredModal(props) {
         >
           홈 바로가기
         </CustomButton>
-        <CustomButton onClick={() => {}}>작품 바로가기</CustomButton>
+        <CustomButton
+          onClick={() => {
+            navigate(`/work/${work.workId}`);
+          }}
+        >
+          작품 바로가기
+        </CustomButton>
       </Modal.Footer>
     </Modal>
   );

@@ -19,7 +19,7 @@ const EditInfo = styled.div`
 
   & > div {
     width: 350px;
-    height: 550px;
+    height: 650px;
     margin: 0 10px;
     flex-shrink: 0;
     flex-grow: 0;
@@ -124,6 +124,7 @@ const CastAddButton = styled.button`
 const ImgUpload = styled.label`
   background-color: #e9e9e9;
   text-align: center;
+  cursor: pointer;
   & > svg {
     width: 100%;
     background-color: #e9e9e9;

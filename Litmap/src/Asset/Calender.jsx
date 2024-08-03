@@ -5,8 +5,21 @@ import "react-datepicker/dist/react-datepicker.css";
 import styled from "styled-components";
 
 const SelectDate = styled.div`
-  margin-left: 35%;
+  text-align: center;
+  width: 100%;
+  & > div {
+    width: 100%;
+  }
 `;
+
+const Button = styled.button`
+  background-color: unset;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #575757;
+  border-radius: 5px;
+`;
+
 const HeaderContainer = styled.div`
   display: flex;
   color: black;
@@ -38,14 +51,14 @@ export default function Calendar(props) {
     "12월",
   ];
   const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
-    <button
+    <Button
       className="custom-input"
       onClick={onClick}
       ref={ref}
-      style={{ color: "black" }}
+      style={{ color: "black", width: "100%" }}
     >
       {value}
-    </button>
+    </Button>
   ));
   return (
     <>
