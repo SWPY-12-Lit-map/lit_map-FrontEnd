@@ -36,6 +36,7 @@
     "react-youtube": "^10.1.0",
     "reactflow": "^11.11.4",
     "styled-components": "^6.1.11",
+    "vite-plugin-svgr": "^4.2.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
