@@ -10,7 +10,6 @@ import RegisterAllow from "./RegisterAllow";
 import MemberManage from "./MemberManage";
 import BannerManage from "./BannerManage";
 import WithdrawalPage from "./WithdrawalPage";
-import { useStore } from "../Asset/store";
 
 const Container = styled.div`
   display: flex;
@@ -137,9 +136,20 @@ const MypageLayout = () => {
   const [contentHeight, setContentHeight] = useState(1000);
   const [stats, setStats] = useState({ 작성중인글: 0, 작성한글: 0 });
   const [profileImage, setProfileImage] = useState("");
-  const { userId } = useStore();
 
   const navigate = useNavigate();
+
+  const getCookie = (name) => {
+    const cookieArr = document.cookie.split("; ");
+    for (let i = 0; i < cookieArr.length; i++) {
+      const cookiePair = cookieArr[i].split("=");
+      if (name === cookiePair[0]) {
+        return cookiePair[1];
+      }
+    }
+    return null;
+  };
+  const memberRoleStatus = getCookie("memberRoleStatus");
 
   useEffect(() => {
     const fetchUserProfile = async (type) => {
@@ -153,6 +163,7 @@ const MypageLayout = () => {
 
         if (response.data.resultCode === 200) {
           const profileData = response.data.result;
+          console.log("Profile Data:", profileData);
 
           // 역할에 따라 API 호출
           if (profileData.memberRoleStatus === "PUBLISHER_MEMBER") {
@@ -171,7 +182,10 @@ const MypageLayout = () => {
           } else if (profileData.memberRoleStatus === "PENDING_MEMBER") {
             alert("승인중인 회원입니다");
             navigate("/");
-          } else if (profileData.memberRoleStatus === "ACTIVE_MEMBER") {
+          } else if (
+            profileData.memberRoleStatus === "ACTIVE_MEMBER" ||
+            profileData.memberRoleStatus === "ADMIN"
+          ) {
             setProfile(profileData);
             setProfileImage(profileData.userImage);
           }
@@ -220,7 +234,9 @@ const MypageLayout = () => {
         console.error("Failed to fetch stats", error);
       }
     };
-    if (userId == 62) {
+
+    console.log(memberRoleStatus);
+    if (memberRoleStatus === "ADMIN") {
       fetchUserProfile("admin");
     } else {
       fetchUserProfile("api/members");
@@ -252,12 +268,12 @@ const MypageLayout = () => {
     <Container
       $contentHeight={contentHeight}
       style={{
-        backgroundColor: userId == 62 ? "#ABB0BC" : null,
+        backgroundColor: memberRoleStatus === "ADMIN" ? "#ABB0BC" : null,
       }}
     >
       <Sidebar
         style={{
-          backgroundColor: userId == 62 ? "#ABB0BC" : null,
+          backgroundColor: memberRoleStatus === "ADMIN" ? "#ABB0BC" : null,
         }}
       >
         <Box>
@@ -303,7 +319,7 @@ const MypageLayout = () => {
                 </Link>
               </li>
             </ul>
-            {userId == 62 ? (
+            {memberRoleStatus === "62" ? (
               <AdminMenu>
                 <h3>관리자용 메뉴</h3>
                 <li>
