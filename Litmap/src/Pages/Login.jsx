@@ -152,7 +152,6 @@ const Login = ({ setLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { userId, setUserId } = useStore();
 
   useEffect(() => {
     const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
@@ -166,8 +165,6 @@ const Login = ({ setLogin }) => {
     }
   }, [setLogin, navigate]);
 
-  useEffect(() => {}, [userId]);
-
   const handleLogin = async () => {
     if (!email || !password) {
       alert("이메일과 비밀번호를 모두 입력해주세요.");
@@ -179,11 +176,13 @@ const Login = ({ setLogin }) => {
         password: password,
       });
       console.log(result);
-      setUserId(result.data.result.id);
+
       setLogin(true);
 
       // 로그인 성공 후 쿠키 설정 (7일 동안 유효)
       setCookie("litmapEmail", email, 7);
+      setCookie("userId", result.data.result.id, 7);
+      setCookie("memberRoleStatus", result.data.result.memberRoleStatus, 7);
 
       // 쿠키 설정 확인
       console.log("Cookies:", document.cookie);
