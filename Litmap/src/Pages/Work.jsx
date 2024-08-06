@@ -6,7 +6,7 @@ import YouTube from "react-youtube";
 import ModalBtn from "../Asset/Share/ModalBtn";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import { ReactFlowProvider } from "reactflow";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ReadStore, useStore } from "../Asset/store";
 import { format } from "date-fns";
 
@@ -69,9 +69,10 @@ const Season = styled(List)``;
 const Channel = styled(List)``;
 const Content = styled(List)``;
 
-const Btn1 = styled(Button)`
-  border-radius: 10px;
-  width: 40%;
+const Btn = styled(Button)`
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+  width: 5%;
   padding: 10px 0px;
   display: flex;
   flex-direction: row;
@@ -96,7 +97,17 @@ const Recommends = styled.div`
   grid-template-columns: repeat(5, 1fr);
   & > div > img {
     width: 200px;
+    &:hover {
+      cursor: pointer;
+    }
   }
+  & > div > p {
+    display: none;
+  }
+`;
+
+const Versions = styled.div`
+  display: flex;
 `;
 
 export default function Work({
@@ -116,6 +127,7 @@ export default function Work({
   const { setBackgroundColor } = useStore();
   const { read, setRead } = ReadStore();
   const [relatedWork, setRelatedWork] = useState([]);
+  const navigate = useNavigate();
 
   const GetWork = async () => {
     await axios
@@ -124,8 +136,6 @@ export default function Work({
         setRead(true);
         const Get = result.data.result;
         setWorkInfo(Get);
-        console.log(workInfo);
-        console.log(result);
         setBackgroundColor(
           Get.versions.relationship.backgroundColor
             ? Get.versions.relationship.backgroundColor
@@ -175,8 +185,9 @@ export default function Work({
     setBackgroundColor("");
     setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
     GetWork();
-    // 데이터를 가져오는 함수 호출
     console.log(workInfo);
+    // 데이터를 가져오는 함수 호출
+    console.log(workInfo.versions?.relationship);
   }, [read]);
 
   // 연관작품 가져오기
@@ -184,7 +195,6 @@ export default function Work({
     axios
       .get(`https://api.litmap.store/api/relate/related/${id}`)
       .then((result) => {
-        console.log(result.data);
         setRelatedWork([...result.data]);
       })
       .catch((error) => {
@@ -244,12 +254,17 @@ export default function Work({
                 <Content>내용: {workInfo.contents}</Content>
               </Info>
             ) : (
-              <RelatedVideo>
-                <YouTube videoId="ESPFTY8Y-xM"></YouTube>
-              </RelatedVideo>
+              <RelatedVideo>{/* 유튜브 자리 */}</RelatedVideo>
             )}
           </Description>
         </Workinfo>
+        <Versions>
+          {workInfo.versionList
+            ? workInfo.versionList.map((a, i) => {
+                return <Btn>{a.versionNum}</Btn>;
+              })
+            : null}
+        </Versions>
         <Connection>
           <ReactFlowProvider>
             <Mindmap
@@ -269,11 +284,14 @@ export default function Work({
           <h3>함께 볼만한 드라마</h3>
           <Recommends>
             {relatedWork?.map((data, i) => {
-              console.log(data);
               return (
-                <div>
+                <div
+                  onClick={() => {
+                    navigate(`/work/${data.workId}`);
+                  }}
+                >
                   <img src={data.imageUrl} alt="추천 포스터 1" key={i} />
-                  {data.title}
+                  <p>{data.title}</p>
                 </div>
               );
             })}

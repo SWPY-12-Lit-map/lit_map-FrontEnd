@@ -79,7 +79,7 @@ function FloatingEdge({
         style={{
           ...style,
           stroke: selected ? "grey" : style.stroke,
-          strokeWidth: selected ? 4 : style.strokeWidth,
+          strokeWidth: selected ? 4 : 1,
           strokeDasharray: data.lineStyle === "실선" ? "" : "4",
         }}
       />

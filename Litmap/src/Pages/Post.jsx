@@ -151,7 +151,7 @@ export default function Post(props) {
     };
     const userId = getCookie("userId");
 
-    console.log(work);
+    console.log(workInfos);
     setRead(false);
     console.log(condition);
     if (!condition) {
@@ -188,7 +188,8 @@ export default function Post(props) {
             : ""
         );
       }
-
+      console.log(work);
+      console.log(characterInfos);
       console.log(backgroundImg);
     } else {
       setWork({
@@ -202,7 +203,7 @@ export default function Post(props) {
         contents: "", // 설명
         publisherDate: date, // 출판일자
         version: "1.0", // 시스템 버전
-        versionName: "?", // 작성자 임의 버전
+        versionName: "", // 작성자 임의 버전
         publisherName: "민음사",
       });
       // 초기 상태 설정
@@ -338,6 +339,8 @@ export default function Post(props) {
             <Prevbtn
               onClick={() => {
                 if (state === 2) {
+                  const Extrasave = { ...work, confirmCheck: false };
+                  setWork(Extrasave);
                   setState(1);
                   document.querySelector("#nextBtn").innerHTML = "다음";
                 }
@@ -389,28 +392,23 @@ export default function Post(props) {
                 if (state === 1) {
                   setState(2);
                   document.querySelector("#nextBtn").innerHTML = "저장";
+                  const Extrasave = { ...work, confirmCheck: true };
+                  setWork(Extrasave);
                 } else if (state === 2) {
                   // 저장 로직 추가
-                  const Extrasave = { ...work, confirmCheck: true };
-                  await setWork(Extrasave);
-                  console.log(work);
-                  {
-                    work.confirmCheck
-                      ? axios
-                          .post("https://api.litmap.store/api/work", work, {
-                            withCredentials: true,
-                          })
-                          .then((result) => {
-                            console.log(result);
-                            setModalShow(true);
-                          })
-                          .catch((error) => {
-                            console.log(error);
-                            setModalShow(false);
-                            alert("잠시 후 다시 시도해주세요");
-                          })
-                      : console.log("loading");
-                  }
+                  axios
+                    .post("https://api.litmap.store/api/work", work, {
+                      withCredentials: true,
+                    })
+                    .then((result) => {
+                      console.log(result);
+                      setModalShow(true);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      setModalShow(false);
+                      alert("잠시 후 다시 시도해주세요");
+                    });
                 }
               }}
               style={!next ? { borderColor: "#9F9F9F", color: "#9F9F9F" } : {}}

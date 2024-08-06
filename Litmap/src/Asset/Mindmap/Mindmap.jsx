@@ -25,6 +25,12 @@ const Mapping = styled.div`
   z-index: 99;
   & > div > div > div > div > div > .react-flow__node {
     width: 150px;
+    height: 200px;
+    background-color: white;
+    & > div > .customNodeBody {
+      border: unset;
+      border-radius: 0px;
+    }
   }
 `;
 const Btns = styled.div`
@@ -70,8 +76,13 @@ const CustomControls = styled(Controls)`
 
 const PreviewButton = styled(ControlButton)`
   position: absolute;
+  width: 100px !important;
+  border-radius: 5px;
   top: 510%;
-  right: 400%;
+  right: 420%;
+  background-color: unset !important;
+  color: #8b0024;
+  border: 1px solid #8b0024 !important;
 `;
 
 const DeleteEdgesButton = styled(ControlButton)`
@@ -94,6 +105,16 @@ const CustomBackground = styled.div`
   top: 0;
   left: 0;
   z-index: -1;
+`;
+
+const PreviewCard = styled.div`
+  position: fixed;
+  width: 50vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  background-color: white;
+  z-index: 100; /* Ensure it's above other elements */
 `;
 
 const initialNodes = [];
@@ -144,7 +165,6 @@ const Mindmap = (props) => {
 
   // 노드 생성
   const createNodes = useCallback(() => {
-    console.log(count);
     const newNodes = [...Array(parseInt(count))].map((_, i) => ({
       id: `${i}`,
       type: "custom",
@@ -158,7 +178,7 @@ const Mindmap = (props) => {
       },
     }));
     setNodes(() => [...newNodes]);
-  }, [count, setNodes, characterInfos]);
+  }, [count, setNodes, work.casts]);
 
   /* 연결 되었을 때 */
   const onConnect = useCallback(
@@ -195,14 +215,17 @@ const Mindmap = (props) => {
   // 마인드맵 저장 복구
   const onRestore = useCallback(
     (data) => {
-      console.log(work.relationship);
+      console.log("복구");
       const restoreFlow = async () => {
         const flow = data;
         if (flow) {
-          const readNodes = flow.nodes;
-          readNodes.forEach((element) => {
-            element.data.read = true;
-          });
+          const readNodes = flow.nodes.map((node, i) => ({
+            ...node,
+            data: {
+              ...workInfos.versions.casts[i],
+              read: true,
+            },
+          }));
 
           const restoredEdges = flow.edges.map((edge) => ({
             ...edge,
@@ -211,9 +234,13 @@ const Mindmap = (props) => {
               text: edge.data.text || "", // 라벨 데이터 복원
             },
           }));
-          setNodes(flow.nodes || []);
+          setNodes(readNodes || []);
+          console.log(nodes);
           setEdges(restoredEdges || []);
-          setTimeout(() => setViewport(0.1), 0);
+          setTimeout(() => {
+            fitView(); // FitView 호출
+            setViewport(0.1);
+          }, 0);
           if (flow.backgroundColor) {
             setBackColor(flow.backgroundColor);
           } else if (flow.backgroundImage) {
@@ -223,7 +250,7 @@ const Mindmap = (props) => {
       };
       restoreFlow();
     },
-    [setNodes, setEdges, setBackImg, setBackColor, setViewport]
+    [setNodes, setEdges, setBackImg, setBackColor, setViewport, fitView]
   );
 
   // 마인드맵 저장
@@ -246,7 +273,6 @@ const Mindmap = (props) => {
       const updateRelationship = {
         ...work,
         relationship: flow,
-        version: " 1.0 ",
       };
 
       setWork(updateRelationship);
@@ -277,6 +303,7 @@ const Mindmap = (props) => {
   // 컴포넌트 로드 시 노드 생성
   useEffect(() => {
     console.log(work);
+    console.log("복구");
     createNodes();
   }, [count, createNodes, characterInfos]);
 
@@ -287,7 +314,6 @@ const Mindmap = (props) => {
       try {
         if (read) {
           onRestore(relationship);
-          fitView(); // fitView 호출
         } else if (!condition) {
           onRestore(work.relationship);
           console.log(work.relationship);
@@ -297,7 +323,7 @@ const Mindmap = (props) => {
       }
     };
     loadRelationship();
-  }, [relationship, read, onRestore, fitView]);
+  }, [relationship, read, onRestore]);
 
   useEffect(() => {
     if (!read) {
@@ -353,14 +379,8 @@ const Mindmap = (props) => {
           backgroundImage={backgroundImage}
           backgroundColor={backgroundColor}
         />
-        <CustomControls>
-          <PreviewButton onClick={fitView}>미리보기</PreviewButton>
-          {/* <DeleteEdgesButton onClick={deleteAllEdges}>
-            선 삭제
-          </DeleteEdgesButton> */}
-        </CustomControls>
+        <CustomControls></CustomControls>
         {read ? null : <CustomMiniMap />}
-        {/* <Logo src="/Logo.png"></Logo> */}
       </ReactFlow>
       {!read ? null : (
         <Btns>
