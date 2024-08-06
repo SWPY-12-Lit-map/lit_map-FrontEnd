@@ -56,6 +56,8 @@ export default function CustomNode({ id, data, selected }) {
   const isTarget = connectionNodeId && connectionNodeId !== id;
   const { read } = ReadStore();
 
+  console.log(data);
+
   return (
     <NodeStyle className="customNode">
       {!read && <NodeResizer color="blue" isVisible={selected} />}
@@ -74,7 +76,7 @@ export default function CustomNode({ id, data, selected }) {
             height: "100%",
           }}
         >
-          <NodeImg src={data.imageUrl || basicImg} alt="Profile" />
+          <NodeImg src={data.imageUrl || basicImg} alt="Cast Img" />
           {/* <NodeName
             onClick={() => {
               setShow(!show);
@@ -94,7 +96,8 @@ export default function CustomNode({ id, data, selected }) {
       {/* {show && ( */}
       <InfoTab>
         <h5>
-          이름: {data.name} ( {data.age})
+          이름: {data.name}
+          {data.age ? `(${data.age}세)` : null}
         </h5>
         <p>{data.contents}</p>
         {/* <p>종족: {data.type}</p>
