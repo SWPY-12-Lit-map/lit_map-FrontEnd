@@ -117,7 +117,7 @@ function App() {
     contents: "", // 설명
     publisherDate: date, // 출판일자
     version: "1.0", // 시스템 버전
-    versionName: "none", // 작성자 임의 버전
+    versionName: "", // 작성자 임의 버전
     publisherName: "민음사",
     casts: [
       {
