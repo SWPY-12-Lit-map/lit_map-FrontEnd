@@ -271,6 +271,8 @@ export default function RegisterAllow() {
   const [endDate, setEndDate] = useState(new Date());
   const [deny, setDeny] = useState(false);
   const [denyReason, setReason] = useState("");
+  const [change, setChange] = useState(false);
+  const [filterData, setFilterData] = useState([]);
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
@@ -289,26 +291,36 @@ export default function RegisterAllow() {
     setRefreshTime(new Date().toLocaleString());
   };
 
-  const filteredData = data.filter((item) => {
-    if (filterStatus !== "all" && item.status !== filterStatus) {
-      return false;
-    }
-    if (searchTerm && !item.name.includes(searchTerm)) {
-      return false;
-    }
-    return true;
-  });
+  const handleSearch = () => {
+    const filtered = data.filter((item) => {
+      if (filterStatus !== "all" && item.status !== filterStatus) {
+        return false;
+      }
+      if (
+        searchTerm &&
+        !item.title.toLowerCase().includes(searchTerm.toLowerCase())
+      ) {
+        return false;
+      }
+      const itemDate = new Date(item.versionList[0]?.lastUpdateDate);
+      if (itemDate < startDate || itemDate > endDate) {
+        return false;
+      }
+      return true;
+    });
+    setFilterData(filtered);
+    setCurrentPage(1); // 검색 후 첫 페이지로 이동
+  };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filterData.slice(indexOfFirstItem, indexOfLastItem);
 
   const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredData.length / itemsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(filterData.length / itemsPerPage); i++) {
     pageNumbers.push(i);
   }
 
-  // 승인 안된 작품 가져오기
   const getAxios = () => {
     axios
       .get("https://api.litmap.store/api/board/confirm", {
@@ -317,21 +329,22 @@ export default function RegisterAllow() {
       .then((result) => {
         console.log(result);
         setData([...result.data.result]);
+        setFilterData(result.data.result); // 초기 데이터 필터링
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  // 작품 승인하기
   const confirm = (versionId) => {
-    console.log(versionId);
     axios
-      .put(`https://api.litmap.store/api/version/${versionId}/confirm`, {
+      .put(`https://api.litmap.store/api/version/confirm/${versionId}`, "", {
         withCredentials: true,
       })
       .then((result) => {
         console.log(result);
+        alert("승인이 완료되었습니다");
+        setChange(true);
       })
       .catch((error) => {
         console.log(error);
@@ -340,7 +353,7 @@ export default function RegisterAllow() {
 
   useEffect(() => {
     getAxios();
-  }, []);
+  }, [change]);
 
   return (
     <Content>
@@ -359,7 +372,11 @@ export default function RegisterAllow() {
         <div className="text-container">
           <NameArea>
             <span>제목</span>
-            <input type="text" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </NameArea>
           <DateArea>
             <span>등록날짜별</span>
@@ -369,7 +386,7 @@ export default function RegisterAllow() {
               <SimpleCalender date={endDate} setDate={setEndDate} />
             </SelectDate>
           </DateArea>
-          <SearchBtn>검색</SearchBtn>
+          <SearchBtn onClick={handleSearch}>검색</SearchBtn>
         </div>
       </SearchName>
 
@@ -388,7 +405,7 @@ export default function RegisterAllow() {
           </Category>
         </div>
 
-        {currentItems.map((item, i) => (
+        {currentItems.map((item) => (
           <div
             key={item.id}
             style={{
@@ -412,13 +429,12 @@ export default function RegisterAllow() {
               <span>
                 {item?.versionList[0]?.lastUpdateDate &&
                   format(
-                    item.versionList[0].lastUpdateDate,
+                    new Date(item.versionList[0].lastUpdateDate),
                     "yyyy년 MM월 dd일"
                   )}
               </span>
               <span>{item.title}</span>
               <span>
-                {" "}
                 {item?.versionList[0]?.versionName &&
                   item.versionList[0].versionName}
               </span>
@@ -426,7 +442,7 @@ export default function RegisterAllow() {
                 <Status
                   onClick={() => {
                     axios
-                      .get(`https://api.litmap.store/api/work/${item.workId}`)
+                      .get(`https://api.litmap.store/api/work/35`)
                       .then((result) => {
                         console.log(result);
                       })
@@ -450,7 +466,7 @@ export default function RegisterAllow() {
                     backgroundColor: "#EFF5FF",
                   }}
                   onClick={() => {
-                    confirm(item.workId);
+                    confirm(item.versionList[0].versionId);
                   }}
                 >
                   승인
@@ -479,7 +495,6 @@ export default function RegisterAllow() {
                       <input
                         onChange={(e) => {
                           setReason(e.target.value);
-                          console.log(e.target.value);
                         }}
                         type="text"
                       />{" "}
@@ -492,7 +507,6 @@ export default function RegisterAllow() {
                             )
                             .then((result) => {
                               console.log(result);
-                              // setDeny(false);
                             })
                             .catch((error) => {
                               console.log(error);
@@ -510,7 +524,6 @@ export default function RegisterAllow() {
         ))}
       </Controls>
       <Foot>
-        {" "}
         <ChooseBtn>
           <button
             style={{
@@ -522,7 +535,7 @@ export default function RegisterAllow() {
           </button>
           <button
             style={{
-              color: "#8B0024 ",
+              color: "#8B0024",
               borderColor: "#8B0024",
             }}
           >

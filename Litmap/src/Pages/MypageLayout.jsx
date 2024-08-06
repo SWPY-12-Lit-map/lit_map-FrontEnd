@@ -162,10 +162,9 @@ const MypageLayout = () => {
             { withCredentials: true }
           );
         } else if (memberRoleStatus === "ADMIN") {
-          response = await axios.get(
-            "https://api.litmap.store/admin/mypage",
-            { withCredentials: true }
-          );
+          response = await axios.get("https://api.litmap.store/admin/mypage", {
+            withCredentials: true,
+          });
         } else {
           response = await axios.get(
             "https://api.litmap.store/api/members/mypage",
@@ -323,7 +322,13 @@ const MypageLayout = () => {
         <Routes>
           <Route
             path="/"
-            element={<ArtworkManagement setContentHeight={setContentHeight} />}
+            element={
+              memberRoleStatus === "ADMIN" ? (
+                <AdminPage />
+              ) : (
+                <ArtworkManagement setContentHeight={setContentHeight} />
+              )
+            }
           />
           <Route
             path="manage-profile"

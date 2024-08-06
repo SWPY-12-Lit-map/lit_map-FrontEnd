@@ -229,16 +229,7 @@ const ChooseBtn = styled.div`
 
 export default function MemberManage() {
   const navigate = useNavigate();
-  const [data, setData] = useState([
-    {
-      id: 1,
-      date: "2024.07.01",
-      userName: "가입자",
-      area: "1인 작가",
-      workLink: "www.naver.com",
-      state: false,
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -266,11 +257,18 @@ export default function MemberManage() {
     setRefreshTime(new Date().toLocaleString());
   };
 
+  const handleSearch = () => {
+    setCurrentPage(1); // 검색 후 첫 페이지로 이동
+  };
+
   const filteredData = data.filter((item) => {
     if (filterStatus !== "all" && item.status !== filterStatus) {
       return false;
     }
-    if (searchTerm && !item.name.includes(searchTerm)) {
+    if (
+      searchTerm &&
+      !item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -329,7 +327,11 @@ export default function MemberManage() {
         <div className="text-container">
           <NameArea>
             <span>이름</span>
-            <input type="text" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </NameArea>
           <DateArea>
             <span>가입날짜별</span>
@@ -339,7 +341,7 @@ export default function MemberManage() {
               <SimpleCalender date={endDate} setDate={setEndDate} />
             </SelectDate>
           </DateArea>
-          <SearchBtn>검색</SearchBtn>
+          <SearchBtn onClick={handleSearch}>검색</SearchBtn>
         </div>
       </SearchName>
 
@@ -350,9 +352,9 @@ export default function MemberManage() {
             <CheckboxCustom />
           </CheckboxContainer>
           <Category>
-            <div>가입 날짜</div>
+            <div>회원 구분 </div>
+            <div>아이디</div>
             <div>이름</div>
-            <div>선택 분야</div>
             <div>회사명</div>
             <div>회원구분</div>
           </Category>
@@ -379,7 +381,8 @@ export default function MemberManage() {
             </div>
 
             <Category id="memberInfo">
-              <span>{item.memberRoleStatus}</span>
+              {/* <span>{item.memberRoleStatus}</span> */}
+              <span>{item.litmapEmail}</span>
               <span>{item.name}</span>
               <span>{item.area}</span>
               <span>회사이름</span>

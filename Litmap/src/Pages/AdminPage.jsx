@@ -71,19 +71,10 @@ const SearchName = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     & > * {
       height: 100%;
     }
-  }
-`;
-
-const SelectDate = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  & > div {
-    margin: 5px;
   }
 `;
 
@@ -184,6 +175,7 @@ const Category = styled.div`
   align-items: center;
   border-bottom: 1px solid #c5c5c5;
   padding: 10px 0 5px 0;
+  justify-content: space-evenly;
   & > span {
     width: 20%;
     & > button {
@@ -220,11 +212,7 @@ const ChooseBtn = styled.div`
     margin: 0 5px;
   }
 `;
-
 export default function ArtworkManagement() {
-  const { addWorkInfos } = useStore();
-  const navigate = useNavigate();
-  const [data, setData] = useState([]);
   const [checkedItems, setCheckedItems] = useState({});
   const [allChecked, setAllChecked] = useState(false);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
@@ -232,8 +220,6 @@ export default function ArtworkManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const [member, setMember] = useState([]);
 
   const handleCheckAll = () => {
@@ -253,11 +239,18 @@ export default function ArtworkManagement() {
     setRefreshTime(new Date().toLocaleString());
   };
 
-  const filteredData = data.filter((item) => {
+  const handleSearch = () => {
+    setCurrentPage(1); // 검색 후 첫 페이지로 이동
+  };
+
+  const filteredData = member.filter((item) => {
     if (filterStatus !== "all" && item.status !== filterStatus) {
       return false;
     }
-    if (searchTerm && !item.name.includes(searchTerm)) {
+    if (
+      searchTerm &&
+      !item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
       return false;
     }
     return true;
@@ -280,12 +273,14 @@ export default function ArtworkManagement() {
       })
       .then((result) => {
         console.log(result);
+        GetwaitMembers(); // 데이터 갱신
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
+  /* 가입 대기 회원 조회 */
   const GetwaitMembers = () => {
     axios
       .get("https://api.litmap.store/admin/pending", {
@@ -321,17 +316,13 @@ export default function ArtworkManagement() {
         <div className="text-container">
           <NameArea>
             <span>이름</span>
-            <input type="text" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </NameArea>
-          <DateArea>
-            <span>가입날짜별</span>
-            <SelectDate>
-              <SimpleCalender date={startDate} setDate={setStartDate} />
-              ~
-              <SimpleCalender date={endDate} setDate={setEndDate} />
-            </SelectDate>
-          </DateArea>
-          <SearchBtn>검색</SearchBtn>
+          <SearchBtn onClick={handleSearch}>검색</SearchBtn>
         </div>
       </SearchName>
 
@@ -345,12 +336,11 @@ export default function ArtworkManagement() {
             <div>릿맵 아이디</div>
             <div>이름</div>
             <div>닉네임</div>
-            <div>작품 링크</div>
             <div>상태</div>
           </Category>
         </div>
 
-        {member.map((item) => (
+        {currentItems.map((item) => (
           <div
             key={item.id}
             style={{
@@ -374,15 +364,6 @@ export default function ArtworkManagement() {
               <span>{item.litmapEmail}</span>
               <span>{item.name}</span>
               <span>{item.nickname}</span>
-              <span>
-                <Status
-                  onClick={() => {
-                    navigate();
-                  }}
-                >
-                  작품 보러가기
-                </Status>
-              </span>
               <span
                 style={{
                   display: "flex",
@@ -412,7 +393,6 @@ export default function ArtworkManagement() {
         ))}
       </Controls>
       <Foot>
-        {" "}
         <ChooseBtn>
           <button
             style={{
