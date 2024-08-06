@@ -291,15 +291,25 @@ const MemberEdit = () => {
         }
     
         // 기본적인 업데이트 데이터 객체 생성
-        const updatedData = {
-            workEmail: memberType === "1인작가" ? workEmail : "",
-            publisherPhone: memberType === "출판사 직원" ? representativePhone : "",
-            name,
-            nickname,
-            myMessage,
-            userImage,
-            urlLink: website,
-        };
+        let updatedData = {};
+    
+        if (memberType === "1인작가") {
+            updatedData = {
+                workEmail: workEmail,
+                name,
+                nickname,
+                myMessage,
+                userImage,
+                urlLink: website,
+            };
+        } else if (memberType === "출판사 직원") {
+            updatedData = {
+                publisherAddress: address,
+                publisherPhoneNumber: representativePhone,
+                name,
+                memberRoleStatus, // 현재 상태의 memberRoleStatus를 유지
+            };
+        }
     
         // 비밀번호가 입력된 경우에만 필드를 추가
         if (newPassword) {
@@ -330,7 +340,7 @@ const MemberEdit = () => {
             console.error("Error updating user info:", error);
             setErrorMessage("정보 수정에 실패했습니다.");
         }
-    };
+    };       
     
     const handleCancel = () => {
         // 필요한 경우 취소 시 초기화 로직 추가

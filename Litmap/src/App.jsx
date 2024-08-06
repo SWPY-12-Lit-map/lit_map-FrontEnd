@@ -20,6 +20,8 @@ import styled, { createGlobalStyle } from "styled-components";
 import SearchResult from "./Pages/SearchResult";
 import WithdrawalPage from "./Pages/WithdrawalPage";
 import { useStore } from "./Asset/store";
+import TermsPage from './Pages/TermsPage';
+
 
 const GlobalStyle = createGlobalStyle`html {
     height: 100%;
@@ -247,6 +249,8 @@ function App() {
               />
             }
           />
+          <Route path="/terms" element={<TermsPage />} />
+
         </Routes>
       </Router>
     </>

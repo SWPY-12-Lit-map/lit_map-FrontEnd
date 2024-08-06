@@ -5,6 +5,7 @@ import Megamenu from "../Asset/Megamenu";
 import Carousel from "react-bootstrap/Carousel";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import TermsPage from './TermsPage';
 
 const Container = styled.div`
   font-size: 20px;
@@ -101,6 +102,8 @@ const FootNav = styled.div`
 
 const Home = ({ mega, setMega, update, view, state, setState }) => {
   const navigate = useNavigate();
+  const [termsOpen, setTermsOpen] = useState(false);
+
 
   // 캐러셀 이미지
   const [slides, setSlides] = useState([]);
@@ -205,9 +208,7 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
             개인정보처리방침
           </Link>
           <span style={{ color: "#9F9F9F" }}>|</span>
-          <Link to="/이용약관" style={{ color: "#9F9F9F" }}>
-            이용약관
-          </Link>
+          <Link to="/terms" style={{ color: "#9F9F9F" }}>이용약관</Link>
         </FootNav>
         <div style={{ color: "#9F9F9F", marginTop: "20px" }}>
           Copyright 2024. Lit Map(릿맵). All rights reserved.
