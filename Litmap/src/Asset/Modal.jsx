@@ -5,9 +5,16 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const CustomButton = styled(Button)`
+  width: 45%;
   background-color: unset;
   color: #8d2741;
   border-color: #8d2741;
+  &:hover,
+  :active {
+    background-color: #8d2741;
+    color: white;
+    border-color: #8d2741;
+  }
 `;
 
 export default function MyVerticallyCenteredModal(props) {
@@ -17,7 +24,7 @@ export default function MyVerticallyCenteredModal(props) {
   return (
     <Modal
       {...props}
-      size="sm"
+      size="md"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
@@ -46,10 +53,10 @@ export default function MyVerticallyCenteredModal(props) {
         </CustomButton>
         <CustomButton
           onClick={() => {
-            navigate(`/work/${work.workId}`);
+            navigate(`/category2`);
           }}
         >
-          작품 바로가기
+          마이페이지 바로가기
         </CustomButton>
       </Modal.Footer>
     </Modal>

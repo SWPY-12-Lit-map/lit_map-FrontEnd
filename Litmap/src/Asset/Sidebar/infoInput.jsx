@@ -483,7 +483,7 @@ export default function InfoInput(props) {
         </AuthorAddBtn>
       </Input>
       {/* 시스템 버전등록 */}
-      <Input id="versionName">
+      <Input id="version">
         <span>버전명: </span>
         <VersionBar placeholder="버전명을 입력해주세요">
           {work.version}

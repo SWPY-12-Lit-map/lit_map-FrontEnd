@@ -156,7 +156,7 @@ export default function EditTool(props) {
       ...work,
       relationship: {
         ...work.relationship,
-        backgroundColor: "11",
+        backgroundColor: backgroundColor,
       },
     });
     console.log(work);
@@ -170,6 +170,14 @@ export default function EditTool(props) {
           <RadioLabel
             onClick={() => {
               setBackground(true);
+              setWork({
+                ...work,
+                relationship: {
+                  ...work.relationship,
+                  backgroundColor: "",
+                },
+              });
+              setBackgroundColor("");
             }}
           >
             <input type="radio" name="BackroundType" />
@@ -188,6 +196,14 @@ export default function EditTool(props) {
           <RadioLabel
             onClick={() => {
               setBackground(false);
+              setWork({
+                ...work,
+                relationship: {
+                  ...work.relationship,
+                  backgroundImage: "",
+                },
+              });
+              setBackgroundImg("");
             }}
           >
             <input type="radio" name="BackroundType" />

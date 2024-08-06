@@ -160,11 +160,29 @@ export default function EditCharacter(props) {
   const UploadImg = ({ index }) => {
     const fileUpload = (e) => {
       const file = e.target.files[0];
-      const imgUrl = URL.createObjectURL(file);
-      const updatedInfos = characterInfos.map((info, i) =>
-        i === index ? { ...info, imageUrl: imgUrl } : info
-      );
-      setInfos(updatedInfos);
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("path", "casts");
+      console.log(characterInfos[index].imageUrl);
+
+      axios
+        .post("https://api.litmap.store/api/files", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response.data.result);
+
+          const updatedInfos = characterInfos.map((info, idx) =>
+            idx === index ? { ...info, imageUrl: response.data.result } : info
+          );
+
+          setInfos(updatedInfos);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     };
 
     return (
