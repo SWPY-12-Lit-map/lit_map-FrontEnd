@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useReactFlow } from "reactflow";
+import { useReactFlow } from "@xyflow/react";
 import { toPng } from "html-to-image";
 import { useStore } from "../store";
 import styled from "styled-components";
@@ -29,8 +29,8 @@ export default function DownloadImg(props) {
   const { imgUrl, setImgUrl, backgroundColor, backgroundImg } = useStore();
 
   useEffect(() => {
-    console.log(backgroundImg);
-  }, []);
+    fitView(); // 컴포넌트가 마운트될 때 호출
+  }, [fitView]);
 
   /* 이미지 다운로드 함수 */
   function downloadImage(dataUrl) {
@@ -80,11 +80,18 @@ export default function DownloadImg(props) {
               setImgUrl(finalDataUrl);
               downloadImage(finalDataUrl);
             };
+
+            logo.onerror = (error) => {
+              console.error("Logo image failed to load", error);
+            };
+          };
+
+          bgImg.onerror = (error) => {
+            console.error("Background image failed to load", error);
           };
         } else {
           // 배경색 설정
-          ctx.fillStyle =
-            backgroundColor == undefined ? "white" : backgroundColor;
+          ctx.fillStyle = backgroundColor || "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
           ctx.drawImage(img, 0, 0);
@@ -100,10 +107,18 @@ export default function DownloadImg(props) {
             setImgUrl(finalDataUrl);
             downloadImage(finalDataUrl);
           };
+
+          logo.onerror = (error) => {
+            console.error("Logo image failed to load", error);
+          };
         }
       };
+
+      img.onerror = (error) => {
+        console.error("Viewport image failed to load", error);
+      };
     } catch (error) {
-      console.error(error);
+      console.error("Failed to generate PNG", error);
     }
   }
 
@@ -111,10 +126,6 @@ export default function DownloadImg(props) {
   const handleDownload = () => {
     ImgtoPng();
   };
-
-  useEffect(() => {
-    fitView();
-  }, [fitView]);
 
   return (
     <Button className="download-btn" onClick={handleDownload}>

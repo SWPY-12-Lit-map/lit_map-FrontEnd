@@ -1,9 +1,9 @@
-import { ReactFlowProvider } from "reactflow";
+import { ReactFlowProvider } from "@xyflow/react";
 import styled from "styled-components";
 import Mindmap from "../Asset/Mindmap/Mindmap";
 import Sidebar from "../Asset/Sidebar/Sidebar";
 import EditCharacter from "../Asset/EditCharacter";
-import { useEffect, useRef, useState, version } from "react";
+import { useEffect, useRef, useState } from "react";
 import MyVerticallyCenteredModal from "../Asset/Modal";
 import axios from "axios";
 import { ReadStore, useStore } from "../Asset/store";
