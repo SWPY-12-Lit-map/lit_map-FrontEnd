@@ -1,5 +1,7 @@
-import React, { useCallback, useState, useEffect } from "react";
-import ReactFlow, {
+import React, { useCallback, useState, useEffect, useRef } from "react";
+import {
+  ReactFlow,
+  ReactFlowProvider,
   addEdge,
   useNodesState,
   useEdgesState,
@@ -9,15 +11,16 @@ import ReactFlow, {
   useReactFlow,
   Background,
   ControlButton,
-} from "reactflow";
+} from "@xyflow/react";
 import CustomNode from "./CustomNode";
 import FloatingEdge from "./FloatingEdge";
 import CustomConnectionLine from "./CustomConnectionLine";
-import "reactflow/dist/style.css";
+import "@xyflow/react/dist/style.css";
 import "./style.css";
 import styled from "styled-components";
 import ModalBtn from "../Share/ModalBtn";
 import { ReadStore, useStore } from "../store";
+import * as htmlToImage from "html-to-image";
 
 const Mapping = styled.div`
   width: 100%;
@@ -37,6 +40,10 @@ const Btns = styled.div`
   display: flex;
   margin-top: 10px;
   justify-content: flex-end;
+  position: ${({ modalState }) => (modalState ? "fixed" : "relative")};
+  top: ${({ modalState }) => (modalState ? "0" : "auto")};
+  right: ${({ modalState }) => (modalState ? "0" : "auto")};
+  width: ${({ modalState }) => (modalState ? "100%" : "auto")};
 `;
 const CustomControls = styled(Controls)`
   position: absolute;
@@ -150,6 +157,7 @@ const Mindmap = (props) => {
     setBackImg,
     workInfo,
     relationship,
+    modalState,
   } = props;
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -162,6 +170,10 @@ const Mindmap = (props) => {
   const [rfInstance, setRfInstance] = useState(null);
   const { fitView, setViewport } = useReactFlow();
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const [image, setImage] = useState(null);
+  const ref = useRef(null);
+
+  console.log(modalState);
 
   // 노드 생성
   const createNodes = useCallback(() => {
@@ -222,8 +234,9 @@ const Mindmap = (props) => {
           const readNodes = flow.nodes.map((node, i) => ({
             ...node,
             data: {
-              ...workInfos.versions.casts[i],
+              ...workInfo?.versions?.casts[i],
               read: true,
+              imageUrl: workInfo?.versions?.casts[i]?.imageUrl || "", // Ensure imageUrl is provided
             },
           }));
 
@@ -250,7 +263,15 @@ const Mindmap = (props) => {
       };
       restoreFlow();
     },
-    [setNodes, setEdges, setBackImg, setBackColor, setViewport, fitView]
+    [
+      setNodes,
+      setEdges,
+      setBackImg,
+      setBackColor,
+      setViewport,
+      fitView,
+      workInfo,
+    ]
   );
 
   // 마인드맵 저장
@@ -342,51 +363,72 @@ const Mindmap = (props) => {
     setEdges([]);
   };
 
+  useEffect(() => {
+    if (read) {
+      htmlToImage
+        .toPng(ref.current)
+        .then((dataUrl) => {
+          setImage(dataUrl);
+        })
+        .catch((err) => {
+          console.error("Failed to capture image:", err);
+        });
+    }
+  }, [read]);
+
   if (isLoading) {
     return <div>Loading...</div>; // 로딩 중
   }
 
+  if (read && image) {
+    return <img src={image} alt="Mindmap Snapshot" />;
+  }
+
   return (
-    <Mapping>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges.map((edge) => ({
-          ...edge,
-          data: {
-            ...edge.data,
-            onTextChange,
-            edgeType,
-            lineStyle,
-            read: edge.data.read,
-          },
-          selected: edge.id === selectedEdgeId,
-        }))}
-        onNodesChange={read ? null : onNodesChange}
-        onEdgesChange={read ? null : onEdgesChange}
-        onConnect={read ? null : onConnect}
-        onEdgesDelete={read ? null : onEdgesDelete}
-        onEdgeClick={read ? null : onEdgeClick}
-        fitView
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        defaultEdgeOptions={defaultEdgeOptions}
-        connectionLineComponent={CustomConnectionLine}
-        connectionLineStyle={connectionLineStyle}
-        defaultViewport={defaultViewport}
-        onInit={setRfInstance}
-      >
-        <CustomBackground
-          backgroundImage={backgroundImage}
-          backgroundColor={backgroundColor}
-        />
-        <CustomControls></CustomControls>
-        {read ? null : <CustomMiniMap />}
-      </ReactFlow>
-      {!read ? null : (
-        <Btns>
+    <Mapping ref={ref}>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges.map((edge) => ({
+            ...edge,
+            data: {
+              ...edge.data,
+              onTextChange,
+              edgeType,
+              lineStyle,
+              read: edge.data.read,
+            },
+            selected: edge.id === selectedEdgeId,
+          }))}
+          onNodesChange={read ? null : onNodesChange}
+          onEdgesChange={read ? null : onEdgesChange}
+          onConnect={read ? null : onConnect}
+          onEdgesDelete={read ? null : onEdgesDelete}
+          onEdgeClick={read ? null : onEdgeClick}
+          fitView
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={CustomConnectionLine}
+          connectionLineStyle={connectionLineStyle}
+          defaultViewport={defaultViewport}
+          onInit={setRfInstance}
+          panOnDrag={read ? false : true}
+          zoomOnScroll={read ? false : true}
+        >
+          <CustomBackground
+            backgroundImage={backgroundImage}
+            backgroundColor={backgroundColor}
+          />
+          {read ? null : <CustomControls />}
+          {read ? null : <CustomMiniMap />}
+        </ReactFlow>
+      </ReactFlowProvider>
+      {read && modalState ? (
+        <Btns modalState={modalState}>
           <ModalBtn workInfo={workInfo} />
         </Btns>
-      )}
+      ) : null}
     </Mapping>
   );
 };

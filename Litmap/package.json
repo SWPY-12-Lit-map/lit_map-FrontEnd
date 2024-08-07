@@ -14,6 +14,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@xyflow/react": "^12.0.4",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
     "copy-image-clipboard": "^2.1.2",
@@ -34,7 +35,6 @@
     "react-router-dom": "^6.24.0",
     "react-spinners": "^0.14.1",
     "react-youtube": "^10.1.0",
-    "reactflow": "^11.11.4",
     "styled-components": "^6.1.11",
     "zustand": "^4.5.4"
   },
@@ -48,5 +48,6 @@
     "eslint-plugin-react-refresh": "^0.4.7",
     "vite": "^5.3.1",
     "vite-plugin-svgr": "^4.2.0"
-  }
+  },
+  "proxy": "https://image.litmap.store"
 }

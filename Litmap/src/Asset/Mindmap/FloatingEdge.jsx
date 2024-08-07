@@ -5,7 +5,8 @@ import {
   EdgeLabelRenderer,
   getBezierPath,
   useReactFlow,
-} from "reactflow";
+  useInternalNode,
+} from "@xyflow/react";
 import { getEdgeParams } from "./util";
 import { ReadStore } from "../store";
 
@@ -18,18 +19,13 @@ function FloatingEdge({
   data = {},
   selected,
 }) {
-  const sourceNode = useStore(
-    useCallback((store) => store.nodeInternals.get(source), [source])
-  );
-  const targetNode = useStore(
-    useCallback((store) => store.nodeInternals.get(target), [target])
-  );
+  const sourceNode = useInternalNode(source);
+  const targetNode = useInternalNode(target);
 
   const [text, setText] = useState(data.text || "");
 
   const { setEdges } = useReactFlow();
-
-  const { read, setRead } = ReadStore();
+  const { read } = ReadStore();
 
   useEffect(() => {
     if (data.text !== text) {
@@ -89,7 +85,7 @@ function FloatingEdge({
             position: "absolute",
             transform: `translate(-50%, -50%) translate(${
               labelX + 4
-            }px,${labelY}px)`,
+            }px, ${labelY}px)`,
             fontSize: 12,
             pointerEvents: "all",
             backgroundColor: "white",

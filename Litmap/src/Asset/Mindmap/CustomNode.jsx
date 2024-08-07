@@ -1,4 +1,4 @@
-import { Handle, NodeResizer, Position } from "reactflow";
+import { Handle, NodeResizer, Position, useConnection } from "@xyflow/react";
 import basicImg from "../blank-profile-picture-973460_1280.png";
 import { useState } from "react";
 import styled from "styled-components";
@@ -15,11 +15,10 @@ const NodeStyle = styled.div`
   background-color: #e3e3e3;
 
   .customHandle {
-    width: 10px;
-    height: 10px;
-    background: #555;
-    border-radius: 50%;
+    width: 100%;
+    height: 100px;
     border: 1px solid #fff;
+    top: 10;
     left: 40%;
   }
 `;
@@ -51,9 +50,9 @@ const NodeImg = styled.img`
 
 export default function CustomNode({ id, data, selected }) {
   const [show, setShow] = useState(false);
-  const connectionNodeId = useStore(connectionNodeIdSelector);
-  const isConnecting = !!connectionNodeId;
-  const isTarget = connectionNodeId && connectionNodeId !== id;
+  const connection = useConnection();
+
+  const isTarget = connection.inProgress && connection.fromNode.id !== id;
   const { read } = ReadStore();
 
   console.log(data);
@@ -61,13 +60,28 @@ export default function CustomNode({ id, data, selected }) {
   return (
     <NodeStyle className="customNode">
       {!read && <NodeResizer color="blue" isVisible={selected} />}
-      <div className="customNodeBody" style={{ width: "100%", height: "100%" }}>
-        {!isConnecting && (
+      <div
+        className="customNodeBody"
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        {!connection.inProgress && (
           <Handle
             className="customHandle"
             position={Position.Right}
             type="source"
-            style={read ? null : { top: "50%", transform: "translateY(-50%)" }}
+            style={
+              read
+                ? { width: 0, height: 0 }
+                : {
+                    transform: "translateY(-50%)",
+                    backgroundColor: "blue",
+                    width: "100%",
+                    left: "0px",
+                  }
+            }
           />
         )}
         <div
@@ -77,21 +91,25 @@ export default function CustomNode({ id, data, selected }) {
           }}
         >
           <NodeImg src={data.imageUrl || basicImg} alt="Cast Img" />
-          {/* <NodeName
-            onClick={() => {
-              setShow(!show);
-            }}
-          >
-            {data.name}
-          </NodeName> */}
         </div>
-        <Handle
-          className="customHandle"
-          position={Position.Left}
-          type="target"
-          isConnectableStart={false}
-          style={read ? null : { top: "50%", transform: "translateY(-50%)" }}
-        />
+        {(!connection.inProgress || isTarget) && (
+          <Handle
+            className="customHandle"
+            position={Position.Left}
+            type="target"
+            isConnectableStart={false}
+            style={
+              read
+                ? { width: 0, height: 0 }
+                : {
+                    transform: "translateY(-50%)",
+                    backgroundColor: "red",
+                    width: "100%",
+                    left: 0,
+                  }
+            }
+          />
+        )}
       </div>{" "}
       {/* {show && ( */}
       <InfoTab>

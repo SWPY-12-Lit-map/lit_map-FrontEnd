@@ -1,5 +1,5 @@
 import React from "react";
-import { getStraightPath } from "reactflow";
+import { getStraightPath } from "@xyflow/react";
 
 function CustomConnectionLine({
   fromX,
