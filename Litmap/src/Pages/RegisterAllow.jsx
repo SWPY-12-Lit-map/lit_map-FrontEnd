@@ -344,7 +344,7 @@ export default function RegisterAllow() {
       .then((result) => {
         console.log(result);
         alert("승인이 완료되었습니다");
-        setChange(true);
+        getAxios();
       })
       .catch((error) => {
         console.log(error);
@@ -442,7 +442,7 @@ export default function RegisterAllow() {
                 <Status
                   onClick={() => {
                     axios
-                      .get(`https://api.litmap.store/api/work/35`)
+                      .get(`https://api.litmap.store/api/work/${item.workId}`)
                       .then((result) => {
                         console.log(result);
                       })
