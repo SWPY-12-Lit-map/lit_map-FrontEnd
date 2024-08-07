@@ -1,12 +1,47 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronRight,
+  faRotateRight,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useStore } from "../Asset/store";
 import { useNavigate } from "react-router-dom";
 import Calendar from "../Asset/Calender";
 import SimpleCalender from "../Asset/SimpleCalender";
+
+const BigButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 16px;
+
+  img {
+    margin-right: 10px;
+  }
+
+  .text-container {
+    flex-grow: 1;
+    text-align: left;
+  }
+
+  .text-title {
+    font-weight: bold;
+  }
+
+  .text-subtitle {
+    font-size: 12px;
+    color: #888;
+  }
+`;
 
 const Content = styled.div`
   padding: 20px;
@@ -221,6 +256,9 @@ export default function ArtworkManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [member, setMember] = useState([]);
+  const { setCondition, condition } = useStore();
+
+  const navigate = useNavigate();
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
@@ -301,6 +339,22 @@ export default function ArtworkManagement() {
 
   return (
     <Content>
+      <BigButton
+        onClick={() => {
+          setCondition(true);
+          console.log(condition);
+          navigate("/category1");
+        }}
+      >
+        <img src="/registration.png" alt="등록 아이콘" />
+        <div className="text-container">
+          <div className="text-title">릿맵 등록하기</div>
+          <div className="text-subtitle">
+            새 작품의 인물지도를 등록해보세요.
+          </div>
+        </div>
+        <FontAwesomeIcon icon={faChevronRight} size="2x" />
+      </BigButton>
       <Header>가입 승인</Header>
 
       <RefreshSection>
