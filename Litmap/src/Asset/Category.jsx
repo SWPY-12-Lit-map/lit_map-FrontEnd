@@ -39,8 +39,7 @@ const BarsIcon = styled(FontAwesomeIcon)`
   margin-right: 20px;
 `;
 
-function Category({ setMega, mega }) {
-  const [activeCategory, setActiveCategory] = useState("홈");
+function Category({ setMega, mega, activeCategory, setActiveCategory }) {
   return (
     <CategoryMenu>
       <BarsIcon

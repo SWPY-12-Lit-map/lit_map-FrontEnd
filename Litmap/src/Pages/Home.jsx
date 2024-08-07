@@ -5,7 +5,7 @@ import Megamenu from "../Asset/Megamenu";
 import Carousel from "react-bootstrap/Carousel";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import TermsPage from './TermsPage';
+import TermsPage from "./TermsPage";
 
 const Container = styled.div`
   font-size: 20px;
@@ -103,7 +103,7 @@ const FootNav = styled.div`
 const Home = ({ mega, setMega, update, view, state, setState }) => {
   const navigate = useNavigate();
   const [termsOpen, setTermsOpen] = useState(false);
-
+  const [activeCategory, setActiveCategory] = useState("홈");
 
   // 캐러셀 이미지
   const [slides, setSlides] = useState([]);
@@ -125,11 +125,23 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
       });
   }, []);
 
+  const filterPosts = (posts) => {
+    if (activeCategory === "홈") {
+      return posts;
+    }
+    return posts.filter((post) => post.category === activeCategory);
+  };
+
   return (
     <>
       <Container>
         {/* 카테고리 */}
-        <Category setMega={setMega} mega={mega} />
+        <Category
+          setMega={setMega}
+          mega={mega}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
         {/* 배너 캐러셀 */}
         <Banner activeIndex={index} onSelect={handleSelect}>
           {slides.map((img, index) => (
@@ -166,7 +178,7 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
         <div>
           <Posts>
             {!state
-              ? update.map((post, index) => (
+              ? filterPosts(update).map((post, index) => (
                   <Post
                     key={index}
                     onClick={() => {
@@ -182,11 +194,16 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
                       }}
                     />
                     <div>{post.title}</div>
+                    <div>{post.category}</div>
                   </Post>
                 ))
-              : view.map((post, index) => (
-                  <Post key={index}>
-                    {" "}
+              : filterPosts(view).map((post, index) => (
+                  <Post
+                    key={index}
+                    onClick={() => {
+                      navigate(`/work/${post.workId}`);
+                    }}
+                  >
                     <Bookmark>{index + 1}</Bookmark>
                     <img
                       src={post.imageUrl}
@@ -208,7 +225,9 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
             개인정보처리방침
           </Link>
           <span style={{ color: "#9F9F9F" }}>|</span>
-          <Link to="/terms" style={{ color: "#9F9F9F" }}>이용약관</Link>
+          <Link to="/terms" style={{ color: "#9F9F9F" }}>
+            이용약관
+          </Link>
         </FootNav>
         <div style={{ color: "#9F9F9F", marginTop: "20px" }}>
           Copyright 2024. Lit Map(릿맵). All rights reserved.
