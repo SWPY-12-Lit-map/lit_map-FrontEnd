@@ -2,24 +2,39 @@ import styled from "styled-components";
 import Category from "../Asset/Category";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import YouTube from "react-youtube";
-import ModalBtn from "../Asset/Share/ModalBtn";
 import Mindmap from "../Asset/Mindmap/Mindmap";
-import { ReactFlowProvider } from "reactflow";
+import { ReactFlowProvider } from "@xyflow/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReadStore, useStore } from "../Asset/store";
 import { format } from "date-fns";
+import { FadeLoader } from "react-spinners";
+import DownloadImg from "../Asset/Share/DownloadImg";
+import Modal from "react-modal";
+
+const LoadingPage = styled.div`
+  position: fixed;
+  top: 0;
+  opacity: 0.2;
+  width: 100%;
+  height: 100%;
+  background-color: lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Body = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 200px;
 `;
+
 const Workinfo = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
 `;
+
 const Thumbnail = styled.img`
   width: 30%;
 `;
@@ -29,6 +44,7 @@ const Description = styled.div`
   border-left: 1px solid black;
   padding: 0 30px;
 `;
+
 const Title = styled.span`
   font-weight: 600;
   font-size: 30px;
@@ -50,6 +66,7 @@ const State = styled.span`
   left: 10px;
   margin-bottom: 10px;
 `;
+
 const Button = styled.button`
   background-color: white;
   border-radius: 20px;
@@ -57,11 +74,24 @@ const Button = styled.button`
   color: black;
   margin-right: 30px;
 `;
+
 const Info = styled.div`
   & > * {
     margin-bottom: 10px;
   }
 `;
+
+const ModalOpenBtn = styled.button`
+  position: absolute;
+  top: 118%;
+  right: 95px;
+  background-color: white;
+  border-color: #8d2741;
+  color: #8d2741;
+  padding: 5px 10px;
+  border-radius: 5px;
+`;
+
 const List = styled.div``;
 const Author = styled(List)``;
 const Releasedate = styled(List)``;
@@ -87,6 +117,7 @@ const Connection = styled.div`
   height: 60vh;
   border: 1px solid black;
 `;
+
 const Recommend = styled.div`
   margin-top: 50px;
 `;
@@ -110,6 +141,26 @@ const Versions = styled.div`
   display: flex;
 `;
 
+// Modal 스타일
+const CustomModal = styled(Modal)`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 90vh;
+  padding: 0;
+  border: 1px solid black;
+  background-color: white;
+  & > button {
+    position: fixed;
+    top: 0%;
+    right: 0%;
+  }
+`;
+
 export default function Work({
   count,
   characterInfos,
@@ -122,14 +173,17 @@ export default function Work({
 }) {
   const [state, setState] = useState(false);
   const date = new Date();
-  const [workInfo, setWorkInfo] = useState({}); // 백엔드에서 받은거를 저장
+  const [workInfo, setWorkInfo] = useState({});
+  const [loading, setLoading] = useState(true); // Loading state
   const { id } = useParams();
   const { setBackgroundColor } = useStore();
   const { read, setRead } = ReadStore();
   const [relatedWork, setRelatedWork] = useState([]);
   const navigate = useNavigate();
+  const [modalIsOpen, setModalIsOpen] = useState(false); // 모달 열기 상태
 
   const GetWork = async () => {
+    setLoading(true); // Start loading
     await axios
       .get(`https://api.litmap.store/api/work/${id}`)
       .then((result) => {
@@ -141,9 +195,11 @@ export default function Work({
             ? Get.versions.relationship.backgroundColor
             : "white"
         );
+        setLoading(false); // End loading
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false); // End loading
       });
   };
 
@@ -183,12 +239,9 @@ export default function Work({
       relationship: {},
     });
     setBackgroundColor("");
-    setRead(true); // 컴포넌트가 마운트될 때 read를 true로 설정
+    setRead(true);
     GetWork();
-    console.log(workInfo);
-    // 데이터를 가져오는 함수 호출
-    console.log(workInfo.versions?.relationship);
-  }, [read]);
+  }, []);
 
   // 연관작품 가져오기
   useEffect(() => {
@@ -202,6 +255,22 @@ export default function Work({
       });
   }, []);
 
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  if (loading) {
+    return (
+      <LoadingPage>
+        <FadeLoader color="#8d2741" />
+      </LoadingPage>
+    ); // Loading indicator
+  }
+
   return (
     <>
       <Category mega={mega} setMega={setMega} />
@@ -209,36 +278,30 @@ export default function Work({
         <Workinfo>
           <Thumbnail src={workInfo.imageUrl} alt="썸네일 자리"></Thumbnail>
           <Description>
-            <Title>{workInfo.title}</Title>{" "}
-            {/* <State>완결여부 결정도 해야됨</State> */}
+            <Title>{workInfo.title}</Title>
             <SelectBar>
               <Button
-                onClick={() => {
-                  setState(false);
-                  console.log(workInfo.genre.join(", "));
-                }}
+                onClick={() => setState(false)}
                 style={{
-                  backgroundColor: state == false ? "#8d2741" : "white",
-                  border: state == false ? "#8d2741" : "white",
-                  color: state == false ? "white" : "black",
+                  backgroundColor: state === false ? "#8d2741" : "white",
+                  border: state === false ? "#8d2741" : "white",
+                  color: state === false ? "white" : "black",
                 }}
               >
                 기본정보
-              </Button>{" "}
+              </Button>
               <Button
-                onClick={() => {
-                  setState(true);
-                }}
+                onClick={() => setState(true)}
                 style={{
-                  backgroundColor: state == true ? "#8d2741" : "white",
-                  border: state == true ? "#8d2741" : "white",
-                  color: state == true ? "white" : "black",
+                  backgroundColor: state === true ? "#8d2741" : "white",
+                  border: state === true ? "#8d2741" : "white",
+                  color: state === true ? "white" : "black",
                 }}
               >
                 연관영상
               </Button>
             </SelectBar>
-            {state == false ? (
+            {state === false ? (
               <Info>
                 <Author>
                   감독/작가:{" "}
@@ -261,7 +324,7 @@ export default function Work({
         <Versions>
           {workInfo.versionList
             ? workInfo.versionList.map((a, i) => {
-                return <Btn>{a.versionNum}</Btn>;
+                return <Btn key={i}>{a.versionNum}</Btn>;
               })
             : null}
         </Versions>
@@ -277,27 +340,49 @@ export default function Work({
               read={read}
               setRead={setRead}
               relationship={workInfo.versions?.relationship}
-            />{" "}
+            />
           </ReactFlowProvider>
+          <ModalOpenBtn
+            onClick={() => {
+              openModal();
+            }}
+          >
+            크게보기
+          </ModalOpenBtn>
         </Connection>
         <Recommend>
           <h3>함께 볼만한 드라마</h3>
           <Recommends>
-            {relatedWork?.map((data, i) => {
-              return (
-                <div
-                  onClick={() => {
-                    navigate(`/work/${data.workId}`);
-                  }}
-                >
-                  <img src={data.imageUrl} alt="추천 포스터 1" key={i} />
-                  <p>{data.title}</p>
-                </div>
-              );
-            })}
+            {relatedWork?.map((data, i) => (
+              <div key={i} onClick={() => navigate(`/work/${data.workId}`)}>
+                <img src={data.imageUrl} alt="추천 포스터" />
+                <p>{data.title}</p>
+              </div>
+            ))}
           </Recommends>
         </Recommend>
       </Body>
+      {/* 모달 */}
+      <CustomModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        shouldCloseOnOverlayClick={true}
+      >
+        <ReactFlowProvider>
+          <Mindmap
+            count={count}
+            characterInfos={characterInfos}
+            work={work}
+            edgeType={edgeType}
+            lineStyle={lineStyle}
+            workInfo={workInfo}
+            read={read}
+            setRead={setRead}
+            relationship={workInfo.versions?.relationship}
+            modalState={modalIsOpen}
+          />
+        </ReactFlowProvider>
+      </CustomModal>
     </>
   );
 }
