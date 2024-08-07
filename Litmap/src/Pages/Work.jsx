@@ -210,6 +210,7 @@ export default function Work({
       : format(date, "yyyy년 MM월 dd일");
   };
 
+  // ID가 변경될 때마다 작업을 새로 가져옴
   useEffect(() => {
     setWork({
       confirmCheck: false,
@@ -241,7 +242,7 @@ export default function Work({
     setBackgroundColor("");
     setRead(true);
     GetWork();
-  }, []);
+  }, [id]); // ID가 변경될 때마다 실행
 
   // 연관작품 가져오기
   useEffect(() => {
@@ -253,7 +254,7 @@ export default function Work({
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [id]); // ID가 변경될 때마다 실행
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -382,6 +383,16 @@ export default function Work({
             modalState={modalIsOpen}
           />
         </ReactFlowProvider>
+        <button
+          onClick={closeModal}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+          }}
+        >
+          닫기
+        </button>
       </CustomModal>
     </>
   );
