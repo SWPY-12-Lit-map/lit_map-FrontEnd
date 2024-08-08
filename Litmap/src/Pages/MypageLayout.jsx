@@ -245,8 +245,18 @@ const MypageLayout = () => {
         <Box>
           <ProfileSection>
             <img src={profileImage || "/profile.png"} alt="프로필 이미지" />
-            <div className="name">{profile.nickname}님</div>
-            <div className="role">{getRoleLabel(profile.memberRoleStatus)}</div>
+            <div
+              className="name"
+              style={memberRoleStatus === "ADMIN" ? { fontSize: "13px" } : null}
+            >
+              {profile.nickname}님
+            </div>
+            <div
+              className="role"
+              style={memberRoleStatus === "ADMIN" ? { fontSize: "13px" } : null}
+            >
+              {getRoleLabel(profile.memberRoleStatus)}
+            </div>
           </ProfileSection>
           <StatsSection>
             <div className="stat">
@@ -276,19 +286,19 @@ const MypageLayout = () => {
                 </Link>
               </li>
             </ul>
-            {memberRoleStatus !== "ADMIN" && (
-              <>
-                <h3>관리</h3>
-                <ul>
-                  <li>
-                    <Link to="manage-artworks">
-                      <img src="/mypage_list.png" alt="작품 리스트" />
-                      작품 리스트
-                    </Link>
-                  </li>
-                </ul>
-              </>
-            )}
+
+            <>
+              <h3>관리</h3>
+              <ul>
+                <li>
+                  <Link to="manage-artworks">
+                    <img src="/mypage_list.png" alt="작품 리스트" />
+                    작품 리스트
+                  </Link>
+                </li>
+              </ul>
+            </>
+
             {memberRoleStatus === "ADMIN" && (
               <AdminMenu>
                 <h3>관리자용 메뉴</h3>

@@ -11,38 +11,6 @@ import { useNavigate } from "react-router-dom";
 import Calendar from "../Asset/Calender";
 import SimpleCalender from "../Asset/SimpleCalender";
 
-const BigButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-size: 16px;
-
-  img {
-    margin-right: 10px;
-  }
-
-  .text-container {
-    flex-grow: 1;
-    text-align: left;
-  }
-
-  .text-title {
-    font-weight: bold;
-  }
-
-  .text-subtitle {
-    font-size: 12px;
-    color: #888;
-  }
-`;
-
 const Content = styled.div`
   padding: 20px;
   background-color: #fff;
@@ -256,9 +224,6 @@ export default function ArtworkManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [member, setMember] = useState([]);
-  const { setCondition, condition } = useStore();
-
-  const navigate = useNavigate();
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
@@ -303,12 +268,16 @@ export default function ArtworkManagement() {
     pageNumbers.push(i);
   }
 
-  /* 가입 승인 */
+  // 가입 승인
   const AllowAccess = (memberId) => {
     axios
-      .put(`https://api.litmap.store/admin/approve/${memberId}/`, {
-        withCredentials: true,
-      })
+      .put(
+        `https://api.litmap.store/admin/approve/${memberId}/`,
+        {},
+        {
+          withCredentials: true,
+        }
+      )
       .then((result) => {
         console.log(result);
         GetwaitMembers(); // 데이터 갱신
@@ -318,7 +287,7 @@ export default function ArtworkManagement() {
       });
   };
 
-  /* 가입 대기 회원 조회 */
+  // 가입 대기 회원 조회
   const GetwaitMembers = () => {
     axios
       .get("https://api.litmap.store/admin/pending", {
@@ -333,28 +302,32 @@ export default function ArtworkManagement() {
       });
   };
 
+  // 일괄 승인
+  const bulkConfirm = () => {
+    const memberIds = Object.keys(checkedItems).filter(
+      (id) => checkedItems[id]
+    );
+    memberIds.forEach((memberId) => {
+      AllowAccess(memberId);
+    });
+  };
+
+  // 일괄 거절
+  const bulkDeny = () => {
+    const memberIds = Object.keys(checkedItems).filter(
+      (id) => checkedItems[id]
+    );
+    memberIds.forEach((memberId) => {
+      // 거절 api
+    });
+  };
+
   useEffect(() => {
     GetwaitMembers();
   }, []);
 
   return (
     <Content>
-      <BigButton
-        onClick={() => {
-          setCondition(true);
-          console.log(condition);
-          navigate("/category1");
-        }}
-      >
-        <img src="/registration.png" alt="등록 아이콘" />
-        <div className="text-container">
-          <div className="text-title">릿맵 등록하기</div>
-          <div className="text-subtitle">
-            새 작품의 인물지도를 등록해보세요.
-          </div>
-        </div>
-        <FontAwesomeIcon icon={faChevronRight} size="2x" />
-      </BigButton>
       <Header>가입 승인</Header>
 
       <RefreshSection>
@@ -438,6 +411,9 @@ export default function ArtworkManagement() {
                   style={{
                     backgroundColor: "#FFE1DC",
                   }}
+                  onClick={() => {
+                    // 거절 로직
+                  }}
                 >
                   거절
                 </button>
@@ -453,6 +429,7 @@ export default function ArtworkManagement() {
               color: "#007BFF",
               borderColor: "#007BFF",
             }}
+            onClick={bulkConfirm}
           >
             일괄 승인
           </button>
@@ -461,6 +438,7 @@ export default function ArtworkManagement() {
               color: "#8B0024 ",
               borderColor: "#8B0024",
             }}
+            onClick={bulkDeny}
           >
             일괄 거절
           </button>

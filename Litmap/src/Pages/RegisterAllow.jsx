@@ -3,11 +3,11 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-
 import { useNavigate } from "react-router-dom";
-
 import SimpleCalender from "../Asset/SimpleCalender";
 import { format } from "date-fns";
+import Modal from "react-modal";
+import { IoMdClose } from "react-icons/io";
 
 const Content = styled.div`
   padding: 20px;
@@ -257,6 +257,71 @@ const DenyBar = styled.div`
   }
 `;
 
+const customStyles = {
+  content: {
+    width: "30%",
+    height: "300px",
+    borderRadius: "10px",
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    padding: "10px 40px 0 40px",
+  },
+};
+Modal.setAppElement("#root");
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  margin-bottom: 10px;
+  & > h4 {
+    margin: 0;
+  }
+  & > button {
+    background-color: unset;
+    border: none;
+    font-size: 28px;
+  }
+`;
+
+const ModalBody = styled.form`
+  display: flex;
+  flex-direction: column;
+  height: 70%;
+  & > textarea {
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 10px;
+    height: 70%;
+    padding-top: 10px;
+    padding-left: 10px;
+    resize: none;
+    &::placeholder {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+  }
+  & > button {
+    border-color: #8b0024;
+    background-color: unset;
+    border-radius: 10px;
+    color: #8b0024;
+    padding: 10px;
+    margin-top: 20px;
+    &:active,
+    :hover,
+    :focus {
+      border-color: #8b0024;
+    }
+  }
+`;
+
 export default function RegisterAllow() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -269,15 +334,23 @@ export default function RegisterAllow() {
   const itemsPerPage = 5;
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [deny, setDeny] = useState(false);
   const [denyReason, setReason] = useState("");
   const [change, setChange] = useState(false);
   const [filterData, setFilterData] = useState([]);
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
 
   const handleCheckAll = () => {
     const newCheckedItems = {};
     currentItems.forEach((item) => {
-      newCheckedItems[item.id] = !allChecked;
+      newCheckedItems[item.workId] = !allChecked;
     });
     setCheckedItems(newCheckedItems);
     setAllChecked(!allChecked);
@@ -321,6 +394,7 @@ export default function RegisterAllow() {
     pageNumbers.push(i);
   }
 
+  // 작품 가져오기
   const getAxios = () => {
     axios
       .get("https://api.litmap.store/api/board/confirm", {
@@ -336,6 +410,7 @@ export default function RegisterAllow() {
       });
   };
 
+  // 작품 승인
   const confirm = (versionId) => {
     axios
       .put(`https://api.litmap.store/api/version/confirm/${versionId}`, "", {
@@ -349,6 +424,44 @@ export default function RegisterAllow() {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  // 작품 거절
+  const deny = (versionId) => {
+    axios
+      .post("https://api.litmap.store/version/confirm/decline", {
+        versionId: versionId,
+        summary: denyReason,
+      })
+      .then((result) => {
+        console.log(result);
+        alert("완료되었습니다");
+        setChange(!change);
+        closeModal();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // 일괄 승인
+  const bulkConfirm = () => {
+    const versionIds = Object.keys(checkedItems).filter(
+      (id) => checkedItems[id]
+    );
+    versionIds.forEach((versionId) => {
+      confirm(versionId);
+    });
+  };
+
+  // 일괄 거절
+  const bulkDeny = () => {
+    const versionIds = Object.keys(checkedItems).filter(
+      (id) => checkedItems[id]
+    );
+    versionIds.forEach((versionId) => {
+      deny(versionId);
+    });
   };
 
   useEffect(() => {
@@ -407,7 +520,7 @@ export default function RegisterAllow() {
 
         {currentItems.map((item) => (
           <div
-            key={item.id}
+            key={item.workId}
             style={{
               display: "flex",
               width: "100%",
@@ -415,16 +528,15 @@ export default function RegisterAllow() {
             }}
           >
             <div>
-              <CheckboxContainer onClick={() => handleCheckItem(item.id)}>
+              <CheckboxContainer onClick={() => handleCheckItem(item.workId)}>
                 <CheckboxInput
                   type="checkbox"
-                  checked={checkedItems[item.id] || false}
+                  checked={checkedItems[item.workId] || false}
                   readOnly
                 />
                 <CheckboxCustom />
               </CheckboxContainer>
             </div>
-
             <Category id="memberInfo">
               <span>
                 {item?.versionList[0]?.lastUpdateDate &&
@@ -476,50 +588,41 @@ export default function RegisterAllow() {
                     backgroundColor: "#FFE1DC",
                   }}
                   onClick={() => {
-                    setDeny(true);
+                    openModal();
                   }}
                 >
                   거절
                 </button>
-                {deny ? (
-                  <DenyBar>
-                    <button
-                      onClick={() => {
-                        setDeny(false);
-                      }}
-                    >
-                      X
-                    </button>
-                    <div>
-                      <span>반려사유를 입력하세요: </span>{" "}
-                      <input
-                        onChange={(e) => {
-                          setReason(e.target.value);
-                        }}
-                        type="text"
-                      />{" "}
-                      <button
-                        onClick={() => {
-                          axios
-                            .post(
-                              "https://api.litmap.store/api/version/confirm/decline",
-                              { versionId: item.workId, summary: denyReason }
-                            )
-                            .then((result) => {
-                              console.log(result);
-                            })
-                            .catch((error) => {
-                              console.log(error);
-                            });
-                        }}
-                      >
-                        전송
-                      </button>
-                    </div>
-                  </DenyBar>
-                ) : null}
               </span>
             </Category>
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={closeModal}
+              style={customStyles}
+            >
+              <ModalHeader>
+                <h4>탈퇴처리</h4>
+                <button onClick={closeModal}>
+                  <IoMdClose />
+                </button>
+              </ModalHeader>
+              <ModalBody>
+                <textarea
+                  placeholder="탈퇴사유를 입력해주세요"
+                  onChange={(e) => {
+                    setReason(e.target.value);
+                    console.log(e.target.value);
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    bulkDeny();
+                  }}
+                >
+                  탈퇴하기
+                </button>
+              </ModalBody>
+            </Modal>
           </div>
         ))}
       </Controls>
@@ -530,6 +633,7 @@ export default function RegisterAllow() {
               color: "#007BFF",
               borderColor: "#007BFF",
             }}
+            onClick={bulkConfirm}
           >
             일괄 승인
           </button>
@@ -538,6 +642,7 @@ export default function RegisterAllow() {
               color: "#8B0024",
               borderColor: "#8B0024",
             }}
+            onClick={openModal}
           >
             일괄 거절
           </button>

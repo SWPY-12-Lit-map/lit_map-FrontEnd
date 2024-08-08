@@ -228,10 +228,8 @@ const ChooseBtn = styled.div`
 `;
 
 export default function MemberManage() {
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [checkedItems, setCheckedItems] = useState({});
-  const [allChecked, setAllChecked] = useState(false);
+  const [checkedItem, setCheckedItem] = useState(null);
   const [refreshTime, setRefreshTime] = useState(new Date().toLocaleString());
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -240,17 +238,9 @@ export default function MemberManage() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-  const handleCheckAll = () => {
-    const newCheckedItems = {};
-    currentItems.forEach((item) => {
-      newCheckedItems[item.id] = !allChecked;
-    });
-    setCheckedItems(newCheckedItems);
-    setAllChecked(!allChecked);
-  };
-
   const handleCheckItem = (id) => {
-    setCheckedItems({ ...checkedItems, [id]: !checkedItems[id] });
+    setCheckedItem(checkedItem === id ? null : id);
+    console.log(id);
   };
 
   const handleRefresh = () => {
@@ -304,10 +294,18 @@ export default function MemberManage() {
       .post(`https://api.litmap.store/admin/approve-withdrawl/${memberId}/`)
       .then((result) => {
         console.log(result);
+        alert("탈퇴처리완료!");
+        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const handleDenyAccess = () => {
+    if (checkedItem) {
+      DenyAccess(checkedItem);
+    }
   };
 
   return (
@@ -347,16 +345,12 @@ export default function MemberManage() {
 
       <Controls>
         <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-          <CheckboxContainer onClick={handleCheckAll}>
-            <CheckboxInput type="checkbox" checked={allChecked} readOnly />
-            <CheckboxCustom />
-          </CheckboxContainer>
           <Category>
-            <div>회원 구분 </div>
-            <div>아이디</div>
+            <div>릿맵 아이디</div>
             <div>이름</div>
-            <div>회사명</div>
-            <div>회원구분</div>
+            <div>닉네임</div>
+            <div>업무용 이메일</div>
+            <div>작품보러가기</div>
           </Category>
         </div>
 
@@ -373,7 +367,7 @@ export default function MemberManage() {
               <CheckboxContainer onClick={() => handleCheckItem(item.id)}>
                 <CheckboxInput
                   type="checkbox"
-                  checked={checkedItems[item.id] || false}
+                  checked={checkedItem === item.id}
                   readOnly
                 />
                 <CheckboxCustom />
@@ -384,8 +378,8 @@ export default function MemberManage() {
               {/* <span>{item.memberRoleStatus}</span> */}
               <span>{item.litmapEmail}</span>
               <span>{item.name}</span>
-              <span>{item.area}</span>
-              <span>회사이름</span>
+              <span>{item.nickname}</span>
+              <span>{item.workEmail}</span>
               <span
                 style={{
                   display: "flex",
@@ -393,22 +387,23 @@ export default function MemberManage() {
                   justifyContent: "center",
                 }}
               >
-                직함
+                <button
+                  onClick={() => {
+                    item.urlLink == null
+                      ? alert("링크가 존재하지 않습니다")
+                      : (location.href = item.urlLink);
+                  }}
+                >
+                  작품보러가기
+                </button>
               </span>
             </Category>
           </div>
         ))}
       </Controls>
       <Foot>
-        {" "}
         <ChooseBtn>
-          <button
-            onClick={() => {
-              DenyAccess("회원id");
-            }}
-          >
-            탈퇴처리
-          </button>
+          <button onClick={handleDenyAccess}>탈퇴처리</button>
         </ChooseBtn>
         <Pagination>
           <span
