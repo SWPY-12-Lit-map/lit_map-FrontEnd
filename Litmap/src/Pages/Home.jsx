@@ -194,7 +194,6 @@ const Home = ({ mega, setMega, update, view, state, setState }) => {
                       }}
                     />
                     <div>{post.title}</div>
-                    <div>{post.category}</div>
                   </Post>
                 ))
               : filterPosts(view).map((post, index) => (

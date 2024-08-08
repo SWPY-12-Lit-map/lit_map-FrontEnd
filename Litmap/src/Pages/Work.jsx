@@ -383,16 +383,18 @@ export default function Work({
             modalState={modalIsOpen}
           />
         </ReactFlowProvider>
-        <button
+        <Button
           onClick={closeModal}
           style={{
+            width: "80px",
+            padding: "10px",
             position: "absolute",
             top: "10px",
-            right: "10px",
+            left: "10px",
           }}
         >
           닫기
-        </button>
+        </Button>
       </CustomModal>
     </>
   );

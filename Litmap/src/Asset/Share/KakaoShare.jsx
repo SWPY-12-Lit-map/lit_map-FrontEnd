@@ -23,7 +23,7 @@ export default function KakaoShare() {
 
   useEffect(() => {
     Kakao.cleanup();
-    Kakao.init(import.meta.env.VITE_KAKAO_KEY);
+    Kakao.init("8fc283d3e9d008abbc54a3ec1c5087ed");
     Kakao.isInitialized();
   }, []);
 
